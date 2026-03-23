@@ -1,0 +1,399 @@
+@prefix ns1: <http://esempio.org/ontologia#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://esempio.org/nodo/Message_1> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "Hey Frank, how is it going?" ;
+    ns1:received_at "2026-03-20T15:50:33.728000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Frank> .
+
+rdf:HTML a rdfs:Datatype .
+
+rdf:PlainLiteral a rdfs:Datatype .
+
+rdf:XMLLiteral a rdfs:Datatype .
+
+rdf:langString a rdfs:Datatype .
+
+rdfs:Literal a rdfs:Datatype .
+
+rdfs:comment a owl:AnnotationProperty .
+
+rdfs:isDefinedBy a owl:AnnotationProperty .
+
+rdfs:label a owl:AnnotationProperty .
+
+rdfs:seeAlso a owl:AnnotationProperty .
+
+xsd:NCName a rdfs:Datatype .
+
+xsd:NMTOKEN a rdfs:Datatype .
+
+xsd:Name a rdfs:Datatype .
+
+xsd:anyURI a rdfs:Datatype .
+
+xsd:base64Binary a rdfs:Datatype .
+
+xsd:boolean a rdfs:Datatype .
+
+xsd:byte a rdfs:Datatype .
+
+xsd:date a rdfs:Datatype .
+
+xsd:dateTime a rdfs:Datatype .
+
+xsd:dateTimeStamp a rdfs:Datatype .
+
+xsd:decimal a rdfs:Datatype .
+
+xsd:double a rdfs:Datatype .
+
+xsd:float a rdfs:Datatype .
+
+xsd:hexBinary a rdfs:Datatype .
+
+xsd:int a rdfs:Datatype .
+
+xsd:integer a rdfs:Datatype .
+
+xsd:language a rdfs:Datatype .
+
+xsd:long a rdfs:Datatype .
+
+xsd:negativeInteger a rdfs:Datatype .
+
+xsd:nonNegativeInteger a rdfs:Datatype .
+
+xsd:nonPositiveInteger a rdfs:Datatype .
+
+xsd:normalizedString a rdfs:Datatype .
+
+xsd:positiveInteger a rdfs:Datatype .
+
+xsd:short a rdfs:Datatype .
+
+xsd:string a rdfs:Datatype .
+
+xsd:time a rdfs:Datatype .
+
+xsd:token a rdfs:Datatype .
+
+xsd:unsignedByte a rdfs:Datatype .
+
+xsd:unsignedInt a rdfs:Datatype .
+
+xsd:unsignedLong a rdfs:Datatype .
+
+xsd:unsignedShort a rdfs:Datatype .
+
+owl:backwardCompatibleWith a owl:AnnotationProperty .
+
+owl:deprecated a owl:AnnotationProperty .
+
+owl:incompatibleWith a owl:AnnotationProperty .
+
+owl:priorVersion a owl:AnnotationProperty .
+
+owl:versionInfo a owl:AnnotationProperty .
+
+ns1:mentions a rdfs:Resource .
+
+owl:SymmetricProperty a rdfs:Resource .
+
+<http://esempio.org/nodo/Englishliteraturebooks> a ns1:Person,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:is_called "Englishliteraturebooks" ;
+    ns1:knows <http://esempio.org/nodo/Bob> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_3> .
+
+<http://esempio.org/nodo/Message_10> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "I think she's been invited by some friends, but I'll have to ask her first. Mattia's always saying we should just stay home and have a quiet night in, but that's not really what I'm in the mood for." ;
+    ns1:mentions <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Mattia> ;
+    ns1:received_at "2026-03-20T15:50:50.912000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Bob> ;
+    ns1:sended_at "2026-03-20T15:50:50.912000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Frank> .
+
+<http://esempio.org/nodo/Message_11> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "Yeah, I'm sure you'll have a great time with Liam's help. Do you think Alice's going to wear that new dress she's been wanting to try out?" ;
+    ns1:mentions <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Liam> ;
+    ns1:sended_at "2026-03-20T15:50:52.565000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Bob> .
+
+<http://esempio.org/nodo/Message_3> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "I'm doing great, just keeping up with my English literature books. I'm sure you'll do well on your exam." ;
+    ns1:mentions <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Englishliteraturebooks> ;
+    ns1:received_at "2026-03-20T15:50:39.612000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Frank> ;
+    ns1:sended_at "2026-03-20T15:50:39.612000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Bob> .
+
+<http://esempio.org/nodo/Message_7> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "It's always a bit of a struggle, but it's worth it in the end. Do you think Liam will really help you with your math problems?" ;
+    ns1:mentions <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Liam> ;
+    ns1:received_at "2026-03-20T15:50:45.898000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Frank> ;
+    ns1:sended_at "2026-03-20T15:50:45.897000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Bob> .
+
+<http://esempio.org/nodo/Message_8> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "Liam's always willing to lend a hand, I'm sure he'll do well on the exam. I just hope he doesn't make me do all the work, that would be a disaster." ;
+    ns1:mentions <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Liam> ;
+    ns1:received_at "2026-03-20T15:50:47.479000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Bob> ;
+    ns1:sended_at "2026-03-20T15:50:47.479000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Frank> .
+
+<http://esempio.org/nodo/you> a ns1:Person,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:is_called "you" ;
+    ns1:knows <http://esempio.org/nodo/Frank> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_2> .
+
+ns1:hasText a rdf:Property ;
+    rdfs:subPropertyOf ns1:hasText ;
+    owl:equivalentProperty ns1:hasText .
+
+ns1:is_called a rdf:Property,
+        rdfs:Resource ;
+    rdfs:domain ns1:Person,
+        owl:Thing ;
+    rdfs:subPropertyOf ns1:is_called ;
+    owl:equivalentProperty ns1:is_called .
+
+ns1:knows a rdf:Property,
+        rdfs:Resource,
+        owl:SymmetricProperty ;
+    rdfs:domain ns1:Person,
+        owl:Thing ;
+    rdfs:range ns1:Person,
+        owl:Thing ;
+    rdfs:subPropertyOf ns1:knows ;
+    owl:equivalentProperty ns1:knows .
+
+ns1:mentioned_in a rdf:Property,
+        rdfs:Resource ;
+    rdfs:subPropertyOf ns1:mentioned_in ;
+    owl:equivalentProperty ns1:mentioned_in ;
+    owl:inverseOf ns1:mentions .
+
+ns1:received_at a rdf:Property,
+        rdfs:Resource ;
+    rdfs:range ns1:Person,
+        owl:Thing ;
+    rdfs:subPropertyOf ns1:received_at ;
+    owl:equivalentProperty ns1:received_at .
+
+ns1:received_by a rdf:Property,
+        rdfs:Resource ;
+    rdfs:domain ns1:Message ;
+    rdfs:range ns1:Person,
+        ns1:User,
+        owl:Thing ;
+    rdfs:subPropertyOf ns1:received_by ;
+    owl:equivalentProperty ns1:received_by .
+
+ns1:sended_at a rdf:Property ;
+    rdfs:subPropertyOf ns1:sended_at ;
+    owl:equivalentProperty ns1:sended_at .
+
+ns1:sended_by a rdf:Property,
+        rdfs:Resource ;
+    rdfs:domain ns1:Message ;
+    rdfs:range ns1:Person,
+        ns1:User,
+        owl:Thing ;
+    rdfs:subPropertyOf ns1:sended_by ;
+    owl:equivalentProperty ns1:sended_by .
+
+rdf:type a rdf:Property ;
+    rdfs:subPropertyOf rdf:type ;
+    owl:equivalentProperty rdf:type .
+
+rdfs:domain a rdf:Property ;
+    rdfs:subPropertyOf rdfs:domain ;
+    owl:equivalentProperty rdfs:domain .
+
+rdfs:range a rdf:Property ;
+    rdfs:subPropertyOf rdfs:range ;
+    owl:equivalentProperty rdfs:range .
+
+rdfs:subClassOf a rdf:Property ;
+    rdfs:subPropertyOf rdfs:subClassOf ;
+    owl:equivalentProperty rdfs:subClassOf .
+
+rdfs:subPropertyOf a rdf:Property ;
+    rdfs:subPropertyOf rdfs:subPropertyOf ;
+    owl:equivalentProperty rdfs:subPropertyOf .
+
+owl:Nothing a owl:Class ;
+    rdfs:subClassOf ns1:Person,
+        owl:Nothing,
+        owl:Thing ;
+    owl:equivalentClass owl:Nothing .
+
+owl:inverseOf a rdf:Property ;
+    rdfs:subPropertyOf owl:inverseOf ;
+    owl:equivalentProperty owl:inverseOf .
+
+<http://esempio.org/nodo/Message_5> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "Yeah, I'm sure you'll do just fine. Mattia's always making jokes, probably just to annoy me. Do you think you'll be able to meet up with Alice tonight?" ;
+    ns1:mentions <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Mattia> ;
+    ns1:received_at "2026-03-20T15:50:42.889000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Frank> ;
+    ns1:sended_at "2026-03-20T15:50:42.888000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Bob> .
+
+<http://esempio.org/nodo/Message_6> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "I'm sure Alice will be there, she's always up for a good time. I just hope Mattia doesn't try to make a fool of me, I don't want to look silly. What's it like, studying for your exam?" ;
+    ns1:mentions <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Mattia> ;
+    ns1:received_at "2026-03-20T15:50:44.576000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Bob> ;
+    ns1:sended_at "2026-03-20T15:50:44.576000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Frank> .
+
+<http://esempio.org/nodo/Message_9> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "I think Liam's just trying to help, he's always looking out for you. Do you think Alice's going to be at the pub tonight, we could all go together?" ;
+    ns1:mentions <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Liam> ;
+    ns1:received_at "2026-03-20T15:50:48.997000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Frank> ;
+    ns1:sended_at "2026-03-20T15:50:48.997000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Bob> .
+
+owl:Class a rdfs:Resource .
+
+<http://esempio.org/nodo/Message_2> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "It's going well, just studying for my next exam. Liam's been good, always helping me with my math problems. Alice's been busy, but she promised to meet up with me tonight. What about you?" ;
+    ns1:mentions <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Liam>,
+        <http://esempio.org/nodo/you> ;
+    ns1:received_at "2026-03-20T15:50:38.660000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Bob> ;
+    ns1:sended_at "2026-03-20T15:50:38.659000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Frank> .
+
+<http://esempio.org/nodo/Message_4> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "My exam is coming up quickly, I'm planning to review my notes until the last minute. Liam's been saying I'm not studying hard enough, but Alice thinks I've got it covered. Mattia's been teasing me about being a procrastinator, but I think he just likes the drama." ;
+    ns1:mentions <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Liam>,
+        <http://esempio.org/nodo/Mattia> ;
+    ns1:received_at "2026-03-20T15:50:41.495000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Bob> ;
+    ns1:sended_at "2026-03-20T15:50:41.495000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Frank> .
+
+ns1:User a rdfs:Resource ;
+    rdfs:subClassOf ns1:Person,
+        owl:Thing .
+
+<http://esempio.org/nodo/Mattia> a ns1:Person,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:is_called "Mattia" ;
+    ns1:knows <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Liam> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_10>,
+        <http://esempio.org/nodo/Message_4>,
+        <http://esempio.org/nodo/Message_5>,
+        <http://esempio.org/nodo/Message_6> .
+
+<http://esempio.org/nodo/Alice> a ns1:Person,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:is_called "Alice" ;
+    ns1:knows <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Liam>,
+        <http://esempio.org/nodo/Mattia> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_2>,
+        <http://esempio.org/nodo/Message_4>,
+        <http://esempio.org/nodo/Message_5>,
+        <http://esempio.org/nodo/Message_6>,
+        <http://esempio.org/nodo/Message_9> .
+
+<http://esempio.org/nodo/Liam> a ns1:Person,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:is_called "Liam" ;
+    ns1:knows <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Mattia> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_11>,
+        <http://esempio.org/nodo/Message_2>,
+        <http://esempio.org/nodo/Message_4>,
+        <http://esempio.org/nodo/Message_7>,
+        <http://esempio.org/nodo/Message_8>,
+        <http://esempio.org/nodo/Message_9> .
+
+ns1:Message a rdfs:Resource .
+
+ns1:Person a rdfs:Resource,
+        owl:Class ;
+    rdfs:subClassOf ns1:Person,
+        owl:Thing ;
+    owl:equivalentClass ns1:Person .
+
+owl:Thing a owl:Class ;
+    rdfs:subClassOf owl:Thing ;
+    owl:equivalentClass owl:Thing .
+
+<http://esempio.org/nodo/Bob> a ns1:Person,
+        ns1:User,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:knows <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Englishliteraturebooks>,
+        <http://esempio.org/nodo/Liam>,
+        <http://esempio.org/nodo/Mattia> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_11>,
+        <http://esempio.org/nodo/Message_3>,
+        <http://esempio.org/nodo/Message_5>,
+        <http://esempio.org/nodo/Message_7>,
+        <http://esempio.org/nodo/Message_9> .
+
+<http://esempio.org/nodo/Frank> a ns1:Person,
+        ns1:User,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:knows <http://esempio.org/nodo/Alice>,
+        <http://esempio.org/nodo/Liam>,
+        <http://esempio.org/nodo/Mattia>,
+        <http://esempio.org/nodo/you> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_10>,
+        <http://esempio.org/nodo/Message_2>,
+        <http://esempio.org/nodo/Message_4>,
+        <http://esempio.org/nodo/Message_6>,
+        <http://esempio.org/nodo/Message_8> .
+
