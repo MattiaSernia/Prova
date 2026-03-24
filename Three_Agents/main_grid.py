@@ -25,7 +25,7 @@ def generate_HR()->Agent:
         ),
         description="Manages employee availability, roles, departments, and absences for BuildCraft S.r.l. in April 2025.",
         data=get_context("context1.json"),
-        model='phi3.5:latest'
+        model='command-r'
     )
     return HR
 
@@ -39,7 +39,7 @@ def generate_Logistic()->Agent:
         ),
         description="Manages the construction of each room in an house. It contains the time needed to finish a room and the number of worker needed for each type",
         data=get_context("context1.json"),
-        model='phi3.5:latest'
+        model='command-r'
     )
     return Logistic
     
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     HR=generate_HR()
     Logistic=generate_Logistic()
     agent_list=[HR,Logistic]
-    Orchestrator=Orchestrator_Agent([HR],'phi3.5:latest')
+    Orchestrator=Orchestrator_Agent(agent_list,'command-r')
     plan=Orchestrator.plan("I need to build a bathroom. The construction will stat on the 15th of April",0)
     for key in plan.keys():
         for agent in agent_list:
