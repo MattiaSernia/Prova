@@ -28,23 +28,38 @@ def generate_HR()->Agent:
         model='phi3.5:latest'
     )
     return HR
+
+def generate_Logistic()->Agent:
+    Logistic=Agent(
+        name="BuildCraft Logistic Agent",
+        context=(
+            "You are the logistics planner for BuildCraft S.r.l. "
+            "You know every phase of a standard house construction: which workers are needed, "
+            "how many, how long each phase takes, and which phases depend on others."
+        ),
+        description="Manages the construction of each room in an house. It contains the time needed to finish a room and the number of worker needed for each type",
+        data=get_context("context1.json"),
+        model='phi3.5:latest'
+    )
+    return Logistic
     
 if __name__ == "__main__":
 
     HR=generate_HR()
-    agent_list=[HR]
+    Logistic=generate_Logistic()
+    agent_list=[HR,Logistic]
     Orchestrator=Orchestrator_Agent([HR],'phi3.5:latest')
-    plan=Orchestrator.plan("I need to build a bathroom on the 15th of April",0)
+    plan=Orchestrator.plan("I need to build a bathroom. The construction will stat on the 15th of April",0)
     for key in plan.keys():
         for agent in agent_list:
             if agent.name==key:
                 risposta=agent.answer(plan[key])
-                coherency=agent.coherency_check(risposta)
-                attempts=1
-                while coherency==False and attempts<=4:
-                    print(coherency)
-                    risposta=agent.answer(plan[key])
-                    coherency=agent.coherency_check(risposta)
-                    attempts+=1
+                #coherency=agent.coherency_check(risposta)
+                #attempts=1
+                #while coherency==False and attempts<=4:
+                #    print(coherency)
+                #    risposta=agent.answer(plan[key])
+                #    coherency=agent.coherency_check(risposta)
+                #    attempts+=1
 #    answer=HR.answer("Who is fully available for the entire month?")
 #    verification=HR.answer("Are this data correct: "+ answer + "\n Answer ONLY TRUE or FAlSE, do not add any additional info.\n ANSWER:")
