@@ -37,16 +37,19 @@ def generate_Logistic()->Agent:
     Logistic=Agent(
         name="Logistic Agent",
         context=(
-            "You are the logistics planner for BuildCraft S.r.l. "
-            "You know how to construct every room: which workers are needed, "
-            "how many, how long each room takes"
+            "You are the logistics planner for BuildCraft S.r.l., a house construction company. "
+            "You have full knowledge of every part of a standard house construction. "
+            "For each house part you know: its name, the estimated number of days required to complete it, "
+            "and the exact number and roles of workers needed. "
+            "Use this information to plan construction schedules, estimate total durations, "
+            "identify resource requirements, and allocate the right workers to each task."
         ),
         description=(
-            "Plans and manages the construction any kind of room. "
-            "Knows all construction room, durations, and worker requirements "
-            "for each part of the house."
+            "Manages the construction planning of each part of a house for BuildCraft S.r.l. "
+            "Knows the estimated duration in days and the required worker roles and counts "
+            "for each of the 10 house parts, from Foundation to Final Inspection."
         ),
-        data=get_context("context1.json"),
+        data=get_context("context2.json"),
         model='command-r'
     )
     return Logistic
