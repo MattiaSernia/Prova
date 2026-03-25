@@ -78,7 +78,7 @@ class Orchestrator_Agent:
                             *self.memory
                         ])
             textual_answer= response['message']['content']
-            logging.info(f"Agent {self.name} answered: {textual_answer}")
+            logging.info(f"Orhcestrator answered: {textual_answer}")
             cleaned=textual_answer.lower().replace(".","").strip()
             if cleaned== "false":
                 logging.info(cleaned)
