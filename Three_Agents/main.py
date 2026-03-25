@@ -71,5 +71,5 @@ if __name__ == "__main__":
                     risposta=agent.answer(plan[key])
                     coherency=agent.coherency_check(risposta)
                     attempts+=1
-            correct= Orchestrator.correct_answer(key, plan[key])
+            correct= Orchestrator.correct_answer(key,risposta, plan[key])
             print(f"YOYOYOYOOYOYOYOYOYOOYOYOY     {correct}       YOYOYOOYOYOYOYOYOYOYOY")
