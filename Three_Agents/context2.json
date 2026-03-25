@@ -1,15 +1,11 @@
 {
     "company": "BuildCraft S.r.l.",
-    "project": "Standard single-family house",
     "house_parts": [
  
         {
             "id": "HP01",
             "name": "Foundation",
-            "description": "Excavation, formwork, steel reinforcement, and concrete pouring for the foundation slab and footings.",
-            "phase": "Structure",
             "estimated_days": 10,
-            "dependencies": [],
             "workers_required": [
                 {"role": "Site Manager",       "count": 1, "notes": "Oversees excavation and concrete schedule"},
                 {"role": "Structural Engineer","count": 1, "notes": "Validates reinforcement layout and load specs"},
@@ -21,10 +17,7 @@
         {
             "id": "HP02",
             "name": "Load-bearing walls",
-            "description": "Construction of all internal and external load-bearing masonry or reinforced concrete walls.",
-            "phase": "Structure",
             "estimated_days": 12,
-            "dependencies": ["HP01"],
             "workers_required": [
                 {"role": "Site Manager",       "count": 1, "notes": "Coordinates daily wall progress"},
                 {"role": "Structural Engineer","count": 1, "notes": "Checks alignment, plumb, and load transfer"},
@@ -36,10 +29,7 @@
         {
             "id": "HP03",
             "name": "Roof structure",
-            "description": "Installation of roof trusses, ridge beam, purlins, and weatherproof membrane.",
-            "phase": "Structure",
             "estimated_days": 8,
-            "dependencies": ["HP02"],
             "workers_required": [
                 {"role": "Site Manager",       "count": 1, "notes": "Crane and delivery scheduling"},
                 {"role": "Structural Engineer","count": 1, "notes": "Truss connection and load path sign-off"},
@@ -51,10 +41,7 @@
         {
             "id": "HP04",
             "name": "External facade",
-            "description": "Thermal insulation boards, render coat, window/door frame installation, and final finishing.",
-            "phase": "Envelope",
             "estimated_days": 14,
-            "dependencies": ["HP02", "HP03"],
             "workers_required": [
                 {"role": "Architect",          "count": 1, "notes": "Approves finish materials and colour palette"},
                 {"role": "BIM Specialist",     "count": 1, "notes": "Updates as-built facade model"},
@@ -66,10 +53,7 @@
         {
             "id": "HP05",
             "name": "Electrical system",
-            "description": "Main panel, conduit routing, wiring, outlets, switches, lighting points, and earthing.",
-            "phase": "Systems",
             "estimated_days": 10,
-            "dependencies": ["HP02"],
             "workers_required": [
                 {"role": "Electrician",        "count": 1, "notes": "Full installation and testing"},
                 {"role": "Site Manager",       "count": 1, "notes": "Coordinates wall-chase work with masons"},
@@ -80,10 +64,7 @@
         {
             "id": "HP06",
             "name": "Plumbing and drainage",
-            "description": "Supply pipes (hot/cold), waste stacks, soil pipes, bathroom rough-in, and external drain connections.",
-            "phase": "Systems",
             "estimated_days": 10,
-            "dependencies": ["HP02"],
             "workers_required": [
                 {"role": "Plumber",            "count": 1, "notes": "Full supply and drainage installation"},
                 {"role": "Site Manager",       "count": 1, "notes": "Coordinates floor-penetration sequencing"},
@@ -94,10 +75,7 @@
         {
             "id": "HP07",
             "name": "Interior partitions",
-            "description": "Non-load-bearing internal walls (drywall or blockwork), door frames, and acoustic insulation.",
-            "phase": "Interior",
             "estimated_days": 8,
-            "dependencies": ["HP05", "HP06"],
             "workers_required": [
                 {"role": "Architect",          "count": 1, "notes": "Room layout and door schedule approval"},
                 {"role": "Carpenter",          "count": 1, "notes": "Stud framing, drywall fixing, door frames"},
@@ -109,10 +87,7 @@
         {
             "id": "HP08",
             "name": "Flooring",
-            "description": "Screed levelling, tile or hardwood floor installation in all rooms, skirting boards.",
-            "phase": "Interior",
             "estimated_days": 7,
-            "dependencies": ["HP07"],
             "workers_required": [
                 {"role": "Architect",          "count": 1, "notes": "Material selection and layout sign-off"},
                 {"role": "Mason",              "count": 1, "notes": "Screed pouring and tile laying"},
@@ -122,11 +97,8 @@
  
         {
             "id": "HP09",
-            "name": "Bathrooms and kitchen fit-out",
-            "description": "Sanitary ware installation, kitchen units, worktops, tiling, and final plumbing connections.",
-            "phase": "Fit-out",
+            "name": "Bathroom",
             "estimated_days": 8,
-            "dependencies": ["HP06", "HP08"],
             "workers_required": [
                 {"role": "Plumber",            "count": 1, "notes": "Final connections, fixtures, commissioning"},
                 {"role": "Electrician",        "count": 1, "notes": "Appliance connections and safety checks"},
@@ -138,10 +110,7 @@
         {
             "id": "HP10",
             "name": "Final inspection and handover",
-            "description": "Snagging walkthrough, safety certifications, as-built documentation, and client handover.",
-            "phase": "Handover",
             "estimated_days": 3,
-            "dependencies": ["HP04", "HP05", "HP06", "HP07", "HP08", "HP09"],
             "workers_required": [
                 {"role": "Project Manager",    "count": 1, "notes": "Leads handover process and client meeting"},
                 {"role": "Site Manager",       "count": 1, "notes": "Snagging list and outstanding works"},

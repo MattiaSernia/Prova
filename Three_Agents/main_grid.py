@@ -38,12 +38,12 @@ def generate_Logistic()->Agent:
         name="Logistic Agent",
         context=(
             "You are the logistics planner for BuildCraft S.r.l. "
-            "You know every phase of a standard house construction: which workers are needed, "
-            "how many, how long each phase takes, and which phases depend on others."
+            "You know how to construct every room: which workers are needed, "
+            "how many, how long each room takes"
         ),
         description=(
-            "Plans and manages the construction schedule of a single-family house. "
-            "Knows all construction phases, durations, dependencies, and worker requirements "
+            "Plans and manages the construction any kind of room. "
+            "Knows all construction room, durations, and worker requirements "
             "for each part of the house."
         ),
         data=get_context("context1.json"),
