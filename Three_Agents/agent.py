@@ -67,7 +67,7 @@ class Agent:
         text=self.coherency.format(text=text)
         logging.info(f"Agent {self.name} received: {text}")
         for attempt in range(3):
-            response=ollama.chat(model='phi3.5:latest',
+            response=ollama.chat(model=self.model,
                     messages=[
                             {'role': 'system', 'content': self.context},
                             {'role': 'user', 'content': text}
