@@ -11,12 +11,20 @@ class Agent:
         self.model=model
         self.description=description
         self.memory=[]
-        self.coherency=f"""You are a coherency checker, you must check wheter the data provided by the user are consistent with your context.
-                        If no error are found answer TRUE, if even one small error has been found anser FALSE.
-                        You must answer ONLY with TRUE or FALSE, do not add any explanation.
-                        === Data ===
-                        {{text}}
-                        === Answer ==="""
+        self.coherency="""### Role: Coherency Checker
+            Verify if the provided Data is strictly consistent with your Context. 
+
+            **Decision Criteria:**
+            - Return "TRUE" only if the Data contains NO errors, contradictions, or hallucinations relative to the Context.
+            - Return "FALSE" if even a single detail is inconsistent, incorrect, or missing from the Context.
+
+            ### Data to Verify:
+            {{text}}
+
+            ### Constraint:
+            Respond ONLY with "TRUE" or "FALSE". Do not include any explanation or extra text.
+
+            Result:"""
 
     def get_prompt(self)->str:
         return f"""You are a specialized assistent called "{self.name}".
