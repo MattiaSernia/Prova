@@ -9,7 +9,7 @@ class Orchestrator_Agent:
         self.agents=agents
         self.model=model
         self.memory=[]
-        self._answered_questions={}
+        self._asked_questions={}
 
     def _agent_registry(self) -> str:
         """Builds a description of all available agents for the LLM."""
@@ -58,15 +58,16 @@ class Orchestrator_Agent:
             logging.info(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n Attempt nr: {attempt}")
             if attempt<=4:
                 attempt+=1
-                self.asked_question  = self.plan(task, attempt)
+                self._asked_question  = self.plan(task, attempt)
+                logging.info(f"Orchestrator plan: {self._asked_question}")
+                self.memory.append(raw)
+                return self._asked_question
             else:
-                self.asked_question ={}
-        logging.info(f"Orchestrator plan: {self.asked_question }")
-        self.memory.append(raw)
-        return self.asked_question
+                self._asked_question ={}
+
 
     def correct_answer(self, name, answer):
-        text = f"""Does this answer: {answer} satisfy this question {self._answered_questions[name]} you've previously asked to this agent {name}?
+        text = f"""Does this answer: {answer} satisfy this question {self._asked_questions[name]} you've previously asked to this agent {name}?
         If if it does answer True, else answer False.
         You must answer ONLY with TRUE or FALSE, do not add any explanation.
         === Answer ==="""
