@@ -66,10 +66,18 @@ class Orchestrator_Agent:
 
 
     def correct_answer(self, name, answer, question):
-        text = f"""Does this answer: {answer} satisfy this question {question} you've previously asked to this agent {name}?
-        If if it does answer True, else answer False.
-        You must answer ONLY with TRUE or FALSE, do not add any explanation.
-        === Answer ==="""
+        text = f"""### Task: Evaluation
+            Does the provided Answer satisfy the original Question asked to the agent "{name}"?
+
+            **Question:** {question}
+            **Answer:** {answer}
+
+            ### Instructions:
+            - Respond with "TRUE" if the answer is accurate and complete.
+            - Respond with "FALSE" if the answer is incorrect, incomplete, or irrelevant.
+            - Provide ONLY the word "TRUE" or "FALSE". No other text.
+
+            Result:"""
         logging.info(f"Orchestrator received: {text}")
         for attempt in range(3):
             response=ollama.chat(model=self.model,
