@@ -23,7 +23,11 @@ def generate_HR()->Agent:
             "You are the HR assistant for BuildCraft S.r.l., a house construction company. "
             "You manage employee availability, roles, and scheduling for April 2025."
         ),
-        description="Manages employee availability, roles, departments, and absences for BuildCraft S.r.l. in April 2025.",
+        description=(
+            "Manages employee availability, roles, departments, and absences for BuildCraft S.r.l. in April 2025. "
+            "Can answer questions about staffing coverage, availability by date, and absence reasons "
+            "for a team of 10 employees across Construction, Engineering, Design, Systems, and Operations."
+            ),
         data=get_context("context1.json"),
         model='command-r'
     )
@@ -37,7 +41,11 @@ def generate_Logistic()->Agent:
             "You know every phase of a standard house construction: which workers are needed, "
             "how many, how long each phase takes, and which phases depend on others."
         ),
-        description="Manages the construction of each room in an house. It contains the time needed to finish a room and the number of worker needed for each type",
+        description=(
+            "Plans and manages the construction schedule of a single-family house. "
+            "Knows all construction phases, durations, dependencies, and worker requirements "
+            "for each part of the house."
+        ),
         data=get_context("context1.json"),
         model='command-r'
     )
@@ -49,11 +57,12 @@ if __name__ == "__main__":
     Logistic=generate_Logistic()
     agent_list=[HR,Logistic]
     Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-    plan=Orchestrator.plan("I need to build a bathroom. The construction will stat on the 15th of April",0)
+    plan=Orchestrator.plan("I need to build a bathroom. The construction will start on the 15th of April",0)
     for key in plan.keys():
         for agent in agent_list:
             if agent.name==key:
                 risposta=agent.answer(plan[key])
+                print(risposta)
                 #coherency=agent.coherency_check(risposta)
                 #attempts=1
                 #while coherency==False and attempts<=4:

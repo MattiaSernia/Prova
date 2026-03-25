@@ -37,7 +37,11 @@ def generate_Logistic()->Agent:
             "You know every phase of a standard house construction: which workers are needed, "
             "how many, how long each phase takes, and which phases depend on others."
         ),
-        description="Manages the construction of each room in an house. It contains the time needed to finish a room and the number of worker needed for each type",
+        description=(
+            "Plans and manages the construction schedule of a single-family house. "
+            "Knows all construction phases, durations, dependencies, and worker requirements "
+            "for each part of the house."
+        ),
         data=get_context("context1.json"),
         model='phi3.5:latest'
     )
