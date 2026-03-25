@@ -57,7 +57,7 @@ if __name__ == "__main__":
     Logistic=generate_Logistic()
     agent_list=[HR,Logistic]
     Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-    plan=Orchestrator.plan("I just need to build a bathroom in one house. The work will begin on the 15th of April 2025, who is available and which roles do I need?",0)
+    plan=Orchestrator.plan("I just need to build a bathroom in one house. The work will begin on the 15th of April 2025 and end in the 29th of April, who is available and which roles do I need?",0)
     for key in plan.keys():
         for agent in agent_list:
             if agent.name==key:
