@@ -8,6 +8,8 @@ class Orchestrator_Agent:
     def __init__(self, agents:list[Agent], model:str):
         self.agents=agents
         self.model=model
+        self.memory=[]
+        self._answered_questions{}
 
     def _agent_registry(self) -> str:
         """Builds a description of all available agents for the LLM."""
@@ -32,7 +34,8 @@ class Orchestrator_Agent:
         "HR Agent": "Which employees are available next week?",
         "PC Prices Agent": "What is the price of the RTX 4070?"
         }}"""
-        
+        self.memory.append(system)
+        self.memory.append(f"Task: {task}")
         response = ollama.chat(
             model=self.model,
             messages=[
@@ -42,7 +45,6 @@ class Orchestrator_Agent:
         )
 
         raw = response.message.content.strip()
-        # Strip markdown fences if the model wraps in ```json ... ```
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -50,14 +52,39 @@ class Orchestrator_Agent:
             raw = raw.strip()
 
         try:
-            plan = json.loads(raw)
+            self.asked_question = json.loads(raw)
         except json.JSONDecodeError:
             print(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n")
             logging.info(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n Attempt nr: {attempt}")
             if attempt<=4:
                 attempt+=1
-                plan = self.plan(task, attempt)
+                self.asked_question  = self.plan(task, attempt)
             else:
-                plan={}
-        logging.info(f"Orchestrator plan: {plan}")
-        return plan
+                self.asked_question ={}
+        logging.info(f"Orchestrator plan: {self.asked_question }")
+        self.memory.append(raw)
+        return self.asked_question
+
+    def correct_answer(self, name, answer):
+        text = f"""Does this answer: {answer} satisfy this question {self._answered_questions[name]} you've previously asked to this agent {name}?
+        If if it does answer True, else answer False.
+        You must answer ONLY with TRUE or FALSE, do not add any explanation.
+        === Answer ==="""
+        logging.info(f"Orchestrator received: {text}")
+        for attempt in range(3):
+            response=ollama.chat(model=self.model,
+                    messages=[
+                            {'role': 'user', 'content': text},
+                            *self.memory
+                        ])
+            textual_answer= response['message']['content']
+            logging.info(f"Agent {self.name} answered: {textual_answer}")
+            cleaned=textual_answer.lower().replace(".","").strip()
+            if cleaned== "false":
+                logging.info(cleaned)
+                return False
+            elif cleaned== "true":
+                logging.info(cleaned)
+                return True
+        return False
+

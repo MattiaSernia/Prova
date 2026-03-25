@@ -45,24 +45,10 @@ class Agent:
         self.memory.append({"role": "assistant", "content": textual_answer})
         logging.info(f"System answered: {textual_answer}")
         return(textual_answer)
-    
 
 
 
 
-
-#     def answer(self, message):
-#        logging.info(f"Agent {self.name} received: {message}")
-#        response=ollama.chat(model='phi3.5:latest',
-#                messages=[
-#                        {'role': 'system', 'content': self.context},
-#                        {'role': 'user', 'content': message}
-#                    ])
-#        textual_answer= response['message']['content']
-#        logging.info(f"Agent {self.name} answered: {textual_answer}")
-#        return textual_answer
-#        
-#    
     def coherency_check(self, text)->bool:
         text=self.coherency.format(text=text)
         logging.info(f"Agent {self.name} received: {text}")
@@ -80,5 +66,4 @@ class Agent:
                   return False
             elif cleaned== "true":
                   return True
-        print(cleaned)
         return False
