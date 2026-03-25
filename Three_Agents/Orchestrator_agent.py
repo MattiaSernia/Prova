@@ -59,11 +59,11 @@ class Orchestrator_Agent:
             if attempt<=4:
                 attempt+=1
                 self._asked_question  = self.plan(task, attempt)
-                logging.info(f"Orchestrator plan: {self._asked_question}")
-                self.memory.append(raw)
-                return self._asked_question
             else:
                 self._asked_question ={}
+        logging.info(f"Orchestrator plan: {self._asked_question}")
+        self.memory.append(raw)
+        return self._asked_question
 
 
     def correct_answer(self, name, answer):
