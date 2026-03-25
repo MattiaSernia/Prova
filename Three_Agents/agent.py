@@ -11,7 +11,7 @@ class Agent:
         self.model=model
         self.description=description
         self.memory=[]
-        self.coherency="""### Role: Coherency Checker
+        self.coherency=f"""### Role: Coherency Checker
             Verify if the provided Data is strictly consistent with your Context. 
 
             **Decision Criteria:**
