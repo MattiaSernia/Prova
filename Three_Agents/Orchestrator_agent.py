@@ -9,7 +9,7 @@ class Orchestrator_Agent:
         self.agents=agents
         self.model=model
         self.memory=[]
-        self._asked_questions={}
+        self._asked_question={}
 
     def _agent_registry(self) -> str:
         """Builds a description of all available agents for the LLM."""
@@ -67,7 +67,7 @@ class Orchestrator_Agent:
 
 
     def correct_answer(self, name, answer):
-        text = f"""Does this answer: {answer} satisfy this question {self._asked_questions[name]} you've previously asked to this agent {name}?
+        text = f"""Does this answer: {answer} satisfy this question {self._asked_question[name]} you've previously asked to this agent {name}?
         If if it does answer True, else answer False.
         You must answer ONLY with TRUE or FALSE, do not add any explanation.
         === Answer ==="""
