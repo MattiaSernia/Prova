@@ -9,7 +9,7 @@ class Orchestrator_Agent:
         self.agents=agents
         self.model=model
         self.memory=[]
-        self._answered_questions{}
+        self._answered_questions={}
 
     def _agent_registry(self) -> str:
         """Builds a description of all available agents for the LLM."""
