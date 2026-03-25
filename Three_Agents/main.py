@@ -18,7 +18,7 @@ def get_context(text:str)->dict:
 
 def generate_HR()->Agent:
     HR=Agent(
-        name="BuildCraft HR Agent",
+        name="HR Agent",
         context=(
             "You are the HR assistant for BuildCraft S.r.l., a house construction company. "
             "You manage employee availability, roles, and scheduling for April 2025."
@@ -31,7 +31,7 @@ def generate_HR()->Agent:
 
 def generate_Logistic()->Agent:
     Logistic=Agent(
-        name="BuildCraft Logistic Agent",
+        name="Logistic Agent",
         context=(
             "You are the logistics planner for BuildCraft S.r.l. "
             "You know every phase of a standard house construction: which workers are needed, "

@@ -18,7 +18,7 @@ def get_context(text:str)->dict:
 
 def generate_HR()->Agent:
     HR=Agent(
-        name="BuildCraft HR Agent",
+        name="HR Agent",
         context=(
             "You are the HR assistant for BuildCraft S.r.l., a house construction company. "
             "You manage employee availability, roles, and scheduling for April 2025."
@@ -35,7 +35,7 @@ def generate_HR()->Agent:
 
 def generate_Logistic()->Agent:
     Logistic=Agent(
-        name="BuildCraft Logistic Agent",
+        name="Logistic Agent",
         context=(
             "You are the logistics planner for BuildCraft S.r.l. "
             "You know every phase of a standard house construction: which workers are needed, "
@@ -57,7 +57,7 @@ if __name__ == "__main__":
     Logistic=generate_Logistic()
     agent_list=[HR,Logistic]
     Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-    plan=Orchestrator.plan("I need to build a bathroom. The construction will start on the 15th of April",0)
+    plan=Orchestrator.plan("I just need to build a bathroom in one house. The work will begin on the 15th of April 2025, who is available and which roles do I need?",0)
     for key in plan.keys():
         for agent in agent_list:
             if agent.name==key:
