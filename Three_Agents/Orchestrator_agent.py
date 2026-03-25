@@ -8,7 +8,6 @@ class Orchestrator_Agent:
     def __init__(self, agents:list[Agent], model:str):
         self.agents=agents
         self.model=model
-        self.memory=[]
 
     def _agent_registry(self) -> str:
         """Builds a description of all available agents for the LLM."""
@@ -33,8 +32,6 @@ class Orchestrator_Agent:
         "HR Agent": "Which employees are available next week?",
         "PC Prices Agent": "What is the price of the RTX 4070?"
         }}"""
-        self.memory.append({'role':'system', 'content':system})
-        self.memory.append({'role':'user', 'content':f"Task: {task}"})
         response = ollama.chat(
             model=self.model,
             messages=[
@@ -61,7 +58,6 @@ class Orchestrator_Agent:
             else:
                 plan ={}
         logging.info(f"Orchestrator plan: {plan}")
-        self.memory.append({"role": "assistant", "content":raw})
         return plan
 
 
@@ -82,10 +78,8 @@ class Orchestrator_Agent:
         response=ollama.chat(model=self.model,
                 messages=[
                         {'role': 'user', 'content': text},
-                        *self.memory
                     ])
         textual_answer= response['message']['content']
-        logging.info(f"Orhcestrator answered: {textual_answer}")
         cleaned=textual_answer.lower().replace(".","").strip()
         if cleaned== "false":
             logging.info(cleaned)
