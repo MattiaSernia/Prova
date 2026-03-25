@@ -63,7 +63,7 @@ class Agent:
 #        return textual_answer
 #        
 #    
-    def coherency_check(self, text)->bool:
+    def _coherency_check(self, text)->bool:
         text=self.coherency.format(text=text)
         logging.info(f"Agent {self.name} received: {text}")
         for attempt in range(3):

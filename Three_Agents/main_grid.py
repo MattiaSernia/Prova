@@ -65,13 +65,11 @@ if __name__ == "__main__":
         for agent in agent_list:
             if agent.name==key:
                 risposta=agent.answer(plan[key])
-                print(risposta)
-                #coherency=agent.coherency_check(risposta)
-                #attempts=1
-                #while coherency==False and attempts<=4:
-                #    print(coherency)
-                #    risposta=agent.answer(plan[key])
-                #    coherency=agent.coherency_check(risposta)
-                #    attempts+=1
+                coherency=agent.coherency_check(risposta)
+                attempts=1
+                while coherency==False and attempts<=4:
+                    risposta=agent.answer(plan[key])
+                    coherency=agent.coherency_check(risposta)
+                    attempts+=1
 #    answer=HR.answer("Who is fully available for the entire month?")
 #    verification=HR.answer("Are this data correct: "+ answer + "\n Answer ONLY TRUE or FAlSE, do not add any additional info.\n ANSWER:")
