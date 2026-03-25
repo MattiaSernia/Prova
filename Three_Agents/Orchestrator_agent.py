@@ -79,20 +79,19 @@ class Orchestrator_Agent:
 
             Result:"""
         logging.info(f"Orchestrator received: {text}")
-        for attempt in range(3):
-            response=ollama.chat(model=self.model,
-                    messages=[
-                            {'role': 'user', 'content': text},
-                            *self.memory
-                        ])
-            textual_answer= response['message']['content']
-            logging.info(f"Orhcestrator answered: {textual_answer}")
-            cleaned=textual_answer.lower().replace(".","").strip()
-            if cleaned== "false":
-                logging.info(cleaned)
-                return False
-            elif cleaned== "true":
-                logging.info(cleaned)
-                return True
+        response=ollama.chat(model=self.model,
+                messages=[
+                        {'role': 'user', 'content': text},
+                        *self.memory
+                    ])
+        textual_answer= response['message']['content']
+        logging.info(f"Orhcestrator answered: {textual_answer}")
+        cleaned=textual_answer.lower().replace(".","").strip()
+        if cleaned== "false":
+            logging.info(cleaned)
+            return False
+        elif cleaned== "true":
+            logging.info(cleaned)
+            return True
         return False
 

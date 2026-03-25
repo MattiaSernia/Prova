@@ -71,5 +71,7 @@ if __name__ == "__main__":
                     risposta=agent.answer(plan[key])
                     coherency=agent.coherency_check(risposta)
                     attempts+=1
+                correct= Orchestrator.correct_answer(key,risposta, plan[key])
+                print(f"YOYOYOYOOYOYOYOYOYOOYOYOY     {correct}       YOYOYOOYOYOYOYOYOYOYOY")
 #    answer=HR.answer("Who is fully available for the entire month?")
 #    verification=HR.answer("Are this data correct: "+ answer + "\n Answer ONLY TRUE or FAlSE, do not add any additional info.\n ANSWER:")
