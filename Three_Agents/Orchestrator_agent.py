@@ -33,8 +33,8 @@ class Orchestrator_Agent:
         "HR Agent": "Which employees are available next week?",
         "PC Prices Agent": "What is the price of the RTX 4070?"
         }}"""
-        self.memory.append(system)
-        self.memory.append(f"Task: {task}")
+        self.memory.append({'role':'system', 'content':system})
+        self.memory.append({'role':'user', 'content':f"Task: {task}"})
         response = ollama.chat(
             model=self.model,
             messages=[
@@ -61,7 +61,7 @@ class Orchestrator_Agent:
             else:
                 plan ={}
         logging.info(f"Orchestrator plan: {plan}")
-        self.memory.append(raw)
+        self.memory.append({"role": "assistant", "content":raw})
         return plan
 
 
