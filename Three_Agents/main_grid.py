@@ -6,7 +6,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
     handlers=[
-        logging.FileHandler("test.log", encoding='utf-8'),
+        logging.FileHandler("test1.log", encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -27,6 +27,7 @@ def generate_HR()->Agent:
             "Manages employee availability, roles, departments, and absences for BuildCraft S.r.l. in April 2025. "
             "Can answer questions about staffing coverage, availability by date, and absence reasons "
             "for a team of 10 employees across Construction, Engineering, Design, Systems, and Operations."
+            "Can answer question about the foles of each employee"
             ),
         data=get_context("context1.json"),
         model='command-r'
@@ -55,12 +56,15 @@ def generate_Logistic()->Agent:
     return Logistic
     
 if __name__ == "__main__":
-
+    att=0
     HR=generate_HR()
     Logistic=generate_Logistic()
     agent_list=[HR,Logistic]
     Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-    plan=Orchestrator.plan("I just need to build a bathroom in one house. The work will begin on the 15th of April 2025 and end in the 29th of April, who is available and which roles do I need?",0)
+    plan=Orchestrator.plan("I wanto to build one bathroom. I need to know which roles are needed and I want to know which eployee is available in the 10th of April, alonside with it's role",att)
+    while plan=={}: 
+        att+=1
+        plan=Orchestrator.plan("I just need to build a bathroom in one house. The work will begin on the 15th of April 2025 and end in the 29th of April, who is available and which roles do I need?",att)
     for key in plan.keys():
         for agent in agent_list:
             if agent.name==key:

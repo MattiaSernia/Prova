@@ -49,15 +49,12 @@ class Orchestrator_Agent:
 
         try:
             plan = json.loads(raw)
+            logging.info(f"Orchestrator Answer: {raw}")
         except json.JSONDecodeError:
             print(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n")
             logging.info(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n Attempt nr: {attempt}")
-            if attempt<=4:
-                attempt+=1
-                plan  = self.plan(task, attempt)
-            else:
-                plan ={}
-        logging.info(f"Orchestrator plan: {plan}")
+            logging.info(f"Orchestrator Answer is not in json format, attempt: {attempt}")
+            plan={}
         return plan
 
 
@@ -74,7 +71,7 @@ class Orchestrator_Agent:
             - Provide ONLY the word "TRUE" or "FALSE". No other text.
 
             Result:"""
-        logging.info(f"Orchestrator received: {text}")
+        logging.info(f"Orchestrator Correct: {answer}")
         response=ollama.chat(model=self.model,
                 messages=[
                         {'role': 'user', 'content': text},

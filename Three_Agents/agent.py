@@ -11,14 +11,14 @@ class Agent:
         self.model=model
         self.description=description
         self.memory=[]
-        self.coherency=f"""### Role: Coherency Checker
-            Verify if the provided Data is strictly consistent with your Context. 
+        self.coherency=f"""Role: Coherency Checker
+            Verify if the provided Data is consistent with your Context. 
 
             **Decision Criteria:**
-            - Return "TRUE" only if the Data contains NO errors, contradictions, or hallucinations relative to the Context.
-            - Return "FALSE" if even a single detail is inconsistent, incorrect, or missing from the Context.
+            - Return "TRUE" if the Data contains NO errors, contradictions, or hallucinations relative to the Context.
+            - Return "FALSE" if even a single detail is inconsistent or incorrect.
 
-            ### Data to Verify:
+            Data to Verify:
             {{text}}
 
             ### Constraint:
@@ -32,7 +32,8 @@ class Agent:
 
         Answer ONLY using the data provided below.
         If a question concerns information not present in the data, politely let the user know you dont have that data.
-        Be concise and precise.
+        Be precise.
+        DO NOT format the data, no bullet list accepted
         
         === AVAILABLE DATA ===
         {json.dumps(self.data, indent=2, ensure_ascii=False)}
@@ -41,7 +42,7 @@ class Agent:
 
     def answer(self, message:str)-> str:
         self.memory.append({"role":"user", "content": message})
-        logging.info(f"User asked: {message}")
+        logging.info(f"{self.name} received: {message}")
         response=ollama.chat(
             model=self.model,
             messages=[
@@ -51,15 +52,15 @@ class Agent:
         )
         textual_answer= response['message']['content']
         self.memory.append({"role": "assistant", "content": textual_answer})
-        logging.info(f"System answered: {textual_answer}")
+        logging.info(f"{self.name} answered: {textual_answer}")
         return(textual_answer)
 
 
 
 
     def coherency_check(self, text)->bool:
+        logging.info(f"{self.name} coherence received: {text}")
         text=self.coherency.format(text=text)
-        logging.info(f"Agent {self.name} received: {text}")
         for attempt in range(3):
             response=ollama.chat(model=self.model,
                     messages=[
@@ -68,7 +69,7 @@ class Agent:
                         ])
             
             textual_answer= response['message']['content']
-            logging.info(f"Agent {self.name} answered: {textual_answer}")
+            logging.info(f"{self.name} coherence answered: {textual_answer}")
             cleaned=textual_answer.lower().replace(".","").strip()
             if cleaned== "false":
                   return False
