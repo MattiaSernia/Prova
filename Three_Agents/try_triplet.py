@@ -39,12 +39,12 @@ if __name__=="__main__":
         else:
             Orchestrator.append(row.split(" | ")[-1])
     
-    text=""
     final = []
     for lista in [HR_Agent, Orchestrator, Logistic_Agent]:
+        text=""
         for element in lista:
-            first=element.split("answered:")[-1]
-            text+=first.split("received:")[-1]+"\n"
+            text+=element+"\n"
+            print(text)
         resolver=CoreferenceResolver()
         text=resolver.resolve(text)
         answers=extractor.answer(text)

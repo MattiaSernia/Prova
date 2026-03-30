@@ -1,0 +1,11 @@
+from datetime import datetime
+class Message:
+    def __init__(self, text:str, timestamp:str, node:str, convPart=str, role=str):
+        self.text = text
+        self.timestamp = strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+        self.node = node
+        self.convPart = convPart
+        self.role = role
+
+    def toString(self)->str:
+        return f"Corp: {self.text}\nTimestamp: {self.timestamp}\nNode: {self.node}\nconvPart: {self.convPart}\nRole: {self.role}\n"
