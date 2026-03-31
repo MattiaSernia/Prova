@@ -1,7 +1,9 @@
 from rdflib import Graph, Literal, RDF, Namespace, URIRef
+from rdflib.term import BNode
 from rdflib.namespace import PROV, XSD
 from mxg import Message
 from tripletExtractor import TripletExtractor
+from CoreferenceResolver import CoreferenceResolver
 class Custom_Graph:
     def __init__(self, file=""):
         self.graph=Graph()
@@ -17,6 +19,7 @@ class Custom_Graph:
         self.nodeUri="http://example.org/node/"
         self.edgeUri="http://example.org/edge/"
         self.graph.bind("prov",PROV)
+        self.resolver=CoreferenceResolver()
 
     def triplet_extraction(self, file=""):
         try:
@@ -58,15 +61,18 @@ class Custom_Graph:
                         self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + messages[i+1].node.replace(" ","_"))))
                     elif mxg.convPart== "answer":
                         self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + messages[i-1].node.replace(" ","_"))))
-                        text+="\n"+messages[i-1].text
+                        text=messages[i-1].text+"\n"+text
                     self.graph.add((URImxg, self.NS.timestamp, Literal(mxg.timestamp, datatype=XSD.dateTime)))
-                    resolver=CoreferenceResolver()
-                    text=resolver.resolve(text)
-                    answers=extractor.answer(text)
+                    print(text)
+                    text=self.resolver.resolve(text)
+                    answers=self.extractor.answer(text)
                     for element in answers:
-                        tri=(URIRef(self.nodeUri + element[0]),URIRef(self.edgeUri + element[1]),URIRef(self.nodeUri + element[2]))
-                        self.graph.add(tri)
-                        self.graph.add(tri, self.NS.estracted_from, URImxg)
+                        stmt = BNode()
+                        self.graph.add((stmt, RDF.type, RDF.Statement))
+                        self.graph.add((stmt, RDF.subject,   URIRef(self.nodeUri + element[0].strip().replace(" ","_"))))
+                        self.graph.add((stmt, RDF.predicate, URIRef(self.edgeUri + element[1].strip().replace(" ","_"))))
+                        self.graph.add((stmt, RDF.object,    URIRef(self.nodeUri + element[2].strip().replace(" ","_"))))
+                        self.graph.add((stmt, self.NS.estracted_from, URImxg))
                         print(element[0], element[1], element[2])
             elif mxg.role=="coherency":
                 if mxg.convPart=="answer":

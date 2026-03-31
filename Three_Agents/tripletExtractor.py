@@ -13,7 +13,8 @@ class TripletExtractor:
                         "- Extract one triplet per distinct relation\n"
                         "- Preserve negations in the relation (e.g. 'did not win' not 'win')\n"
                         "- Keep subjects and objects as specific as possible\n"
-                        "- Output only the triplets, no other text, no numbering")
+                        "- Output only the triplets, no other text, no numbering\n"
+                        "- The element inside the triplets must use only alphanumeric elements")
         self.examples= """EXAMPLES:
                 Sentence: Marie Curie discovered the elements polonium and radium and was the first woman to win a Nobel Prize, as well as the first person to win two Nobel Prizes in different fields, physics and chemistry.
                 Triplets:
