@@ -47,8 +47,14 @@ class Custom_Graph:
                     URImxg=self.dict[mxg.text]
                     if (URImxg, self.NS.is_coherent,Literal('FALSE')) in self.graph or (URImxg, self.NS.does_answer,Literal('FALSE')):
                         for (s,o,p) in self.graph:
-                            if s==URImxg or p==URImxg:
+                            if s==URImxg:
                                 self.graph.remove((s, o, p))
+                            if p==URImxg:
+                                if isinstance(s, BNode):
+                                    self.graph.remove((s, None, None))
+                                else:
+                                    self.graph.remove((s,o,p)
+
                     else:
                         error=True             
                 else:
