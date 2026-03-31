@@ -4,6 +4,7 @@ from rdflib.namespace import PROV, XSD
 from mxg import Message
 from tripletExtractor import TripletExtractor
 from CoreferenceResolver import CoreferenceResolver
+import re
 class Custom_Graph:
     def __init__(self, file=""):
         self.graph=Graph()
@@ -53,7 +54,7 @@ class Custom_Graph:
                                 if isinstance(s, BNode):
                                     self.graph.remove((s, None, None))
                                 else:
-                                    self.graph.remove((s,o,p)
+                                    self.graph.remove((s,o,p))
 
                     else:
                         error=True             
@@ -75,9 +76,9 @@ class Custom_Graph:
                     for element in answers:
                         stmt = BNode()
                         self.graph.add((stmt, RDF.type, RDF.Statement))
-                        self.graph.add((stmt, RDF.subject,   URIRef(self.nodeUri + element[0].strip().replace(" ","_"))))
-                        self.graph.add((stmt, RDF.predicate, URIRef(self.edgeUri + element[1].strip().replace(" ","_"))))
-                        self.graph.add((stmt, RDF.object,    URIRef(self.nodeUri + element[2].strip().replace(" ","_"))))
+                        self.graph.add((stmt, RDF.subject,   URIRef(self.nodeUri + self.clean_uri(element[0]))))
+                        self.graph.add((stmt, RDF.predicate, URIRef(self.edgeUri + self.clean_uri(element[1]))))
+                        self.graph.add((stmt, RDF.object,    URIRef(self.nodeUri + self.clean_uri(element[2]))))
                         self.graph.add((stmt, self.NS.estracted_from, URImxg))
                         print(element[0], element[1], element[2])
             elif mxg.role=="coherency":
@@ -90,7 +91,11 @@ class Custom_Graph:
                     self.graph.add((URImxg, self.NS.does_answer,Literal(messages[i].text.lstrip().rstrip())))
         self.saveGraph()
 
-                
+    def clean_uri(self, label: str) -> str:
+        label = label.strip().lower()
+        label = re.sub(r'[^a-zA-Z0-9]', '_', label)
+        label = re.sub(r'_+', '_', label)
+        return label.strip('_')                
 
     def generate_mxg(self, text:str)-> Message:
         split=text.split(" | ")
