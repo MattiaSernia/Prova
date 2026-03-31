@@ -41,7 +41,7 @@ class Custom_Graph:
             mxg=messages[i]
             error=False
             if mxg.role=="default":
-                URIagent=URIRef(self.nodeUri + mxg.node.replace(" ","_"))
+                URIagent=URIRef(self.nodeUri + clean_uri(mxg.node))
                 if (URIagent, RDF.type, self.NS.Agent) not in self.graph:
                     self.graph.add((URIagent, RDF.type, self.NS.Agent))
                 if mxg.text in self.dict:
@@ -59,15 +59,15 @@ class Custom_Graph:
                     else:
                         error=True             
                 else:
-                    URImxg=URIRef(self.nodeUri +f"Message{len(self.dict.keys())}")
+                    URImxg=URIRef(self.nodeUri +f"message{len(self.dict.keys())}")
                     self.dict[mxg.text]=URImxg
                 if not error:
                     text=mxg.text
                     self.graph.add((URImxg, self.NS.sended_by,URIagent))
                     if mxg.convPart== "question":
-                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + messages[i+1].node.replace(" ","_"))))
+                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + self.clean_uri(messages[i+1].node))))
                     elif mxg.convPart== "answer":
-                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + messages[i-1].node.replace(" ","_"))))
+                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + self.clean_uri(messages[i-1].node))))
                         text=messages[i-1].text+"\n"+text
                     self.graph.add((URImxg, self.NS.timestamp, Literal(mxg.timestamp, datatype=XSD.dateTime)))
                     print(text)
