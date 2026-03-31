@@ -75,7 +75,7 @@ class Custom_Graph:
                     answers=self.extractor.answer(text)
                     for element in answers:
                         stmt = BNode()
-                        self.graph.add((stmt, RDF.type, RDF.Statement))
+                        #self.graph.add((stmt, RDF.type, RDF.Statement))
                         self.graph.add((stmt, RDF.subject,   URIRef(self.nodeUri + self.clean_uri(element[0]))))
                         self.graph.add((stmt, RDF.predicate, URIRef(self.edgeUri + self.clean_uri(element[1]))))
                         self.graph.add((stmt, RDF.object,    URIRef(self.nodeUri + self.clean_uri(element[2]))))

@@ -2,9 +2,9 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://example.org/node/hr_agent> a ns:Agent .
-
-<http://example.org/node/logistic_agent> a ns:Agent .
+<http://example.org/node/message2> ns:sended_at <http://example.org/node/logistic_agent> ;
+    ns:sended_by <http://example.org/node/orchestrator> ;
+    ns:timestamp "2026-03-26T11:44:28"^^xsd:dateTime .
 
 <http://example.org/node/message4> ns:sended_at <http://example.org/node/hr_agent> ;
     ns:sended_by <http://example.org/node/orchestrator> ;
@@ -16,13 +16,9 @@
     ns:sended_by <http://example.org/node/user> ;
     ns:timestamp "2026-03-26T11:44:15"^^xsd:dateTime .
 
-<http://example.org/node/message2> ns:sended_at <http://example.org/node/logistic_agent> ;
-    ns:sended_by <http://example.org/node/orchestrator> ;
-    ns:timestamp "2026-03-26T11:44:28"^^xsd:dateTime .
+<http://example.org/node/hr_agent> a ns:Agent .
 
-<http://example.org/node/message1> ns:sended_at <http://example.org/node/user> ;
-    ns:sended_by <http://example.org/node/orchestrator> ;
-    ns:timestamp "2026-03-26T11:44:28"^^xsd:dateTime .
+<http://example.org/node/logistic_agent> a ns:Agent .
 
 <http://example.org/node/orchestrator> a ns:Agent .
 
@@ -32,195 +28,178 @@
     ns:sended_by <http://example.org/node/hr_agent> ;
     ns:timestamp "2026-03-26T11:45:54"^^xsd:dateTime .
 
+<http://example.org/node/message1> ns:sended_at <http://example.org/node/user> ;
+    ns:sended_by <http://example.org/node/orchestrator> ;
+    ns:timestamp "2026-03-26T11:44:28"^^xsd:dateTime .
+
 <http://example.org/node/message3> ns:does_answer "FALSE" ;
     ns:is_coherent "TRUE" ;
     ns:sended_at <http://example.org/node/orchestrator> ;
     ns:sended_by <http://example.org/node/logistic_agent> ;
     ns:timestamp "2026-03-26T11:44:56"^^xsd:dateTime .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message5> ;
-    rdf:object <http://example.org/node/april_15_to_april_29> ;
-    rdf:predicate <http://example.org/edge/availability> ;
-    rdf:subject <http://example.org/node/marco_ferretti> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message4> ;
-    rdf:object <http://example.org/node/april_15> ;
-    rdf:predicate <http://example.org/edge/is_available> ;
-    rdf:subject <http://example.org/node/who> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message5> ;
-    rdf:object <http://example.org/node/april_15_to_april_29> ;
-    rdf:predicate <http://example.org/edge/availability> ;
-    rdf:subject <http://example.org/node/davide_ricci> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message5> ;
-    rdf:object <http://example.org/node/april_15_to_april_29> ;
-    rdf:predicate <http://example.org/edge/availability> ;
-    rdf:subject <http://example.org/node/federica_lombardi> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message1> ;
-    rdf:object <http://example.org/node/which_roles_do_i_need> ;
-    rdf:predicate <http://example.org/edge/need> ;
+[] ns:estracted_from <http://example.org/node/message1> ;
+    rdf:object <http://example.org/node/availability> ;
+    rdf:predicate <http://example.org/edge/need_to_know> ;
     rdf:subject <http://example.org/node/i> .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message0> ;
-    rdf:object <http://example.org/node/15th_of_april_2025> ;
-    rdf:predicate <http://example.org/edge/begin> ;
-    rdf:subject <http://example.org/node/build> .
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/plumber> .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
+[] ns:estracted_from <http://example.org/node/message3> ;
     rdf:object <http://example.org/node/plumber> ;
-    rdf:predicate <http://example.org/edge/requires_worker_roles_and_counts> ;
+    rdf:predicate <http://example.org/edge/required_worker_roles_and_counts> ;
     rdf:subject <http://example.org/node/building_a_bathroom> .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message1> ;
+[] ns:estracted_from <http://example.org/node/message1> ;
     rdf:object <http://example.org/node/2025_04_29> ;
     rdf:predicate <http://example.org/edge/end> ;
     rdf:subject <http://example.org/node/build> .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/1> ;
-    rdf:predicate <http://example.org/edge/count> ;
-    rdf:subject <http://example.org/node/architect> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message5> ;
-    rdf:object <http://example.org/node/april_15_to_april_29> ;
-    rdf:predicate <http://example.org/edge/availability> ;
-    rdf:subject <http://example.org/node/roberto_esposito> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/architect> ;
-    rdf:predicate <http://example.org/edge/requires_worker_roles_and_counts> ;
-    rdf:subject <http://example.org/node/building_a_bathroom> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message0> ;
-    rdf:object <http://example.org/node/29th_of_april> ;
-    rdf:predicate <http://example.org/edge/end> ;
-    rdf:subject <http://example.org/node/build> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/1> ;
-    rdf:predicate <http://example.org/edge/count> ;
-    rdf:subject <http://example.org/node/electrician> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message5> ;
-    rdf:object <http://example.org/node/april_15_to_april_29> ;
-    rdf:predicate <http://example.org/edge/availability> ;
-    rdf:subject <http://example.org/node/luca_bianchi> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/1> ;
-    rdf:predicate <http://example.org/edge/count> ;
-    rdf:subject <http://example.org/node/carpenter> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message0> ;
-    rdf:object <http://example.org/node/a_bathroom> ;
-    rdf:predicate <http://example.org/edge/need_to_build> ;
-    rdf:subject <http://example.org/node/i> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message2> ;
-    rdf:object <http://example.org/node/counts> ;
-    rdf:predicate <http://example.org/edge/include_specific> ;
-    rdf:subject <http://example.org/node/worker_roles> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/1> ;
-    rdf:predicate <http://example.org/edge/count> ;
-    rdf:subject <http://example.org/node/plumber> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message2> ;
-    rdf:object <http://example.org/node/roles> ;
-    rdf:predicate <http://example.org/edge/have_specific> ;
-    rdf:subject <http://example.org/node/workers> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message5> ;
-    rdf:object <http://example.org/node/april_15_to_april_29> ;
-    rdf:predicate <http://example.org/edge/availability> ;
-    rdf:subject <http://example.org/node/giulia_marchetti> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/carpenter> ;
-    rdf:predicate <http://example.org/edge/requires_worker_roles_and_counts> ;
-    rdf:subject <http://example.org/node/building_a_bathroom> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/electrician> ;
-    rdf:predicate <http://example.org/edge/requires_worker_roles_and_counts> ;
-    rdf:subject <http://example.org/node/building_a_bathroom> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/appliance_connections_and_safety_checks> ;
-    rdf:predicate <http://example.org/edge/notes> ;
-    rdf:subject <http://example.org/node/electrician> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message1> ;
-    rdf:object <http://example.org/node/who_is_available> ;
-    rdf:predicate <http://example.org/edge/need> ;
-    rdf:subject <http://example.org/node/i> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/kitchen_unit_assembly_and_worktop_fitting> ;
-    rdf:predicate <http://example.org/edge/notes> ;
-    rdf:subject <http://example.org/node/carpenter> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message4> ;
-    rdf:object <http://example.org/node/april_29> ;
-    rdf:predicate <http://example.org/edge/is_available> ;
-    rdf:subject <http://example.org/node/who> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
-    rdf:object <http://example.org/node/final_connections_fixtures_commissioning> ;
-    rdf:predicate <http://example.org/edge/notes> ;
-    rdf:subject <http://example.org/node/plumber> .
-
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message3> ;
+[] ns:estracted_from <http://example.org/node/message3> ;
     rdf:object <http://example.org/node/fit_out_quality_inspection> ;
     rdf:predicate <http://example.org/edge/notes> ;
     rdf:subject <http://example.org/node/architect> .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message1> ;
+[] ns:estracted_from <http://example.org/node/message1> ;
+    rdf:object <http://example.org/node/worker_roles_and_counts_for_building_a_bathroom> ;
+    rdf:predicate <http://example.org/edge/question> ;
+    rdf:subject <http://example.org/node/logistic_agent> .
+
+[] ns:estracted_from <http://example.org/node/message5> ;
+    rdf:object <http://example.org/node/april_15_to_april_29> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/giulia_marchetti> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/electrician> ;
+    rdf:predicate <http://example.org/edge/required_worker_roles_and_counts> ;
+    rdf:subject <http://example.org/node/building_a_bathroom> .
+
+[] ns:estracted_from <http://example.org/node/message0> ;
+    rdf:object <http://example.org/node/4_29> ;
+    rdf:predicate <http://example.org/edge/end> ;
+    rdf:subject <http://example.org/node/build> .
+
+[] ns:estracted_from <http://example.org/node/message5> ;
+    rdf:object <http://example.org/node/april_15_to_april_29> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/roberto_esposito> .
+
+[] ns:estracted_from <http://example.org/node/message5> ;
+    rdf:object <http://example.org/node/april_15_to_april_29> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/marco_ferretti> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/kitchen_unit_assembly_and_worktop_fitting> ;
+    rdf:predicate <http://example.org/edge/notes> ;
+    rdf:subject <http://example.org/node/carpenter> .
+
+[] ns:estracted_from <http://example.org/node/message1> ;
     rdf:object <http://example.org/node/2025_04_15> ;
     rdf:predicate <http://example.org/edge/begin> ;
     rdf:subject <http://example.org/node/build> .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message2> ;
-    rdf:object <http://example.org/node/workers> ;
-    rdf:predicate <http://example.org/edge/requires> ;
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/electrician> .
+
+[] ns:estracted_from <http://example.org/node/message1> ;
+    rdf:object <http://example.org/node/who_is_available_from_2025_04_15_to_2025_04_29> ;
+    rdf:predicate <http://example.org/edge/question> ;
+    rdf:subject <http://example.org/node/hr_agent> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/carpenter> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/final_connections_fixtures_commissioning> ;
+    rdf:predicate <http://example.org/edge/notes> ;
+    rdf:subject <http://example.org/node/plumber> .
+
+[] ns:estracted_from <http://example.org/node/message1> ;
+    rdf:object <http://example.org/node/hr_agent> ;
+    rdf:predicate <http://example.org/edge/related_to> ;
+    rdf:subject <http://example.org/node/availability> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/architect> ;
+    rdf:predicate <http://example.org/edge/required_worker_roles_and_counts> ;
     rdf:subject <http://example.org/node/building_a_bathroom> .
 
-[] a rdf:Statement ;
-    ns:estracted_from <http://example.org/node/message5> ;
+[] ns:estracted_from <http://example.org/node/message5> ;
     rdf:object <http://example.org/node/april_15_to_april_29> ;
     rdf:predicate <http://example.org/edge/availability> ;
     rdf:subject <http://example.org/node/antonio_greco> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/appliance_connections_and_safety_checks> ;
+    rdf:predicate <http://example.org/edge/notes> ;
+    rdf:subject <http://example.org/node/electrician> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/carpenter> ;
+    rdf:predicate <http://example.org/edge/required_worker_roles_and_counts> ;
+    rdf:subject <http://example.org/node/building_a_bathroom> .
+
+[] ns:estracted_from <http://example.org/node/message1> ;
+    rdf:object <http://example.org/node/build> ;
+    rdf:predicate <http://example.org/edge/need> ;
+    rdf:subject <http://example.org/node/i> .
+
+[] ns:estracted_from <http://example.org/node/message4> ;
+    rdf:object <http://example.org/node/april_15> ;
+    rdf:predicate <http://example.org/edge/is_available> ;
+    rdf:subject <http://example.org/node/who> .
+
+[] ns:estracted_from <http://example.org/node/message0> ;
+    rdf:object <http://example.org/node/4_15_2025> ;
+    rdf:predicate <http://example.org/edge/begin> ;
+    rdf:subject <http://example.org/node/build> .
+
+[] ns:estracted_from <http://example.org/node/message5> ;
+    rdf:object <http://example.org/node/april_15_to_april_29> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/davide_ricci> .
+
+[] ns:estracted_from <http://example.org/node/message2> ;
+    rdf:object <http://example.org/node/unknown> ;
+    rdf:predicate <http://example.org/edge/requires_worker_roles_and_counts> ;
+    rdf:subject <http://example.org/node/building_a_bathroom> .
+
+[] ns:estracted_from <http://example.org/node/message5> ;
+    rdf:object <http://example.org/node/april_15_to_april_29> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/federica_lombardi> .
+
+[] ns:estracted_from <http://example.org/node/message4> ;
+    rdf:object <http://example.org/node/april_29> ;
+    rdf:predicate <http://example.org/edge/is_available> ;
+    rdf:subject <http://example.org/node/who> .
+
+[] ns:estracted_from <http://example.org/node/message0> ;
+    rdf:object <http://example.org/node/bathroom> ;
+    rdf:predicate <http://example.org/edge/build> ;
+    rdf:subject <http://example.org/node/i> .
+
+[] ns:estracted_from <http://example.org/node/message3> ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/architect> .
+
+[] ns:estracted_from <http://example.org/node/message5> ;
+    rdf:object <http://example.org/node/april_15_to_april_29> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/luca_bianchi> .
+
+[] ns:estracted_from <http://example.org/node/message1> ;
+    rdf:object <http://example.org/node/logistic_agent> ;
+    rdf:predicate <http://example.org/edge/related_to> ;
+    rdf:subject <http://example.org/node/availability> .
 
