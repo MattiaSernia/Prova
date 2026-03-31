@@ -1,6 +1,7 @@
 import ollama
 import re
 from triplet import Triplet
+from CoreferenceResolver import CoreferenceResolver
 class TripletExtractor:
     def __init__(self, model, temperature):
         self.model=model
