@@ -1,8 +1,6 @@
 import ollama
 import logging
 import json
-logger = logging.getLogger(__name__)
-
 class Agent:
     def __init__(self, name:str, context:str, description:str, data:dict, model:str):
         self.name=name
@@ -42,7 +40,7 @@ class Agent:
 
     def answer(self, message:str)-> str:
         self.memory.append({"role":"user", "content": message})
-        logging.info(f"{self.name} received: {message}")
+        logging.log(25, f"{self.name} received: {message}")
         response=ollama.chat(
             model=self.model,
             messages=[
@@ -52,14 +50,14 @@ class Agent:
         )
         textual_answer= response['message']['content']
         self.memory.append({"role": "assistant", "content": textual_answer})
-        logging.info(f"{self.name} answered: {textual_answer}")
+        logging.log(25, f"{self.name} answered: {textual_answer}")
         return(textual_answer)
 
 
 
 
     def coherency_check(self, text)->bool:
-        logging.info(f"{self.name} coherence received: {text}")
+        logging.log(25, f"{self.name} coherence received: {text}")
         text=self.coherency.format(text=text)
         for attempt in range(3):
             response=ollama.chat(model=self.model,
@@ -69,7 +67,7 @@ class Agent:
                         ])
             
             textual_answer= response['message']['content']
-            logging.info(f"{self.name} coherence answered: {textual_answer}")
+            logging.log(25, f"{self.name} coherence answered: {textual_answer}")
             cleaned=textual_answer.lower().replace(".","").strip()
             if cleaned== "false":
                   return False

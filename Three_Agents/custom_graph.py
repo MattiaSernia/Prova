@@ -5,8 +5,9 @@ from mxg import Message
 from tripletExtractor import TripletExtractor
 from CoreferenceResolver import CoreferenceResolver
 import re
+
 class Custom_Graph:
-    def __init__(self, file="", graph_name:str):
+    def __init__(self, graph_name:str, file=""):
         self.name=graph_name
         self.graph=Graph()
         if not file =="":
@@ -106,6 +107,7 @@ class Custom_Graph:
         mxgCorp = ": ".join(split[1:])
         mxgInfo = split[0]
         total = mxgInfo.split(" ")
+        print(total)
         if "received" in total:
             node = "Orchestrator"
             convPart = "question"
@@ -135,14 +137,14 @@ class Custom_Graph:
         while i < len(rows)-1:
             j=i+1
             stringa=rows[i]
-            if "HTTP" not in stringa.split(" "):
+            if "INFO" not in stringa.split(" | "):
                 while not rows[j].startswith("2026"):
                     stringa+= "\n"+rows[j]
                     i=j
                     j+=1
                 r2.append(stringa.strip())
             i+=1
-        if rows[len(rows)-1].startswith("2026"): r2.append(rows[len(rows)-1])
+        if rows[len(rows)-1].startswith("2026") and "INFO" not in rows[len(rows)-1].split(" | "): r2.append(rows[len(rows)-1])
         return r2
 
     def saveGraph(self):

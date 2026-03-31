@@ -2,7 +2,7 @@ import ollama
 import logging
 from agent import Agent
 import json
-logger = logging.getLogger(__name__)
+
 
 class Orchestrator_Agent:
     def __init__(self, agents:list[Agent], model:str):
@@ -17,7 +17,7 @@ class Orchestrator_Agent:
         return "\n".join(lines)
     
     def plan(self, task: str, attempt:int) -> dict:
-        logging.info(f"User asked: {task}")
+        logging.log(25, f"User asked: {task}")
         system = f"""You are an orchestrator. You have access to these specialized agents:
  
         {self._agent_registry()}
@@ -49,11 +49,11 @@ class Orchestrator_Agent:
 
         try:
             plan = json.loads(raw)
-            logging.info(f"Orchestrator Answer: {raw}")
+            logging.log(25,f"Orchestrator Answer: {raw}")
         except json.JSONDecodeError:
             print(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n")
-            logging.info(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n Attempt nr: {attempt}")
-            logging.info(f"Orchestrator Answer is not in json format, attempt: {attempt}")
+            logging.warning(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n Attempt nr: {attempt}")
+            logging.warning(f"Orchestrator Answer is not in json format, attempt: {attempt}")
             plan={}
         return plan
 
@@ -71,7 +71,7 @@ class Orchestrator_Agent:
             - Provide ONLY the word "TRUE" or "FALSE". No other text.
 
             Result:"""
-        logging.info(f"Orchestrator correct received: {answer}")
+        logging.log(25,f"Orchestrator correct received: {answer}")
         response=ollama.chat(model=self.model,
                 messages=[
                         {'role': 'user', 'content': text},
@@ -79,10 +79,10 @@ class Orchestrator_Agent:
         textual_answer= response['message']['content']
         cleaned=textual_answer.lower().replace(".","").strip()
         if cleaned== "false":
-            logging.info("Orchestrator correct received: FALSE")
+            logging.log(25,"Orchestrator correct received: FALSE")
             return False
         elif cleaned== "true":
-            logging.info("Orchestrator correct received: TRUE")
+            logging.log(25,"Orchestrator correct received: TRUE")
             return True
         return False
 

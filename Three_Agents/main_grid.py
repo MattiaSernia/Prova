@@ -1,15 +1,19 @@
-from agent import Agent
-import json
 import logging
-from Orchestrator_agent import Orchestrator_Agent
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
     handlers=[
-        logging.FileHandler("`new`.log", encoding='utf-8'),
+        logging.FileHandler("new.log", encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
+AGENT_LEVEL = 25  # tra INFO(20) e WARNING(30)
+logging.addLevelName(AGENT_LEVEL, "AGENT")
+
+from agent import Agent
+import json
+from Orchestrator_agent import Orchestrator_Agent
+from custom_graph import Custom_Graph
 
 def get_context(text:str)->dict:
     with open(text, "r") as cont:
@@ -61,7 +65,7 @@ if __name__ == "__main__":
     Logistic=generate_Logistic()
     agent_list=[HR,Logistic]
     Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-    plan=Orchestrator.plan("I wanto to build one bathroom. I need to know which roles are needed and I want to know which eployee is available in the 10th of April, alonside with it's role",att)
+    plan=Orchestrator.plan("I need to build a bathroom. Which worker roles are required for this task, and which employees are available on April 10th? Please also include each available employee's role.",att)
     while plan=={}: 
         att+=1
         plan=Orchestrator.plan("I just need to build a bathroom in one house. The work will begin on the 15th of April 2025 and end in the 29th of April, who is available and which roles do I need?",att)
@@ -76,8 +80,5 @@ if __name__ == "__main__":
                     coherency=agent.coherency_check(risposta)
                     attempts+=1
                 correct= Orchestrator.correct_answer(key,risposta, plan[key])
-    graph=Custom_Graph(graph_name="Pippolo")
+    graph=Custom_Graph("Pippolo")
     graph.triplet_extraction("new.log")
-
-#    answer=HR.answer("Who is fully available for the entire month?")
-#    verification=HR.answer("Are this data correct: "+ answer + "\n Answer ONLY TRUE or FAlSE, do not add any additional info.\n ANSWER:")
