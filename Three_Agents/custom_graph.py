@@ -41,7 +41,7 @@ class Custom_Graph:
             mxg=messages[i]
             error=False
             if mxg.role=="default":
-                URIagent=URIRef(self.nodeUri + clean_uri(mxg.node))
+                URIagent=URIRef(self.nodeUri + self.clean_uri(mxg.node))
                 if (URIagent, RDF.type, self.NS.Agent) not in self.graph:
                     self.graph.add((URIagent, RDF.type, self.NS.Agent))
                 if mxg.text in self.dict:
