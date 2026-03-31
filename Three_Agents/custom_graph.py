@@ -6,7 +6,8 @@ from tripletExtractor import TripletExtractor
 from CoreferenceResolver import CoreferenceResolver
 import re
 class Custom_Graph:
-    def __init__(self, file=""):
+    def __init__(self, file="", graph_name:str):
+        self.name=graph_name
         self.graph=Graph()
         if not file =="":
             try:
@@ -145,7 +146,7 @@ class Custom_Graph:
         return r2
 
     def saveGraph(self):
-        self.graph.serialize(destination=f"Prove.ttl", format="turtle", encoding="utf-8")
+        self.graph.serialize(destination=f"{self.name}.ttl", format="turtle", encoding="utf-8")
 
 
 if __name__=="__main__":

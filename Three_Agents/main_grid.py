@@ -6,7 +6,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
     handlers=[
-        logging.FileHandler("test1.log", encoding='utf-8'),
+        logging.FileHandler("`new`.log", encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -76,6 +76,8 @@ if __name__ == "__main__":
                     coherency=agent.coherency_check(risposta)
                     attempts+=1
                 correct= Orchestrator.correct_answer(key,risposta, plan[key])
-                print(f"YOYOYOYOOYOYOYOYOYOOYOYOY     {correct}       YOYOYOOYOYOYOYOYOYOYOY")
+    graph=Custom_Graph(graph_name="Pippolo")
+    graph.triplet_extraction("new.log")
+
 #    answer=HR.answer("Who is fully available for the entire month?")
 #    verification=HR.answer("Are this data correct: "+ answer + "\n Answer ONLY TRUE or FAlSE, do not add any additional info.\n ANSWER:")
