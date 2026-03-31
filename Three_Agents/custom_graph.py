@@ -1,5 +1,7 @@
-from rdflib import Graph
+from rdflib import Graph, Literal, RDF, Namespace, URIRef
+from rdflib.namespace import PROV, XSD
 from mxg import Message
+from tripletExtractor import TripletExtractor
 class Custom_Graph:
     def __init__(self, file=""):
         self.graph=Graph()
@@ -10,49 +12,103 @@ class Custom_Graph:
                 print("File not found")
         self.extractor= TripletExtractor("command-r", 0)
         self.dict={}
-        self.nodeUri="http://esempio.org/node/"
-        self.edgeUri="http://esempio.org/edge/"
+        self.NS = Namespace("http://esempio.org/ontologia#")
+        self.graph.bind("ns", self.NS)
+        self.nodeUri="http://example.org/node/"
+        self.edgeUri="http://example.org/edge/"
+        self.graph.bind("prov",PROV)
 
     def triplet_extraction(self, file=""):
         try:
-            with open(file, "r", encoding="utf-8"):
+            with open(file, "r", encoding="utf-8") as log:
                 rows=log.readlines()
-            rows=self.cleanRows(rows)
-            for row in rows:
-                mxg=generate_mxg(row)
-                print(mxg.toString())
+            
         except Exception as e:
-            print(f"Excetion {e}")
+            print(f"Exception {e}")
+        rows=self.cleanRows(rows)
+        messages=[]
+        for row in rows:
+            mxg=self.generate_mxg(row)
+            messages.append(mxg)
+        self.generate_graph(messages)
 
-    def generate_mxg(self, text:str)->Message:
+    def generate_graph(self, messages:list):     
+        for i in range(len(messages)):
+            mxg=messages[i]
+            error=False
+            if mxg.role=="default":
+                URIagent=URIRef(self.nodeUri + mxg.node.replace(" ","_"))
+                if (URIagent, RDF.type, self.NS.Agent) not in self.graph:
+                    self.graph.add((URIagent, RDF.type, self.NS.Agent))
+                if mxg.text in self.dict:
+                    URImxg=self.dict[mxg.text]
+                    if (URImxg, self.NS.is_coherent,Literal('FALSE')) in self.graph or (URImxg, self.NS.does_answer,Literal('FALSE')):
+                        for (s,o,p) in self.graph:
+                            if s==URImxg or p==URImxg:
+                                self.graph.remove((s, o, p))
+                    else:
+                        error=True             
+                else:
+                    URImxg=URIRef(self.nodeUri +f"Message{len(self.dict.keys())}")
+                    self.dict[mxg.text]=URImxg
+                if not error:
+                    text=mxg.text
+                    self.graph.add((URImxg, self.NS.sended_by,URIagent))
+                    if mxg.convPart== "question":
+                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + messages[i+1].node.replace(" ","_"))))
+                    elif mxg.convPart== "answer":
+                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + messages[i-1].node.replace(" ","_"))))
+                        text+="\n"+messages[i-1].text
+                    self.graph.add((URImxg, self.NS.timestamp, Literal(mxg.timestamp, datatype=XSD.dateTime)))
+                    resolver=CoreferenceResolver()
+                    text=resolver.resolve(text)
+                    answers=extractor.answer(text)
+                    for element in answers:
+                        tri=(URIRef(self.nodeUri + element[0]),URIRef(self.edgeUri + element[1]),URIRef(self.nodeUri + element[2]))
+                        self.graph.add(tri)
+                        self.graph.add(tri, self.NS.estracted_from, URImxg)
+                        print(element[0], element[1], element[2])
+            elif mxg.role=="coherency":
+                if mxg.convPart=="answer":
+                    URImxg=self.dict[messages[i-1].text]
+                    self.graph.add((URImxg, self.NS.is_coherent,Literal(messages[i].text)))
+            elif mxg.role=="correction":
+                if mxg.convPart=="answer":
+                    URImxg=self.dict[messages[i-1].text]
+                    self.graph.add((URImxg, self.NS.does_answer,Literal(messages[i].text.lstrip().rstrip())))
+        self.saveGraph()
+
+                
+
+    def generate_mxg(self, text:str)-> Message:
         split=text.split(" | ")
         timestamp = split[0]
         unmodified_text = split[2]
-        split=unmodified_text.split(":")
-        mxgCorp = join(split.split(":")[1:], ":")
+        split=unmodified_text.split(": ")
+        mxgCorp = ": ".join(split[1:])
         mxgInfo = split[0]
-        total = mxgIfo.split[" "]
+        total = mxgInfo.split(" ")
         if "received" in total:
             node = "Orchestrator"
             convPart = "question"
         elif "Orchestrator" in total:
             node="Orchestrator"
             convPart = "answer"
-        elif "HR Agent" in total:
+        elif "HR" in total:
             node="HR Agent"
             convPart = "answer"
-        elif "Logistic Agent" in total:
+        elif "Logistic" in total:
             node="Logistic Agent"
             convPart = "answer"
         elif "User" in total:
             node="User"
-            convPart = "answer"
+            convPart = "question"
         role = "default"
         
         if "coherence" in total:
             role = "coherency"
-        elif "Correct" in total:
-            role: "correction"
+        elif "correct" in total:
+            role= "correction"
         return(Message(mxgCorp, timestamp, node, convPart, role))
 
     def cleanRows(self, rows:list)->list:
@@ -71,6 +127,10 @@ class Custom_Graph:
         if rows[len(rows)-1].startswith("2026"): r2.append(rows[len(rows)-1])
         return r2
 
+    def saveGraph(self):
+        self.graph.serialize(destination=f"Prove.ttl", format="turtle", encoding="utf-8")
+
+
 if __name__=="__main__":
     grafo=Custom_Graph()
-    grafo.triplet_extraction("test1.log")
+    grafo.triplet_extraction("test.log")

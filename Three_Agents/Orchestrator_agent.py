@@ -71,7 +71,7 @@ class Orchestrator_Agent:
             - Provide ONLY the word "TRUE" or "FALSE". No other text.
 
             Result:"""
-        logging.info(f"Orchestrator Correct: {answer}")
+        logging.info(f"Orchestrator correct received: {answer}")
         response=ollama.chat(model=self.model,
                 messages=[
                         {'role': 'user', 'content': text},
@@ -79,10 +79,10 @@ class Orchestrator_Agent:
         textual_answer= response['message']['content']
         cleaned=textual_answer.lower().replace(".","").strip()
         if cleaned== "false":
-            logging.info(cleaned)
+            logging.info("Orchestrator correct received: FALSE")
             return False
         elif cleaned== "true":
-            logging.info(cleaned)
+            logging.info("Orchestrator correct received: TRUE")
             return True
         return False
 

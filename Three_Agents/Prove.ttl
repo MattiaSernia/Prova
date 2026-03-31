@@ -1,0 +1,39 @@
+@prefix ns: <http://esempio.org/ontologia#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/node/Message0> ns:sended_at <http://example.org/node/Orchestrator> ;
+    ns:sended_by <http://example.org/node/User> ;
+    ns:timestamp "2026-03-26T11:44:15"^^xsd:dateTime .
+
+<http://example.org/node/Message1> ns:sended_at <http://example.org/node/User> ;
+    ns:sended_by <http://example.org/node/Orchestrator> ;
+    ns:timestamp "2026-03-26T11:44:28"^^xsd:dateTime .
+
+<http://example.org/node/Message2> ns:sended_at <http://example.org/node/Logistic_Agent> ;
+    ns:sended_by <http://example.org/node/Orchestrator> ;
+    ns:timestamp "2026-03-26T11:44:28"^^xsd:dateTime .
+
+<http://example.org/node/Message3> ns:does_answer "FALSE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/Orchestrator> ;
+    ns:sended_by <http://example.org/node/Logistic_Agent> ;
+    ns:timestamp "2026-03-26T11:44:56"^^xsd:dateTime .
+
+<http://example.org/node/Message4> ns:sended_at <http://example.org/node/HR_Agent> ;
+    ns:sended_by <http://example.org/node/Orchestrator> ;
+    ns:timestamp "2026-03-26T11:45:28"^^xsd:dateTime .
+
+<http://example.org/node/Message5> ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/Orchestrator> ;
+    ns:sended_by <http://example.org/node/HR_Agent> ;
+    ns:timestamp "2026-03-26T11:45:54"^^xsd:dateTime .
+
+<http://example.org/node/HR_Agent> a ns:Agent .
+
+<http://example.org/node/Logistic_Agent> a ns:Agent .
+
+<http://example.org/node/User> a ns:Agent .
+
+<http://example.org/node/Orchestrator> a ns:Agent .
+
