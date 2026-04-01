@@ -79,10 +79,10 @@ class Orchestrator_Agent:
         textual_answer= response['message']['content']
         cleaned=textual_answer.lower().replace(".","").strip()
         if cleaned== "false":
-            logging.log(25,"Orchestrator correct received: FALSE")
+            logging.log(25,"Orchestrator correct answered: FALSE")
             return False
         elif cleaned== "true":
-            logging.log(25,"Orchestrator correct received: TRUE")
+            logging.log(25,"Orchestrator correct answered: TRUE")
             return True
         return False
 
