@@ -3,7 +3,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
     handlers=[
-        logging.FileHandler("last.log", encoding='utf-8'),
+        logging.FileHandler("lastlast.log", encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -81,4 +81,4 @@ if __name__ == "__main__":
                     attempts+=1
                 correct= Orchestrator.correct_answer(key,risposta, plan[key])
     graph=Custom_Graph("Last_Part")
-    graph.triplet_extraction("last.log")
+    graph.triplet_extraction("lastlast.log")

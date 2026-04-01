@@ -1,0 +1,88 @@
+2026-04-01 15:58:10,651 | AGENT | User asked: I need to build a bathroom. Which worker roles are required for this task, and which employees are available on April 10th? Please also include each available employee's role.
+2026-04-01 15:58:26,746 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:58:26,752 | AGENT | Orchestrator Answer: {
+  "Logistic Agent": "What worker roles are needed for building a bathroom?",
+  "HR Agent": "Which employees are available in the respective departments: Construction, Engineering, Design, Systems, and Operations on April 10th along with their respective roles?"
+}
+2026-04-01 15:58:26,752 | AGENT | Logistic Agent received: What worker roles are needed for building a bathroom?
+2026-04-01 15:58:33,660 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:58:33,661 | AGENT | Logistic Agent answered: - Plumber: 1
+- Electrician: 1
+- Carpenter: 1
+- Architect: 1
+2026-04-01 15:58:33,661 | AGENT | Logistic Agent coherence received: - Plumber: 1
+- Electrician: 1
+- Carpenter: 1
+- Architect: 1
+2026-04-01 15:58:34,735 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:58:34,736 | AGENT | Logistic Agent coherence answered: TRUE
+2026-04-01 15:58:34,736 | AGENT | Orchestrator correct received: - Plumber: 1
+- Electrician: 1
+- Carpenter: 1
+- Architect: 1
+2026-04-01 15:58:35,641 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:58:35,641 | AGENT | Orchestrator correct answered: TRUE
+2026-04-01 15:58:35,641 | AGENT | HR Agent received: Which employees are available in the respective departments: Construction, Engineering, Design, Systems, and Operations on April 10th along with their respective roles?
+2026-04-01 15:58:49,300 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:58:49,300 | AGENT | HR Agent answered: Construction - Antonio Greco (Carpenter)
+Engineering - Giulia Marchetti (Structural Engineer)
+Design - Sara Conti (Architect)
+Systems - Roberto Esposito (Electrician), Chiara Romano (Plumber)
+Operations - Marco Ferretti (Site Manager), Federica Lombardi (Project Manager)
+2026-04-01 15:58:49,300 | AGENT | HR Agent coherence received: Construction - Antonio Greco (Carpenter)
+Engineering - Giulia Marchetti (Structural Engineer)
+Design - Sara Conti (Architect)
+Systems - Roberto Esposito (Electrician), Chiara Romano (Plumber)
+Operations - Marco Ferretti (Site Manager), Federica Lombardi (Project Manager)
+2026-04-01 15:58:50,413 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:58:50,414 | AGENT | HR Agent coherence answered: FALSE
+2026-04-01 15:58:50,414 | AGENT | HR Agent received: Which employees are available in the respective departments: Construction, Engineering, Design, Systems, and Operations on April 10th along with their respective roles?
+2026-04-01 15:59:04,391 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:04,392 | AGENT | HR Agent answered: Construction - Antonio Greco (Carpenter)
+Engineering - Giulia Marchetti (Structural Engineer)
+Design - Sara Conti (Architect)
+Systems - Roberto Esposito (Electrician), Chiara Romano (Plumber)
+Operations - Marco Ferretti (Site Manager), Federica Lombardi (Project Manager)
+2026-04-01 15:59:04,392 | AGENT | HR Agent coherence received: Construction - Antonio Greco (Carpenter)
+Engineering - Giulia Marchetti (Structural Engineer)
+Design - Sara Conti (Architect)
+Systems - Roberto Esposito (Electrician), Chiara Romano (Plumber)
+Operations - Marco Ferretti (Site Manager), Federica Lombardi (Project Manager)
+2026-04-01 15:59:05,500 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:05,500 | AGENT | HR Agent coherence answered: TRUE
+2026-04-01 15:59:05,501 | AGENT | Orchestrator correct received: Construction - Antonio Greco (Carpenter)
+Engineering - Giulia Marchetti (Structural Engineer)
+Design - Sara Conti (Architect)
+Systems - Roberto Esposito (Electrician), Chiara Romano (Plumber)
+Operations - Marco Ferretti (Site Manager), Federica Lombardi (Project Manager)
+2026-04-01 15:59:06,544 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:06,549 | AGENT | Orchestrator correct answered: FALSE
+2026-04-01 15:59:08,475 | INFO | missing_keys: []
+2026-04-01 15:59:08,476 | INFO | unexpected_keys: []
+2026-04-01 15:59:08,476 | INFO | mismatched_keys: []
+2026-04-01 15:59:08,476 | INFO | error_msgs: []
+2026-04-01 15:59:08,477 | INFO | Model Parameters: 90.5M, Transformer: 82.1M, Coref head: 8.4M
+2026-04-01 15:59:08,488 | INFO | Tokenize 1 inputs...
+2026-04-01 15:59:08,627 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 15:59:15,358 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:15,359 | INFO | Tokenize 1 inputs...
+2026-04-01 15:59:15,481 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 15:59:24,811 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:24,812 | INFO | Tokenize 1 inputs...
+2026-04-01 15:59:24,929 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 15:59:26,553 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:26,554 | INFO | Tokenize 1 inputs...
+2026-04-01 15:59:26,662 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 15:59:32,039 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:32,040 | INFO | Tokenize 1 inputs...
+2026-04-01 15:59:32,157 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 15:59:39,504 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 15:59:39,506 | INFO | Tokenize 1 inputs...
+2026-04-01 15:59:39,622 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 16:00:03,806 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 16:00:03,810 | INFO | Tokenize 1 inputs...
+2026-04-01 16:00:03,925 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 16:00:12,354 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-01 16:00:12,357 | INFO | Tokenize 1 inputs...
+2026-04-01 16:00:12,480 | INFO | ***** Running Inference on 1 texts *****
+2026-04-01 16:00:35,602 | INFO | HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"

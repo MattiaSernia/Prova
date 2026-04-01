@@ -79,7 +79,6 @@ class Custom_Graph:
                     self.graph.add((URImxg, PROV.wasGeneratedBy, URIactivity))
 
                     self.graph.add((URImxg, PROV.wasAttributedTo, URIagent))
-                    self.graph.add((URImxg, self.NS.sended_by,URIagent))
                     self.graph.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime)))
 
                     text=mxg.text
@@ -106,7 +105,6 @@ class Custom_Graph:
                         self.graph.add((stmt, RDF.subject,   URIRef(self.nodeUri + self.clean_uri(element[0]))))
                         self.graph.add((stmt, RDF.predicate, URIRef(self.edgeUri + self.clean_uri(element[1]))))
                         self.graph.add((stmt, RDF.object,    URIRef(self.nodeUri + self.clean_uri(element[2]))))
-                        self.graph.add((stmt, self.NS.estracted_from, URImxg))
                         self.graph.add((stmt, PROV.wasDerivedFrom, URImxg))
                         
             elif mxg.role=="coherency":
