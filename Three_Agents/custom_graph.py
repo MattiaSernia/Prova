@@ -21,8 +21,10 @@ class Custom_Graph:
         self.graph.bind("ns", self.NS)
         self.nodeUri="http://example.org/node/"
         self.edgeUri="http://example.org/edge/"
+        self.activityUri = "http://example.org/activity/"
         self.graph.bind("prov",PROV)
         self.resolver=CoreferenceResolver()
+        self._activity_counter=0
 
     def triplet_extraction(self, file=""):
         try:
@@ -38,14 +40,17 @@ class Custom_Graph:
             messages.append(mxg)
         self.generate_graph(messages)
 
-    def generate_graph(self, messages:list):     
+    def generate_graph(self, messages:list):    
+
         for i in range(len(messages)):
             mxg=messages[i]
             error=False
+
             if mxg.role=="default":
                 URIagent=URIRef(self.nodeUri + self.clean_uri(mxg.node))
                 if (URIagent, RDF.type, self.NS.Agent) not in self.graph:
-                    self.graph.add((URIagent, RDF.type, self.NS.Agent))
+                    self.graph.add((URIagent, RDF.type, PROV.Agent))
+                
                 if mxg.text in self.dict:
                     URImxg=self.dict[mxg.text]
                     if (URImxg, self.NS.is_coherent,Literal('FALSE')) in self.graph or (URImxg, self.NS.does_answer,Literal('FALSE')):
@@ -57,41 +62,68 @@ class Custom_Graph:
                                     self.graph.remove((s, None, None))
                                 else:
                                     self.graph.remove((s,o,p))
-
                     else:
                         error=True             
                 else:
                     URImxg=URIRef(self.nodeUri +f"message{len(self.dict.keys())}")
                     self.dict[mxg.text]=URImxg
+
                 if not error:
-                    text=mxg.text
+                    self.graph.add((URImxg, RDF.type, PROV.Entity))
+
+                    URIactivity= self._new_activity_uri()
+                    self.graph.add((URIactivity, RDF.type, PROV.Activity))
+                    self.graph.add((URIactivity, PROV.wasAssociatedWith, URIagent)) 
+                    self.graph.add((URIactivity, PROV.startedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime)))
+
+                    self.graph.add((URImxg, PROV.wasGeneratedBy, URIactivity))
+
+                    self.graph.add((URImxg, PROV.wasAttributedTo, URIagent))
                     self.graph.add((URImxg, self.NS.sended_by,URIagent))
+                    self.graph.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime)))
+
+                    text=mxg.text
                     if mxg.convPart== "question":
-                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + self.clean_uri(messages[i+1].node))))
+                        URInext = URIRef(self.nodeUri + self.clean_uri(messages[i + 1].node))
+                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + URInext)))
+
                     elif mxg.convPart== "answer":
-                        self.graph.add((URImxg, self.NS.sended_at,URIRef(self.nodeUri + self.clean_uri(messages[i-1].node))))
+                        URIprev = URIRef(self.nodeUri + self.clean_uri(messages[i - 1].node))
+                        self.graph.add((URImxg, self.NS.sended_at, URIprev))
+                        # La risposta è DERIVATA dalla domanda precedente (PROV-O)
+                        if messages[i - 1].text in self.dict:
+                            URIprevMsg = self.dict[messages[i - 1].text]
+                            self.graph.add((URImxg, PROV.wasDerivedFrom, URIprevMsg))
+                            # L'activity ha USATO la domanda per produrre la risposta
+                            self.graph.add((URIactivity, PROV.used, URIprevMsg))
                         text=messages[i-1].text+"\n"+text
-                    self.graph.add((URImxg, self.NS.timestamp, Literal(mxg.timestamp, datatype=XSD.dateTime)))
-                    print(text)
+
                     text=self.resolver.resolve(text)
                     answers=self.extractor.answer(text)
                     for element in answers:
                         stmt = BNode()
-                        #self.graph.add((stmt, RDF.type, RDF.Statement))
+                        self.graph.add((stmt, RDF.type, PROV.Entity))
                         self.graph.add((stmt, RDF.subject,   URIRef(self.nodeUri + self.clean_uri(element[0]))))
                         self.graph.add((stmt, RDF.predicate, URIRef(self.edgeUri + self.clean_uri(element[1]))))
                         self.graph.add((stmt, RDF.object,    URIRef(self.nodeUri + self.clean_uri(element[2]))))
                         self.graph.add((stmt, self.NS.estracted_from, URImxg))
-                        print(element[0], element[1], element[2])
+                        self.graph.add((stmt, PROV.wasDerivedFrom, URImxg))
+                        
             elif mxg.role=="coherency":
                 if mxg.convPart=="answer":
                     URImxg=self.dict[messages[i-1].text]
                     self.graph.add((URImxg, self.NS.is_coherent,Literal(messages[i].text)))
+
             elif mxg.role=="correction":
                 if mxg.convPart=="answer":
                     URImxg=self.dict[messages[i-1].text]
                     self.graph.add((URImxg, self.NS.does_answer,Literal(messages[i].text.lstrip().rstrip())))
+
         self.saveGraph()
+    
+    def _new_activity_uri(self) -> URIRef:
+        self._activity_counter += 1
+        return URIRef(self.activityUri + f"activity{self._activity_counter}")
 
     def clean_uri(self, label: str) -> str:
         label = label.strip().lower()
@@ -107,7 +139,6 @@ class Custom_Graph:
         mxgCorp = ": ".join(split[1:])
         mxgInfo = split[0]
         total = mxgInfo.split(" ")
-        print(total)
         if "received" in total:
             node = "Orchestrator"
             convPart = "question"
@@ -152,5 +183,5 @@ class Custom_Graph:
 
 
 if __name__=="__main__":
-    grafo=Custom_Graph()
-    grafo.triplet_extraction("test.log")
+    grafo=Custom_Graph("Pircillo")
+    grafo.triplet_extraction("new.log")
