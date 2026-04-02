@@ -1,0 +1,52 @@
+@prefix ns1: <http://esempio.org/ontologia#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://esempio.org/nodo/Message_12> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "Yeah, I think Sarah's just really into her photography right now, and I'm sure she's doing well, she's always taking great pics. Do you think Emily's going to join us for lunch today, she's always talking about how busy she is." ;
+    ns1:mentions <http://esempio.org/nodo/Emily>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Sarah> ;
+    ns1:received_at "2026-03-20T09:53:13.833000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Bob> ;
+    ns1:sended_at "2026-03-20T09:53:13.833000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Frank> .
+
+<http://esempio.org/nodo/Message_13> a ns1:Message,
+        rdfs:Resource ;
+    ns1:hasText "Yeah, Sarah's always been passionate about photography, she's really talented. And yeah, I think Emily's probably busy with her own stuff, she's always saying she needs to focus on her own projects, I'm sure she's doing well." ;
+    ns1:mentions <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Emily>,
+        <http://esempio.org/nodo/Sarah> ;
+    ns1:received_at "2026-03-20T09:53:16.164000"^^xsd:dateTime ;
+    ns1:received_by <http://esempio.org/nodo/Frank> ;
+    ns1:sended_at "2026-03-20T09:53:16.163000"^^xsd:dateTime ;
+    ns1:sended_by <http://esempio.org/nodo/Bob> .
+
+<http://esempio.org/nodo/Message_14> ns1:mentions <http://esempio.org/nodo/Emily> .
+
+<http://esempio.org/nodo/Message_15> ns1:mentions <http://esempio.org/nodo/Emily> .
+
+<http://esempio.org/nodo/Thomas> ns1:knows <http://esempio.org/nodo/Emily> .
+
+<http://esempio.org/nodo/Sarah> ns1:knows <http://esempio.org/nodo/Emily> .
+
+<http://esempio.org/nodo/Bob> ns1:knows <http://esempio.org/nodo/Emily> .
+
+<http://esempio.org/nodo/Frank> ns1:knows <http://esempio.org/nodo/Emily> .
+
+<http://esempio.org/nodo/Emily> a ns1:Person,
+        rdfs:Resource,
+        owl:Thing ;
+    ns1:is_called "Emily" ;
+    ns1:knows <http://esempio.org/nodo/Bob>,
+        <http://esempio.org/nodo/Frank>,
+        <http://esempio.org/nodo/Sarah>,
+        <http://esempio.org/nodo/Thomas> ;
+    ns1:mentioned_in <http://esempio.org/nodo/Message_12>,
+        <http://esempio.org/nodo/Message_13>,
+        <http://esempio.org/nodo/Message_14>,
+        <http://esempio.org/nodo/Message_15> .
+

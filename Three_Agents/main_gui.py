@@ -68,13 +68,16 @@ if __name__ == "__main__":
     Logistic=generate_Logistic()
     agent_list=[HR,Logistic]
     Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-    plan=Orchestrator.plan(question,att)
+    if question.strip()!="":
+        plan=Orchestrator.plan(question)
+    else:
+        plan=Orchestrator.plan()
     while plan=={}: 
         att+=1
-        if question.strip!="":
+        if question.strip()!="":
             plan=Orchestrator.plan(question)
         else:
-            plan=Orchestrator.plan(question)
+            plan=Orchestrator.plan()
     for key in plan.keys():
         for agent in agent_list:
             if agent.name==key:
