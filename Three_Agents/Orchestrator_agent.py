@@ -16,7 +16,7 @@ class Orchestrator_Agent:
             lines.append(f'- "{agent.name}": {agent.description}')
         return "\n".join(lines)
     
-    def plan(self, task: str, attempt:int) -> dict:
+    def plan(self, task: str="I need to build a bathroom. Which worker roles are required for this task, and which employees are available on April 10th? Please also include each available employee's role.", attempt:int=0) -> dict:
         logging.log(25, f"User asked: {task}")
         system = f"""You are an orchestrator. You have access to these specialized agents:
  
