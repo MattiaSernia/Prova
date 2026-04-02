@@ -1,0 +1,279 @@
+@prefix ns: <http://esempio.org/ontologia#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/activity/activity3> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:12"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity4> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:25"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/logistic_agent> .
+
+<http://example.org/activity/activity5> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:27"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity6> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:40"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/logistic_agent> .
+
+<http://example.org/activity/activity1> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:06"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/user> .
+
+<http://example.org/activity/activity10> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:45:08"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message4> ;
+    prov:wasAssociatedWith <http://example.org/node/hr_agent> .
+
+<http://example.org/activity/activity2> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:12"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message0> ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity7> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:42"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity8> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:55"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message2> ;
+    prov:wasAssociatedWith <http://example.org/node/logistic_agent> .
+
+<http://example.org/activity/activity9> a prov:Activity ;
+    prov:startedAtTime "2026-04-02T10:44:58"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/node/user> a prov:Agent .
+
+<http://example.org/node/hr_agent> a prov:Agent .
+
+<http://example.org/node/message2> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/logistic_agent> ;
+    prov:generatedAtTime "2026-04-02T10:44:42"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity7> .
+
+<http://example.org/node/message4> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/hr_agent> ;
+    prov:generatedAtTime "2026-04-02T10:44:58"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity9> .
+
+<http://example.org/node/logistic_agent> a prov:Agent .
+
+<http://example.org/node/message0> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-02T10:44:06"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/user> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity1> .
+
+<http://example.org/node/message5> a prov:Entity ;
+    ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-02T10:45:08"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/hr_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity10> .
+
+<http://example.org/node/message1> a prov:Entity ;
+    ns:sended_at <http://example.org/node/user> ;
+    prov:generatedAtTime "2026-04-02T10:44:12"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity2> .
+
+<http://example.org/node/message3> a prov:Entity ;
+    ns:does_answer "FALSE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-02T10:44:55"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/logistic_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity8> .
+
+<http://example.org/node/orchestrator> a prov:Agent .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/employee> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/april_10th> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/appliance_connections_and_safety_checks> ;
+    rdf:predicate <http://example.org/edge/notes> ;
+    rdf:subject <http://example.org/node/electrician> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/april_10th> ;
+    rdf:predicate <http://example.org/edge/are_available> ;
+    rdf:subject <http://example.org/node/employees_from_the_construction_team> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/respective_roles> ;
+    rdf:predicate <http://example.org/edge/have> ;
+    rdf:subject <http://example.org/node/employees_from_the_construction_team> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/architect> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/carpenter> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/worker_roles> ;
+    rdf:predicate <http://example.org/edge/require> ;
+    rdf:subject <http://example.org/node/build_a_bathroom> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/carpenter> ;
+    rdf:predicate <http://example.org/edge/has_the_role_of> ;
+    rdf:subject <http://example.org/node/antonio_greco> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/kitchen_unit_assembly_and_worktop_fitting> ;
+    rdf:predicate <http://example.org/edge/notes> ;
+    rdf:subject <http://example.org/node/carpenter> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/electrician> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/construction_team_employees_available_on_april_10th> ;
+    rdf:predicate <http://example.org/edge/investigate> ;
+    rdf:subject <http://example.org/node/hr_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/count> ;
+    rdf:subject <http://example.org/node/plumber> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/worker_role_counts> ;
+    rdf:predicate <http://example.org/edge/have_count_of> ;
+    rdf:subject <http://example.org/node/worker_roles> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/1> ;
+    rdf:predicate <http://example.org/edge/required_worker_roles_counts> ;
+    rdf:subject <http://example.org/node/building_a_bathroom> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/worker_roles> ;
+    rdf:predicate <http://example.org/edge/have_the_following_roles> ;
+    rdf:subject <http://example.org/node/available_employee> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/build_a_bathroom> ;
+    rdf:predicate <http://example.org/edge/need_to> ;
+    rdf:subject <http://example.org/node/i> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/final_connections_fixtures_commissioning> ;
+    rdf:predicate <http://example.org/edge/notes> ;
+    rdf:subject <http://example.org/node/plumber> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/counts_of_each_worker_role_required> ;
+    rdf:predicate <http://example.org/edge/inquire_about> ;
+    rdf:subject <http://example.org/node/logistic_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/april_10th> ;
+    rdf:predicate <http://example.org/edge/is_available_on> ;
+    rdf:subject <http://example.org/node/mason> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/employee> ;
+    rdf:predicate <http://example.org/edge/be_available_for_work> ;
+    rdf:subject <http://example.org/node/april_10th> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/worker_roles> ;
+    rdf:predicate <http://example.org/edge/requires> ;
+    rdf:subject <http://example.org/node/building_a_bathroom> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/employee> ;
+    rdf:predicate <http://example.org/edge/has_the_role_of> ;
+    rdf:subject <http://example.org/node/mason> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/worker_roles> ;
+    rdf:predicate <http://example.org/edge/require> ;
+    rdf:subject <http://example.org/node/build> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/respective_roles_of_the_available_employees> ;
+    rdf:predicate <http://example.org/edge/investigate> ;
+    rdf:subject <http://example.org/node/hr_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/april_10th> ;
+    rdf:predicate <http://example.org/edge/is_available_on> ;
+    rdf:subject <http://example.org/node/antonio_greco> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/fit_out_quality_inspection> ;
+    rdf:predicate <http://example.org/edge/notes> ;
+    rdf:subject <http://example.org/node/architect> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/employee> ;
+    rdf:predicate <http://example.org/edge/has_the_role_of> ;
+    rdf:subject <http://example.org/node/luca_bianchi> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/april_10th> ;
+    rdf:predicate <http://example.org/edge/is_available_on> ;
+    rdf:subject <http://example.org/node/luca_bianchi> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/required_worker_roles_for_build> ;
+    rdf:predicate <http://example.org/edge/inquire_about> ;
+    rdf:subject <http://example.org/node/logistic_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/employee_s_role> ;
+    rdf:predicate <http://example.org/edge/check> ;
+    rdf:subject <http://example.org/node/availability> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+

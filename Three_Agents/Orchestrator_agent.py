@@ -26,6 +26,7 @@ class Orchestrator_Agent:
         Keys must be agent names from the list above (use only the agents that are relevant).
         Values must be the specific question to ask that agent.
         Do not include any explanation, markdown, or extra text — raw JSON only.
+        Remember that question will be asked in parallel.
         
         Example output:
         {{
