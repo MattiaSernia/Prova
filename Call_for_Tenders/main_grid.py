@@ -15,34 +15,50 @@ import json
 from Orchestrator_agent import Orchestrator_Agent
 from custom_graph import Custom_Graph
 
-def get_context(text:str)->dict:
-    with open(text, "r") as cont:
-        data=json.load(cont)
-    return data
+import os
+import pickle
+
+CHECKPOINT_FILE = "checkpoint_before_graph.pkl"
+
+# SALVATAGGIO CHECKPOINT
+def save_checkpoint(agent_list):
+    with open(CHECKPOINT_FILE, "wb") as f:
+        pickle.dump(agent_list, f)
+
+# CARICAMENTO CHECKPOINT
+def load_checkpoint():
+    with open(CHECKPOINT_FILE, "rb") as f:
+        return pickle.load(f)
+
 
 if __name__ == "__main__":
-    att=0
-    HR=generate_HR()
-    Budget=generate_Budget()
-    Pipeline=generate_Pipeline()
-    Contract=generate_Contract()
-    Compliance=generate_Compliance()
-    agent_list=[HR,Budget, Pipeline, Contract, Compliance]
-    Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-    plan=Orchestrator.plan("Are we ready to bid for the Regione Lombardia €2M infrastructure tender, submission deadline May 10th?",att)
-    while plan=={}: 
-        att+=1
+    if os.path.exists(CHECKPOINT_FILE):
+        print("🔄 Loading checkpoint...")
+        agent_list = load_checkpoint()
+    else:
+        att=0
+        HR=generate_HR()
+        Budget=generate_Budget()
+        Pipeline=generate_Pipeline()
+        Contract=generate_Contract()
+        Compliance=generate_Compliance()
+        agent_list=[HR,Budget, Pipeline, Contract, Compliance]
+        Orchestrator=Orchestrator_Agent(agent_list,'command-r')
         plan=Orchestrator.plan("Are we ready to bid for the Regione Lombardia €2M infrastructure tender, submission deadline May 10th?",att)
-    for key in plan.keys():
-        for agent in agent_list:
-            if agent.name==key:
-                risposta=agent.answer(plan[key])
-                coherency=agent.coherency_check(risposta)
-                attempts=1
-                while coherency==False and attempts<=4:
+        while plan=={}: 
+            att+=1
+            plan=Orchestrator.plan("Are we ready to bid for the Regione Lombardia €2M infrastructure tender, submission deadline May 10th?",att)
+        for key in plan.keys():
+            for agent in agent_list:
+                if agent.name==key:
                     risposta=agent.answer(plan[key])
                     coherency=agent.coherency_check(risposta)
-                    attempts+=1
-                correct= Orchestrator.correct_answer(key,risposta, plan[key])
+                    attempts=1
+                    while coherency==False and attempts<=4:
+                        risposta=agent.answer(plan[key])
+                        coherency=agent.coherency_check(risposta)
+                        attempts+=1
+                    correct= Orchestrator.correct_answer(key,risposta, plan[key])
+        save_checkpoint(agent_list)
     graph=Custom_Graph("Primo",agent_list)
     graph.triplet_extraction("Primo.log")

@@ -148,8 +148,11 @@ class Custom_Graph:
             node="User"
             convPart = "question"
         if node=="":
+            print(total)
             for agent in self.agent_list:
-                elif agent.name.strip(" Agent") in total:
+                name=agent.name.split(" ")[0]
+                print(name)
+                if name in total:
                     node=agent.name
                     convPart = "answer"
                     
@@ -183,4 +186,4 @@ class Custom_Graph:
 
 if __name__=="__main__":
     grafo=Custom_Graph("Pircillo")
-    grafo.triplet_extraction("new.log")
+    grafo.triplet_extraction("Primo.log")

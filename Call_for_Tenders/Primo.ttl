@@ -1,0 +1,440 @@
+@prefix ns: <http://esempio.org/ontologia#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/activity/activity11> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:05:54"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity3> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:04:30"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity4> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:04:49"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/budget_agent> .
+
+<http://example.org/activity/activity7> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:05:14"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity8> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:05:32"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/project_pipeline_agent> .
+
+<http://example.org/activity/activity1> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:04:14"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/user> .
+
+<http://example.org/activity/activity10> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:05:50"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message4> ;
+    prov:wasAssociatedWith <http://example.org/node/project_pipeline_agent> .
+
+<http://example.org/activity/activity12> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:06:01"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/compliance_agent> .
+
+<http://example.org/activity/activity13> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:06:02"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity14> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:06:44"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message6> ;
+    prov:wasAssociatedWith <http://example.org/node/compliance_agent> .
+
+<http://example.org/activity/activity2> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:04:30"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message0> ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity5> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:04:51"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity6> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:05:11"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message2> ;
+    prov:wasAssociatedWith <http://example.org/node/budget_agent> .
+
+<http://example.org/activity/activity9> a prov:Activity ;
+    prov:startedAtTime "2026-04-03T14:05:34"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/node/message0> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-03T14:04:14"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/user> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity1> .
+
+<http://example.org/node/message6> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/compliance_agent> ;
+    prov:generatedAtTime "2026-04-03T14:06:02"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity13> .
+
+<http://example.org/node/user> a prov:Agent .
+
+<http://example.org/node/budget_agent> a prov:Agent .
+
+<http://example.org/node/message4> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/project_pipeline_agent> ;
+    prov:generatedAtTime "2026-04-03T14:05:34"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity9> .
+
+<http://example.org/node/message7> a prov:Entity ;
+    ns:is_coherent "FALSE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-03T14:06:01"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/compliance_agent> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity12> .
+
+<http://example.org/node/project_pipeline_agent> a prov:Agent .
+
+<http://example.org/node/compliance_agent> a prov:Agent .
+
+<http://example.org/node/message1> a prov:Entity ;
+    ns:sended_at <http://example.org/node/user> ;
+    prov:generatedAtTime "2026-04-03T14:04:30"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity2> .
+
+<http://example.org/node/message2> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/budget_agent> ;
+    prov:generatedAtTime "2026-04-03T14:04:51"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity5> .
+
+<http://example.org/node/message5> a prov:Entity ;
+    ns:does_answer "FALSE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-03T14:05:50"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/project_pipeline_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity10> .
+
+<http://example.org/node/message3> a prov:Entity ;
+    ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-03T14:05:11"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/budget_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity6> .
+
+<http://example.org/node/orchestrator> a prov:Agent .
+
+<http://example.org/node/message8> a prov:Entity ;
+    ns:does_answer "FALSE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-03T14:06:44"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/compliance_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message6> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity14> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/they_don_t_impact_ongoing_projects_or_lead_to_overburdening_resources> ;
+    rdf:predicate <http://example.org/edge/should_be_carefully_considered_to_ensure> ;
+    rdf:subject <http://example.org/node/any_further_allocations> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/dnv_gl> ;
+    rdf:predicate <http://example.org/edge/issued_by> ;
+    rdf:subject <http://example.org/node/iso_14001_2015> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/november_30th_2026> ;
+    rdf:predicate <http://example.org/edge/valid_until> ;
+    rdf:subject <http://example.org/node/iso_9001_2015> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/once_provided_with_the_criteria_outlined_in_the_tender_documents> ;
+    rdf:predicate <http://example.org/edge/would_be_happy_to_assist_you> ;
+    rdf:subject <http://example.org/node/i> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/asked> ;
+    rdf:predicate <http://example.org/edge/allocate_resources_to_an_additional_project_without_impacting_ongoing_work> ;
+    rdf:subject <http://example.org/node/project_pipeline_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/credit_availability> ;
+    rdf:predicate <http://example.org/edge/and> ;
+    rdf:subject <http://example.org/node/sufficient_funds> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/there> ;
+    rdf:predicate <http://example.org/edge/availability> ;
+    rdf:subject <http://example.org/node/credit> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/2_500_000> ;
+    rdf:predicate <http://example.org/edge/maximum_contract_value> ;
+    rdf:subject <http://example.org/node/soa_attestation_for_og3_road_and_airport_works_classifica_iv> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/june_onwards> ;
+    rdf:predicate <http://example.org/edge/will_be_an_estimated_increase_in_availability_from> ;
+    rdf:subject <http://example.org/node/there> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/tender_requirements> ;
+    rdf:predicate <http://example.org/edge/meet> ;
+    rdf:subject <http://example.org/node/current_certifications> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/ongoing_work> ;
+    rdf:predicate <http://example.org/edge/impact> ;
+    rdf:subject <http://example.org/node/allocating_resources> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/the_regione_lombardia_2m_infrastructure_tender> ;
+    rdf:predicate <http://example.org/edge/bid_for> ;
+    rdf:subject <http://example.org/node/we> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/iso_9001_2015> ;
+    rdf:predicate <http://example.org/edge/certifications> ;
+    rdf:subject <http://example.org/node/nexus_engineering_s_r_l> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/bureau_veritas> ;
+    rdf:predicate <http://example.org/edge/issued_by> ;
+    rdf:subject <http://example.org/node/iso_45001_2018> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/september_1st_2026> ;
+    rdf:predicate <http://example.org/edge/valid_until> ;
+    rdf:subject <http://example.org/node/soa_attestation_for_og3_road_and_airport_works_classifica_iv> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/soa_attestation_for_og3_road_and_airport_works_classifica_iv> ;
+    rdf:predicate <http://example.org/edge/certifications> ;
+    rdf:subject <http://example.org/node/nexus_engineering_s_r_l> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/august_20th_2025> ;
+    rdf:predicate <http://example.org/edge/valid_with_renewal_in_progress> ;
+    rdf:subject <http://example.org/node/iso_45001_2018> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/may_10th> ;
+    rdf:predicate <http://example.org/edge/is> ;
+    rdf:subject <http://example.org/node/the_submission_deadline> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/soa_costruzioni_s_p_a> ;
+    rdf:predicate <http://example.org/edge/issued_by> ;
+    rdf:subject <http://example.org/node/soa_attestation_for_og3_road_and_airport_works_classifica_iv> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/sufficient> ;
+    rdf:predicate <http://example.org/edge/are> ;
+    rdf:subject <http://example.org/node/funds> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/300_000> ;
+    rdf:predicate <http://example.org/edge/is> ;
+    rdf:subject <http://example.org/node/the_company_s_has_an_available_credit_line> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/march_15th_2026> ;
+    rdf:predicate <http://example.org/edge/valid_until> ;
+    rdf:subject <http://example.org/node/iso_14001_2015> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/august_20th_2025> ;
+    rdf:predicate <http://example.org/edge/in_renewal_process_until_expiration_on> ;
+    rdf:subject <http://example.org/node/iso_45001_2018_certification> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/1_500_000> ;
+    rdf:predicate <http://example.org/edge/maximum_contract_value> ;
+    rdf:subject <http://example.org/node/soa_attestation_for_og10_rail_and_underground_systems_classifica_iii> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/making_any_allocations> ;
+    rdf:predicate <http://example.org/edge/to_review_individual_resource_capacity_and_project_requirements_before> ;
+    rdf:subject <http://example.org/node/it_is_essential> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/may_could_provide_flexibility_for_additional_work_without_directly_impacting_current_commitments> ;
+    rdf:predicate <http://example.org/edge/due_to_the_completion_of_ctr002_and_the_partial_availability_of_certain_staff_members_from> ;
+    rdf:subject <http://example.org/node/an_estimated_increase_in_availability> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/additional_project> ;
+    rdf:predicate <http://example.org/edge/allocate> ;
+    rdf:subject <http://example.org/node/resources> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/credit_availability> ;
+    rdf:predicate <http://example.org/edge/cover> ;
+    rdf:subject <http://example.org/node/a_potential_2m_contract> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/iso_45001_2018> ;
+    rdf:predicate <http://example.org/edge/certifications> ;
+    rdf:subject <http://example.org/node/nexus_engineering_s_r_l> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/did_not_ask> ;
+    rdf:predicate <http://example.org/edge/sufficient_funds_and_credit_availability_to_cover_a_potential_2m_contract> ;
+    rdf:subject <http://example.org/node/budget_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/soa_attestation_for_og10_rail_and_underground_systems_classifica_iii> ;
+    rdf:predicate <http://example.org/edge/certifications> ;
+    rdf:subject <http://example.org/node/nexus_engineering_s_r_l> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/520_000> ;
+    rdf:predicate <http://example.org/edge/is> ;
+    rdf:subject <http://example.org/node/the_company_s_current_cash_position> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/iso_14001_2015> ;
+    rdf:predicate <http://example.org/edge/certifications> ;
+    rdf:subject <http://example.org/node/nexus_engineering_s_r_l> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/september_1st_2026> ;
+    rdf:predicate <http://example.org/edge/valid_until> ;
+    rdf:subject <http://example.org/node/soa_attestation_for_og10_rail_and_underground_systems_classifica_iii> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/its_optimal_workload> ;
+    rdf:predicate <http://example.org/edge/is_likely_operating_near> ;
+    rdf:subject <http://example.org/node/nexus_engineering_s_r_l> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/whether_current_certifications_meet_specific_tender_requirements> ;
+    rdf:predicate <http://example.org/edge/of> ;
+    rdf:subject <http://example.org/node/an_accurate_assessment> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/a_capacity_summary> ;
+    rdf:predicate <http://example.org/edge/has> ;
+    rdf:subject <http://example.org/node/nexus_engineering_s_r_l> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/1_750_000> ;
+    rdf:predicate <http://example.org/edge/sums_up_to> ;
+    rdf:subject <http://example.org/node/the_total_active_projects_budget_allocation> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/bureau_veritas> ;
+    rdf:predicate <http://example.org/edge/issued_by> ;
+    rdf:subject <http://example.org/node/iso_9001_2015> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/sufficient_funds> ;
+    rdf:predicate <http://example.org/edge/cover> ;
+    rdf:subject <http://example.org/node/a_potential_2m_contract> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/soa_costruzioni_s_p_a> ;
+    rdf:predicate <http://example.org/edge/issued_by> ;
+    rdf:subject <http://example.org/node/soa_attestation_for_og10_rail_and_underground_systems_classifica_iii> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/detailed_information_about_specific_tender_requirements> ;
+    rdf:predicate <http://example.org/edge/need> ;
+    rdf:subject <http://example.org/node/my_assistance> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/the_total_active_projects_budget_allocation> ;
+    rdf:predicate <http://example.org/edge/sums_up_to> ;
+    rdf:subject <http://example.org/node/680_000_120_000_950_000> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/2m> ;
+    rdf:predicate <http://example.org/edge/amount> ;
+    rdf:subject <http://example.org/node/contract> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/sufficient_funds> ;
+    rdf:predicate <http://example.org/edge/is> ;
+    rdf:subject <http://example.org/node/the_company_s_current_cash_position_available_credit_line_and_manage_the_company_s_active_project_budgets_effectively_without_overspending_on_these_projects_or_taking_on_additional_debt> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/ready_to_bid_for_the_regione_lombardia_2m_infrastructure_tender_with_a_submission_deadline_of_may_10th> ;
+    rdf:predicate <http://example.org/edge/are> ;
+    rdf:subject <http://example.org/node/we> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/questioned> ;
+    rdf:predicate <http://example.org/edge/do_our_current_certifications_meet_the_tender_requirements> ;
+    rdf:subject <http://example.org/node/compliance_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/the_tender_requirements> ;
+    rdf:predicate <http://example.org/edge/meet> ;
+    rdf:subject <http://example.org/node/our_current_certifications> ;
+    prov:wasDerivedFrom <http://example.org/node/message6> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/credit> ;
+    rdf:predicate <http://example.org/edge/cover> ;
+    rdf:subject <http://example.org/node/contract> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/an_average_allocation_of_68_billable_staff> ;
+    rdf:predicate <http://example.org/edge/indicating> ;
+    rdf:subject <http://example.org/node/a_capacity_summary> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
