@@ -2,7 +2,7 @@ from rdflib import Graph, Literal, RDF, Namespace, URIRef
 from rdflib.term import BNode
 from rdflib.namespace import PROV, XSD
 from mxg import Message
-from tripletExtractor import TripletExtractor
+from tripletExtractorClaude import TripletExtractor
 from CoreferenceResolver import CoreferenceResolver
 import re
 

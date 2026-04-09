@@ -60,5 +60,5 @@ if __name__ == "__main__":
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         save_checkpoint(agent_list)
-    graph=Custom_Graph("Primo",agent_list)
-    graph.triplet_extraction("Primo.log")
+    graph=Custom_Graph("Claude",agent_list)
+    graph.triplet_extraction("Claude.log")
