@@ -10,8 +10,7 @@ logging.basicConfig(
 AGENT_LEVEL = 25  # tra INFO(20) e WARNING(30)
 logging.addLevelName(AGENT_LEVEL, "AGENT")
 
-from agent import Agent, generate_Budget, generate_Compliance, generate_Contract, generate_HR, generate_Pipeline
-import json
+from agent import Agent, generate_Coordinator, generate_AIInnovation, generate_TechnicalArchitect, generate_SecurityCompliance, generate_Legal, generate_Budget, generate_RSE
 from Orchestrator_agent import Orchestrator_Agent
 from custom_graph import Custom_Graph
 
@@ -30,6 +29,14 @@ def load_checkpoint():
     with open(CHECKPOINT_FILE, "rb") as f:
         return pickle.load(f)
 
+def load_question(name:str)->str:
+    with open(name, "r", encoding="utf-8") as file:
+        lines=file.readlines()
+        text=""
+        for line in lines:
+            text+=line+"\n"
+    return text
+
 
 if __name__ == "__main__":
     if os.path.exists(CHECKPOINT_FILE):
@@ -37,14 +44,17 @@ if __name__ == "__main__":
         agent_list = load_checkpoint()
     else:
         att=0
-        HR=generate_HR()
+        Coordinator=generate_Coordinator()
         Budget=generate_Budget()
-        Pipeline=generate_Pipeline()
-        Contract=generate_Contract()
-        Compliance=generate_Compliance()
-        agent_list=[HR,Budget, Pipeline, Contract, Compliance]
+        AIInnovation=generate_AIInnovation()
+        Technical=generate_TechnicalArchitect()
+        SecurityCompliance=generate_SecurityCompliance()
+        Legal=generate_Legal()
+        RSE=generate_RSE()
+        agent_list=[Coordinator, Budget, AIInnovation, Technical, SecurityCompliance, Legal, RSE]
         Orchestrator=Orchestrator_Agent(agent_list,'command-r')
-        plan=Orchestrator.plan("Are we ready to bid for the Regione Lombardia €2M infrastructure tender, submission deadline May 10th?",att)
+        question=load_question("file.txt")
+        plan=Orchestrator.plan(,att)
         while plan=={}: 
             att+=1
             plan=Orchestrator.plan("Are we ready to bid for the Regione Lombardia €2M infrastructure tender, submission deadline May 10th?",att)
