@@ -31,7 +31,7 @@ class Agent:
         Answer ONLY using the data provided below.
         If a question concerns information not present in the data, politely let the user know you dont have that data.
         Be precise.
-        DO NOT format the data, no bullet list accepted
+        DO NOT format the data, no bullet list accepted, no tables accepted
         
         === AVAILABLE DATA ===
         {json.dumps(self.data, indent=2, ensure_ascii=False)}
@@ -77,7 +77,7 @@ class Agent:
 
 def generate_Coordinator() -> Agent:
     Coordinator = Agent(
-        name="Project Coordinator Agent",
+        name="ProjectCoordinator Agent",
         context=(
             "You are the project coordinator and consortium lead for Nexus Engineering S.r.l., a digital transformation and AI consultancy based in Milan. "
             "You have full knowledge of the company's project management capabilities, methodologies (PRINCE2, Agile, SAFe), and certifications. "
@@ -102,7 +102,7 @@ def generate_Coordinator() -> Agent:
  
 def generate_TechnicalArchitect() -> Agent:
     TechnicalArchitect = Agent(
-        name="Technical Architect Agent",
+        name="TechnicalArchitect Agent",
         context=(
             "You are the technical architect for Nexus Engineering S.r.l., a digital transformation and AI consultancy based in Milan. "
             "You have full knowledge of the company's technical stack, including AI/ML frameworks, LLM models, RAG architectures, "
@@ -118,7 +118,7 @@ def generate_TechnicalArchitect() -> Agent:
             "Knows the full technology stack (LLMs, RAG, cloud, integration, security), performance benchmarks, "
             "sovereign hosting options, and technical constraints as of 2024."
         ),
-        data=get_context("contexts/Technical_Architect_Agent.json"),
+        data=get_context("contexts/Architect_Agent.json"),
         model='command-r'
     )
     return TechnicalArchitect
@@ -126,7 +126,7 @@ def generate_TechnicalArchitect() -> Agent:
  
 def generate_SecurityCompliance() -> Agent:
     SecurityCompliance = Agent(
-        name="Security & Compliance Agent",
+        name="SecurityCompliance Agent",
         context=(
             "You are the security and compliance officer for Nexus Engineering S.r.l., a digital transformation and AI consultancy based in Milan. "
             "You have full knowledge of the company's security certifications (ISO 27001, RGS v2, SecNumCloud experience), "
@@ -142,7 +142,7 @@ def generate_SecurityCompliance() -> Agent:
             "Knows the company's certifications, GDPR instruments, AI security controls, audit capabilities, "
             "and experience with EU regulatory frameworks (GDPR, EU AI Act, RGS, SecNumCloud, NIS2) as of 2024."
         ),
-        data=get_context("contexts/Security_Compliance_Agent.json"),
+        data=get_context("contexts/Compliance_Agent.json"),
         model='command-r'
     )
     return SecurityCompliance
@@ -200,7 +200,7 @@ def generate_Budget() -> Agent:
  
 def generate_AIInnovation() -> Agent:
     AIInnovation = Agent(
-        name="AI & Innovation Agent",
+        name="AIInnovation Agent",
         context=(
             "You are the AI and innovation lead for Nexus Engineering S.r.l., a digital transformation and AI consultancy based in Milan. "
             "You have full knowledge of the company's AI research team, LLM expertise, RAG capabilities, fine-tuning methods, "
@@ -218,7 +218,7 @@ def generate_AIInnovation() -> Agent:
             "Knows the company's LLM stack, RAG capabilities, fine-tuning methods, explainability tools, "
             "performance benchmarks, past AI use cases, and known trade-offs as of 2024."
         ),
-        data=get_context("contexts/AI_Innovation_Agent.json"),
+        data=get_context("contexts/Ai_Agent.json"),
         model='command-r'
     )
     return AIInnovation
@@ -226,7 +226,7 @@ def generate_AIInnovation() -> Agent:
  
 def generate_RSE() -> Agent:
     RSE = Agent(
-        name="CSR & Sustainability Agent",
+        name="CSRSustainability Agent",
         context=(
             "You are the CSR and sustainability officer for Nexus Engineering S.r.l., a digital transformation and AI consultancy based in Milan. "
             "You have full knowledge of the company's CSR profile, including its EcoVadis Silver rating, carbon footprint, "
@@ -245,7 +245,7 @@ def generate_RSE() -> Agent:
             "Knows the company's EcoVadis rating, carbon footprint, green hosting partners, digital sobriety practices, "
             "social commitments, AI ethics principles, and known sustainability trade-offs as of 2024."
         ),
-        data=get_context("contexts/RSE_Agent.json"),
+        data=get_context("contexts/Rse_Agent.json"),
         model='command-r'
     )
     return RSE

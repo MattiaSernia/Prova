@@ -148,10 +148,8 @@ class Custom_Graph:
             node="User"
             convPart = "question"
         if node=="":
-            print(total)
             for agent in self.agent_list:
                 name=agent.name.split(" ")[0]
-                print(name)
                 if name in total:
                     node=agent.name
                     convPart = "answer"
@@ -171,13 +169,14 @@ class Custom_Graph:
             j=i+1
             stringa=rows[i]
             if "INFO" not in stringa.split(" | "):
-                while not rows[j].startswith("2026"):
-                    stringa+= "\n"+rows[j]
+                while "INFO" not in rows[j].split(" | ") and "AGENT" not in rows[j].split(" | "):
+                    if rows[j]!= "\n":
+                        stringa+= "\n"+rows[j]
                     i=j
                     j+=1
                 r2.append(stringa.strip())
             i+=1
-        if rows[len(rows)-1].startswith("2026") and "INFO" not in rows[len(rows)-1].split(" | "): r2.append(rows[len(rows)-1])
+        if "AGENT" in stringa.split(" | ") and "INFO" not in rows[len(rows)-1].split(" | "): r2.append(rows[len(rows)-1])
         return r2
 
     def saveGraph(self):

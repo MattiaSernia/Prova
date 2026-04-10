@@ -18,26 +18,41 @@ class Orchestrator_Agent:
     
     def plan(self, task: str="I need to build a bathroom. Which worker roles are required for this task, and which employees are available on April 10th? Please also include each available employee's role.", attempt:int=0) -> dict:
         logging.log(25, f"User asked: {task}")
-        system = f"""You are an orchestrator. You have access to these specialized agents:
- 
-        {self._agent_registry()}
-        
-        Given a user task, respond ONLY with a valid JSON object.
-        Keys must be agent names from the list above (use only the agents that are relevant).
-        Values must be the specific question to ask that agent.
-        Do not include any explanation, markdown, or extra text — raw JSON only.
-        Remember that question will be asked in parallel.
-        
-        Example output:
-        {{
-        "HR Agent": "Which employees are available next week?",
-        "PC Prices Agent": "What is the price of the RTX 4070?"
-        }}"""
+        system = f"""You are an orchestrator managing a consortium responding to a public call for tenders.
+You have access to these specialized agents:
+{self._agent_registry()}
+
+### Your role:
+The user will provide you with the full text of a Call for Tenders document.
+Your job is to read it carefully and dispatch targeted, self-contained questions
+to the relevant agents so that together they can produce a complete bid response.
+
+### How to read the Call for Tenders:
+- Extract the client's requirements, constraints, and evaluation criteria.
+- Identify which sections are relevant to each agent's domain.
+- For each relevant agent, formulate a precise question that embeds all the details
+  that agent needs — do not assume the agent will read the original document.
+
+### Rules:
+- Respond ONLY with a valid JSON object.
+- Keys must be agent names from the list above (use only agents relevant to this tender).
+- Values must be specific, self-contained questions derived from the Call for Tenders text.
+- Each question must include the relevant figures, constraints and requirements extracted
+  from the document (e.g. budget amount, SLA targets, regulatory requirements, deadlines).
+- Do not include any explanation, markdown, or extra text — raw JSON only.
+- Questions will be asked in parallel, so each must be fully self-contained.
+
+Example output format:
+{{
+    "Technical Architect Agent": "The client requires <specific SLA>, <specific integration>, and <specific hosting constraint>. What architecture do you propose and is it feasible given our capabilities?",
+    "Budget Agent": "The total contract value is <X EUR> over <Y years>. Are we financially eligible to bid, and what is the projected margin?",
+    "Legal Agent": "The tender is governed by <specific law/framework>. Are we eligible to bid and what legal risks should be flagged?"
+}}"""
         response = ollama.chat(
             model=self.model,
             messages=[
                 {"role": "system", "content": system},
-                {"role": "user", "content": f"Task: {task}"},
+                {"role": "user", "content": f"Call for Tenders:\n\n{task}"},
             ],
         )
 

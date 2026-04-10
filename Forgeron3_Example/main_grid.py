@@ -54,10 +54,10 @@ if __name__ == "__main__":
         agent_list=[Coordinator, Budget, AIInnovation, Technical, SecurityCompliance, Legal, RSE]
         Orchestrator=Orchestrator_Agent(agent_list,'command-r')
         question=load_question("file.txt")
-        plan=Orchestrator.plan(,att)
+        plan=Orchestrator.plan(question,att)
         while plan=={}: 
             att+=1
-            plan=Orchestrator.plan("Are we ready to bid for the Regione Lombardia €2M infrastructure tender, submission deadline May 10th?",att)
+            plan=Orchestrator.plan(question,att)
         for key in plan.keys():
             for agent in agent_list:
                 if agent.name==key:
