@@ -71,33 +71,45 @@ class Agent:
         logging.log(25, f"{self.name} answered: {text}")
         return text
 
-    def propose(self, tender: str) -> str:
+    def assess(self, tender: str) -> str:
         """
-        Receive a call for tenders (cahier des charges) and produce concrete
-        proposals to satisfy its requirements, using ONLY the agent's own context.
+        Receive a call for tenders and report, from this agent's role, WHAT CAN BE DONE
+        given ONLY the data available in the agent's context.
+ 
+        This is not a proposal or a sales pitch — it is a factual feasibility report:
+        the agent inventories, from its own knowledge, the capabilities, resources,
+        certifications, references or constraints that are relevant to the tender,
+        and states what is feasible, what is partially feasible and what is not
+        covered at all.
         """
         instruction = (
             "You have received the following call for tenders (cahier des charges).\n"
-            f"Analyse it from your role's perspective ({self.role}) and produce "
-            "concrete proposals to satisfy its requirements.\n\n"
-            "Strict rules:\n"
-            "- Use ONLY the information available in your context (company knowledge). "
-            "Never invent capabilities, certifications, references or numbers.\n"
-            "- For each requirement you address, explain HOW your company's existing "
-            "capabilities, resources, certifications or experience meet it.\n"
-            "- If a requirement cannot be addressed with your context, explicitly flag "
-            "it as a GAP rather than inventing a solution.\n"
-            "- Stay within your role: do not produce content that belongs to other "
-            "roles unless your context directly supports it.\n"
-            "- Identify any constraints, risks or trade-offs visible from your context.\n\n"
+            f"Your task — from your role's perspective ({self.role}) — is NOT to "
+            "write a proposal, NOT to sell, NOT to invent a solution.\n\n"
+            "Your task is to report, FACTUALLY and using ONLY the data in your "
+            "context, what can be done to address this tender.\n\n"
+            "For every relevant requirement of the tender, tell me:\n"
+            "1. What is available in your context that is directly relevant "
+            "(capabilities, resources, certifications, past references, numbers, "
+            "constraints). Cite the exact elements from your context.\n"
+            "2. Whether the requirement is FULLY COVERED, PARTIALLY COVERED, or "
+            "NOT COVERED by your context.\n"
+            "3. If partial: what exactly is missing, and what exists.\n"
+            "4. If not covered: say so explicitly. Do NOT guess, do NOT extrapolate, "
+            "do NOT invent capabilities your context does not mention.\n\n"
+            "Also list any information in your context that is relevant to the tender "
+            "even if not tied to a specific requirement (useful constraints, limits, "
+            "trade-offs, known risks).\n\n"
+            "Stay strictly within your role. Ignore requirements that are outside "
+            "your scope — simply state they are outside your scope.\n\n"
             "=== CALL FOR TENDERS ===\n"
             f"{tender}\n"
             "=== END OF CALL FOR TENDERS ===\n\n"
-            "Produce your structured proposal now."
+            "Now produce your factual feasibility report."
         )
-        logging.log(25, f"{self.name} received tender ({len(tender)} chars)")
+        #logging.log(25, f"{self.name} received tender ({len(tender)} chars)")
         text = self._chat(instruction, use_memory=True)
-        logging.log(25, f"{self.name} proposal: {text}")
+        #logging.log(25, f"{self.name} assessment: {text}")
         return text
 
     def coherency_check(self, text: str) -> bool:
@@ -191,3 +203,15 @@ def create_agent(agent_type: str, model: str = "command-r") -> Agent:
 def create_all_agents(model: str = "command-r") -> dict:
     """Instantiate every agent declared in the registry."""
     return {key: create_agent(key, model) for key in AGENT_REGISTRY}
+
+
+if __name__=="__main__":
+    agent=create_agent("legal")
+    with open("file.txt", "r", encoding="utf-8") as f:
+        lines=f.readlines()
+        text=" ".join(lines)
+    print("yo")
+    answer=agent.assess(text)
+    print(answer)
+    boolean=agent.coherency_check(answer)
+    print(boolean)
