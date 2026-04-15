@@ -60,8 +60,9 @@ if __name__=="__main__":
                     coherency=agent.coherency_check(risposta)
                     attempts=1
                     while coherency==False and attempts<=4:
-                        risposta=agent.answer(plan[key])
+                        risposta=agent.retry(plan[key], risposta)
                         coherency=agent.coherency_check(risposta)
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
+        proposal=Orchestrator.propose(question)
         save_checkpoint(agent_list)

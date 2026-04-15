@@ -8,7 +8,7 @@ class Orchestrator_Agent:
     def __init__(self, agents:list[Agent], model:str):
         self.agents=agents
         self.model=model
-        self.memory=[]
+        self.agent_answer=[]
 
     def _agent_registry(self) -> str:
         """Builds a description of all available agents for the LLM."""
@@ -19,35 +19,54 @@ class Orchestrator_Agent:
     
     def plan(self, task: str="I need to build a bathroom. Which worker roles are required for this task, and which employees are available on April 10th? Please also include each available employee's role.", attempt:int=0) -> dict:
         logging.log(25, f"User asked: {task}")
-        system = f"""You are an orchestrator managing a consortium responding to a public call for tenders.
+        system =  f"""You are an orchestrator managing a consortium responding to a public call for tenders.
             You have access to these specialized agents:
             {self._agent_registry()}
-
+ 
+            ### CRITICAL CONSTRAINT — READ THIS FIRST:
+            Each agent operates in COMPLETE ISOLATION. They have NO access to the Call for Tenders document.
+            They can only answer based on their own internal knowledge (their company role and data).
+            If your question does not contain the relevant facts from the tender, the agent will answer
+            in a vacuum and produce a useless generic response.
+            YOUR JOB IS TO BE THEIR EYES: copy every relevant requirement, figure, constraint and
+            deadline from the tender directly into the question you write for that agent.
+ 
             ### Your role:
             The user will provide you with the full text of a Call for Tenders document.
             Your job is to read it carefully and dispatch targeted, self-contained questions
             to the relevant agents so that together they can produce a complete bid response.
-
-            ### How to read the Call for Tenders:
-            - Extract the client's requirements, constraints, and evaluation criteria.
-            - Identify which sections are relevant to each agent's domain.
-            - For each relevant agent, formulate a precise question that embeds all the details
-            that agent needs — agent cannot read the original document.
-
+ 
+            ### How to build each question:
+            1. Identify which sections of the tender are relevant to that agent's domain.
+            2. Extract and paste the specific requirements, numbers, constraints and deadlines
+               that this agent needs to know.
+            3. End with a precise, answerable question about our company's capabilities or risks.
+ 
             ### Rules:
             - Respond ONLY with a valid JSON object.
             - Keys must be agent names from the list above (use only agents relevant to this tender).
             - Values must be specific, self-contained questions derived from the Call for Tenders text.
-            - Each question must include the relevant figures, constraints and requirements extracted
-            from the document (e.g. budget amount, SLA targets, regulatory requirements, deadlines).
+            - Each question MUST quote the exact figures and constraints from the tender
+              (budget amounts, SLA targets, regulatory frameworks, technical specs, deadlines).
             - Do not include any explanation, markdown, or extra text — raw JSON only.
             - Questions will be asked in parallel, so each must be fully self-contained.
-
-            Example output format:
+            - USE the right name for the Agents, do not modify them
+ 
+            ### BAD example (never do this — agent has no context to answer):
             {{
-                "Technical Architect Agent": "The client requires <specific SLA>, <specific integration>, and <specific hosting constraint>. What architecture do you propose and is it feasible given our capabilities?",
-                "Budget Agent": "The total contract value is <X EUR> over <Y years>. Are we financially eligible to bid, and what is the projected margin?",
-                "Legal Agent": "The tender is governed by <specific law/framework>. Are we eligible to bid and what legal risks should be flagged?"
+                "Budget Agent": "Given our budget constraints, can we deliver this project?"
+            }}
+ 
+            ### GOOD example (agent has everything it needs to answer):
+            {{
+                "Budget Agent": "The client's global budget is 3 million EUR over 4 years. Annual operating costs must remain controlled. The tender requires a pilot phase followed by progressive rollout. Given our pricing model and current financial position, what is our projected margin on this contract, and are there cost-optimization strategies we can propose?"
+            }}
+ 
+            Full example format:
+            {{
+                "Technical Architect Agent": "The client requires: response time < 2 seconds, 99.9% availability, API integration with civil-status and town-planning software, EDM and user directories. Hosting must be on SecNumCloud-certified infrastructure within the EU. No dependency on non-European suppliers. Can our current stack meet these requirements, and what architecture do you propose?",
+                "Budget Agent": "The total contract value is 3M EUR over 4 years. Annual exploitation costs must stay within municipal budget capacity. The client expects cost optimisation without sacrificing quality. Are we financially eligible to bid, and what is the projected margin?",
+                "Legal Agent": "The tender requires strict GDPR compliance (EU-only hosting, no data transfer outside EU, encryption of sensitive data). All AI recommendations must be explainable post-hoc. No automated decision is allowed without explicit agent validation. What legal risks should we flag, and are we compliant?"
             }}"""
         response = ollama.chat(
             model=self.model,
@@ -93,7 +112,7 @@ class Orchestrator_Agent:
                 messages=[
                         {'role': 'user', 'content': text},
                     ])
-        self.memory.append({"agent_name":name, "agent_answer":answer})
+        self.agent_answer.append(f"=== {name} ===\n{answer}")
         textual_answer= response['message']['content']
         cleaned=textual_answer.lower().replace(".","").strip()
         if cleaned== "false":
@@ -104,15 +123,11 @@ class Orchestrator_Agent:
             return True
         return False
 
-    def propose(self, task: str, agents_answers: dict) -> str:
-        """
-        Generates a tender proposal using ONLY the original tender text
-        and the answers provided by the agents. No external knowledge allowed.
-        """
+    def propose(self, task: str) -> str:
+
         
         agents_context = "\n\n".join(
-            f"=== {name} ===\n{answer}" 
-            for name, answer in agents_answers.items()
+            self.agent_answer 
         )
 
         system = """You are a proposal writer for a consortium responding to a call for tenders.
@@ -132,7 +147,7 @@ class Orchestrator_Agent:
             5. Budget Overview
             6. Conclusion"""
 
-                user_message = f"""=== ORIGINAL CALL FOR TENDERS ===
+        user_message = f"""=== ORIGINAL CALL FOR TENDERS ===
             {task}
 
             === AGENTS' ANSWERS ===
@@ -140,16 +155,16 @@ class Orchestrator_Agent:
 
             Now write the proposal."""
 
-            response = ollama.chat(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user_message},
-                ]
-            )
+        response = ollama.chat(
+            model=self.model,
+            messages=[
+                {"role": "system", "content": system},
+                {"role": "user", "content": user_message},
+            ]
+        )
         
         proposal = response.message.content
-        logging.log(25, f"Orchestrator proposal generated: {proposal}")
+        logging.log(25, f"Final proposal generated: {proposal}")
         return proposal
 
     

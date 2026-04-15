@@ -109,6 +109,22 @@ class Agent:
         #logging.log(25, f"{self.name} assessment: {text}")
         return text
 
+    def retry(self, message: str, previous_answer: str) -> str:
+        """Re-ask the same question after a failed coherency check,
+        telling the agent explicitly that its previous answer was wrong."""
+        feedback = (
+            "Your previous answer was rejected because it contains information "
+            "that is inconsistent with, or not supported by, your context data. "
+            "Do NOT invent figures, capabilities or facts that are not explicitly "
+            "present in your context. Re-read your context carefully and answer "
+            "the original question again, this time strictly based on what your "
+            "context contains. If the information is not there, say so explicitly."
+        )
+        # The previous answer is already in memory (appended by answer()).
+        # We add the feedback as a user turn so the model sees it before re-answering.
+        self.memory.append({"role": "user", "content": feedback})
+        return self.answer(message)
+
     def coherency_check(self, text: str) -> bool:
         """Check whether `text` is consistent with this agent's context."""
         prompt = (
@@ -127,12 +143,9 @@ class Agent:
             cleaned = answer.lower().replace(".", "").strip()
             logging.log(25, f"{self.name} coherency answered: {cleaned}")
             if cleaned == "true":
-                self.memory.append({"role": "assistant", "content": f"{self.name} coherency answered: {cleaned}"})
                 return True
             if cleaned == "false":
-                self.memory.append({"role": "assistant", "content": f"{self.name} coherency answered: {cleaned}"})
                 return False
-            self.memory.append({"role": "assistant", "content": f"{self.name} coherency answered: false"})
         return False
 
 
