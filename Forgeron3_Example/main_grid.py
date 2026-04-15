@@ -3,7 +3,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
     handlers=[
-        logging.FileHandler("Claude.log", encoding='utf-8'),
+        logging.FileHandler("Nuova_Prova.log", encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
@@ -70,5 +70,6 @@ if __name__ == "__main__":
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         save_checkpoint(agent_list)
-    graph=Custom_Graph("Claude",agent_list)
-    graph.triplet_extraction("Claude.log")
+    graph=Custom_Graph("Nuova_Prova",agent_list)
+    graph.triplet_extraction("Nuova_Prova.log")
+    graph.saveGraph()

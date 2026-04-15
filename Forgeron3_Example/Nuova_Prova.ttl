@@ -1,0 +1,652 @@
+@prefix ns: <http://esempio.org/ontologia#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://example.org/activity/activity9> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:35:33"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity1> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:25:31"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/user> .
+
+<http://example.org/activity/activity10> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:36:16"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/budget_agent> .
+
+<http://example.org/activity/activity11> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:36:18"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity12> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:37:06"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message8> ;
+    prov:wasAssociatedWith <http://example.org/node/budget_agent> .
+
+<http://example.org/activity/activity13> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:37:10"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity14> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:38:26"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message11> ;
+    prov:wasAssociatedWith <http://example.org/node/legal_agent> .
+
+<http://example.org/activity/activity15> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:38:32"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity16> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:39:21"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message13> ;
+    prov:wasAssociatedWith <http://example.org/node/csrsustainability_agent> .
+
+<http://example.org/activity/activity2> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:29:51"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message0> ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity3> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:29:51"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity4> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:31:13"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message2> ;
+    prov:wasAssociatedWith <http://example.org/node/projectcoordinator_agent> .
+
+<http://example.org/activity/activity5> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:31:19"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity6> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:33:27"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message4> ;
+    prov:wasAssociatedWith <http://example.org/node/aiinnovation_agent> .
+
+<http://example.org/activity/activity7> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:33:33"^^xsd:dateTime ;
+    prov:wasAssociatedWith <http://example.org/node/orchestrator> .
+
+<http://example.org/activity/activity8> a prov:Activity ;
+    prov:startedAtTime "2026-04-15T11:35:26"^^xsd:dateTime ;
+    prov:used <http://example.org/node/message6> ;
+    prov:wasAssociatedWith <http://example.org/node/securitycompliance_agent> .
+
+<http://example.org/node/aiinnovation_agent> a prov:Agent .
+
+<http://example.org/node/csrsustainability_agent> a prov:Agent .
+
+<http://example.org/node/legal_agent> a prov:Agent .
+
+<http://example.org/node/message10> a prov:Entity ;
+    ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:37:06"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/budget_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity12> .
+
+<http://example.org/node/message9> a prov:Entity ;
+    ns:is_coherent "FALSE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:36:16"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/budget_agent> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity10> .
+
+<http://example.org/node/projectcoordinator_agent> a prov:Agent .
+
+<http://example.org/node/securitycompliance_agent> a prov:Agent .
+
+<http://example.org/node/message11> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/legal_agent> ;
+    prov:generatedAtTime "2026-04-15T11:37:10"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity13> .
+
+<http://example.org/node/message14> a prov:Entity ;
+    ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:39:21"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/csrsustainability_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message13> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity16> .
+
+<http://example.org/node/message2> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/projectcoordinator_agent> ;
+    prov:generatedAtTime "2026-04-15T11:29:51"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity3> .
+
+<http://example.org/node/user> a prov:Agent .
+
+<http://example.org/node/budget_agent> a prov:Agent .
+
+<http://example.org/node/message1> a prov:Entity ;
+    ns:sended_at <http://example.org/node/user> ;
+    prov:generatedAtTime "2026-04-15T11:29:51"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity2> .
+
+<http://example.org/node/message13> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/csrsustainability_agent> ;
+    prov:generatedAtTime "2026-04-15T11:38:32"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity15> .
+
+<http://example.org/node/message6> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/securitycompliance_agent> ;
+    prov:generatedAtTime "2026-04-15T11:33:33"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity7> .
+
+<http://example.org/node/message8> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/budget_agent> ;
+    prov:generatedAtTime "2026-04-15T11:36:18"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity11> .
+
+<http://example.org/node/message12> a prov:Entity ;
+    ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:38:26"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/legal_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message11> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity14> .
+
+<http://example.org/node/message0> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:25:31"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/user> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity1> .
+
+<http://example.org/node/message5> a prov:Entity ;
+    ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:33:27"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/aiinnovation_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity6> .
+
+<http://example.org/node/message3> a prov:Entity ;
+    ns:does_answer "FALSE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:31:13"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/projectcoordinator_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity4> .
+
+<http://example.org/node/message4> a prov:Entity ;
+    ns:sended_at <http://example.org/node/http://example.org/node/aiinnovation_agent> ;
+    prov:generatedAtTime "2026-04-15T11:31:19"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/orchestrator> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity5> .
+
+<http://example.org/node/orchestrator> a prov:Agent .
+
+<http://example.org/node/message7> a prov:Entity ;
+    ns:does_answer "TRUE" ;
+    ns:is_coherent "TRUE" ;
+    ns:sended_at <http://example.org/node/orchestrator> ;
+    prov:generatedAtTime "2026-04-15T11:35:26"^^xsd:dateTime ;
+    prov:wasAttributedTo <http://example.org/node/securitycompliance_agent> ;
+    prov:wasDerivedFrom <http://example.org/node/message6> ;
+    prov:wasGeneratedBy <http://example.org/activity/activity8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/gdpr> ;
+    rdf:predicate <http://example.org/edge/complies_with> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/robust> ;
+    rdf:predicate <http://example.org/edge/has_posture> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/23> ;
+    rdf:predicate <http://example.org/edge/public_sector_experience> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/cross_border_transfers_of_personal_data> ;
+    rdf:predicate <http://example.org/edge/prohibits> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/3_secnumcloud_certified_projects> ;
+    rdf:predicate <http://example.org/edge/has_delivered> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/2_seconds> ;
+    rdf:predicate <http://example.org/edge/response_time> ;
+    rdf:subject <http://example.org/node/city_of_belval_tender> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/microsoft_presidio> ;
+    rdf:predicate <http://example.org/edge/anonymizes_pii_using> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/gdpr> ;
+    rdf:predicate <http://example.org/edge/has_compliance_demands> ;
+    rdf:subject <http://example.org/node/the_client> ;
+    prov:wasDerivedFrom <http://example.org/node/message6> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/information_search> ;
+    rdf:predicate <http://example.org/edge/assists_agents_with> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/25_to_30> ;
+    rdf:predicate <http://example.org/edge/margin_range> ;
+    rdf:subject <http://example.org/node/client> ;
+    prov:wasDerivedFrom <http://example.org/node/message10> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/8> ;
+    rdf:predicate <http://example.org/edge/consortium_partnerships> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/fine_tuning_strategies> ;
+    rdf:predicate <http://example.org/edge/includes> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/multi_factor_authentication_mfa> ;
+    rdf:predicate <http://example.org/edge/enforces> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/3_000_000> ;
+    rdf:predicate <http://example.org/edge/budget_for_project> ;
+    rdf:subject <http://example.org/node/city_of_belval> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/3_000_000> ;
+    rdf:predicate <http://example.org/edge/eligible_to_bid> ;
+    rdf:subject <http://example.org/node/client> ;
+    prov:wasDerivedFrom <http://example.org/node/message9> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/content_generation> ;
+    rdf:predicate <http://example.org/edge/assists_agents_with> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/tender> ;
+    rdf:predicate <http://example.org/edge/subject> ;
+    rdf:subject <http://example.org/node/gdpr> ;
+    prov:wasDerivedFrom <http://example.org/node/message11> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/100> ;
+    rdf:predicate <http://example.org/edge/energy_saving_with_auto_scaling> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message14> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/28> ;
+    rdf:predicate <http://example.org/edge/target_gross_margin> ;
+    rdf:subject <http://example.org/node/tender> ;
+    prov:wasDerivedFrom <http://example.org/node/message9> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/true> ;
+    rdf:predicate <http://example.org/edge/require_low_carbon_infra> ;
+    rdf:subject <http://example.org/node/client_expectations> ;
+    prov:wasDerivedFrom <http://example.org/node/message13> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/regione_lombardia> ;
+    rdf:predicate <http://example.org/edge/partnerships> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/data_protection_regulations> ;
+    rdf:predicate <http://example.org/edge/complies_with> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/20> ;
+    rdf:predicate <http://example.org/edge/energy_saving_with_caching> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message14> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/strictest_data_security_standards> ;
+    rdf:predicate <http://example.org/edge/is_designed_according_to> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/semi_annual_incident_response_drills> ;
+    rdf:predicate <http://example.org/edge/keeps_prepared> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/12> ;
+    rdf:predicate <http://example.org/edge/average_accuracy_gain> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/prince2_practitioner> ;
+    rdf:predicate <http://example.org/edge/project_management_certifications> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/eu_data_protection_laws> ;
+    rdf:predicate <http://example.org/edge/applies_consistently> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/micro_segmentation_techniques> ;
+    rdf:predicate <http://example.org/edge/applies> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/zero_trust_architecture_patterns> ;
+    rdf:predicate <http://example.org/edge/adopts> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/privileged_access_management_pam_solutions> ;
+    rdf:predicate <http://example.org/edge/secures_with> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/international_data_flows_risks> ;
+    rdf:predicate <http://example.org/edge/protects_against> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/intrusion_detection_systems_ids> ;
+    rdf:predicate <http://example.org/edge/deploys> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/3_000_000> ;
+    rdf:predicate <http://example.org/edge/eligible_for_tender_with_max_value> ;
+    rdf:subject <http://example.org/node/client> ;
+    prov:wasDerivedFrom <http://example.org/node/message10> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/data_sovereignty_requirements> ;
+    rdf:predicate <http://example.org/edge/ensures_compliance_with> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/defence_in_depth_principles> ;
+    rdf:predicate <http://example.org/edge/follows> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/role_based_access_control_rbac> ;
+    rdf:predicate <http://example.org/edge/applies> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/pmp> ;
+    rdf:predicate <http://example.org/edge/project_management_certifications> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/totp> ;
+    rdf:predicate <http://example.org/edge/supports> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/custom_ner_models> ;
+    rdf:predicate <http://example.org/edge/enhances_anonymization> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/data_protection_regulations> ;
+    rdf:predicate <http://example.org/edge/has_compliance_demands> ;
+    rdf:subject <http://example.org/node/the_client> ;
+    prov:wasDerivedFrom <http://example.org/node/message6> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/cyberark_conjur> ;
+    rdf:predicate <http://example.org/edge/uses> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/2_seconds> ;
+    rdf:predicate <http://example.org/edge/response_time_request> ;
+    rdf:subject <http://example.org/node/city_of_belval> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/rgs_v2_framework> ;
+    rdf:predicate <http://example.org/edge/has_experience> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/file_processing> ;
+    rdf:predicate <http://example.org/edge/assists_agents_with> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/99_9> ;
+    rdf:predicate <http://example.org/edge/availability_requirement> ;
+    rdf:subject <http://example.org/node/city_of_belval> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/itil_v4> ;
+    rdf:predicate <http://example.org/edge/project_management_certifications> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/0_65> ;
+    rdf:predicate <http://example.org/edge/low_confidence_threshold> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/99_9> ;
+    rdf:predicate <http://example.org/edge/availability_objective> ;
+    rdf:subject <http://example.org/node/city_of_belval_tender> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/m_tropole_de_lyon> ;
+    rdf:predicate <http://example.org/edge/partnerships> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/fido2_hardware_tokens> ;
+    rdf:predicate <http://example.org/edge/supports> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/ai> ;
+    rdf:predicate <http://example.org/edge/has_solution> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/comune_di_torino> ;
+    rdf:predicate <http://example.org/edge/partnerships> ;
+    rdf:subject <http://example.org/node/our> ;
+    prov:wasDerivedFrom <http://example.org/node/message3> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/40> ;
+    rdf:predicate <http://example.org/edge/energy_saving_with_quantization> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message14> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/hashicorp_vault> ;
+    rdf:predicate <http://example.org/edge/uses> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/true> ;
+    rdf:predicate <http://example.org/edge/include_energy_reduction> ;
+    rdf:subject <http://example.org/node/client_expectations> ;
+    prov:wasDerivedFrom <http://example.org/node/message13> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/unknown> ;
+    rdf:predicate <http://example.org/edge/tender_alignment> ;
+    rdf:subject <http://example.org/node/city_of_belval> ;
+    prov:wasDerivedFrom <http://example.org/node/message2> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/gdpr_compliance> ;
+    rdf:predicate <http://example.org/edge/ensures> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/rag_capabilities> ;
+    rdf:predicate <http://example.org/edge/includes> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/gdpr> ;
+    rdf:predicate <http://example.org/edge/ensures_compliance_with> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/3_000_000> ;
+    rdf:predicate <http://example.org/edge/has_budget> ;
+    rdf:subject <http://example.org/node/client> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/public_interest_tasks_official_authority> ;
+    rdf:predicate <http://example.org/edge/legal_basis_for_data_processing> ;
+    rdf:subject <http://example.org/node/article_6_1_e_gdpr> ;
+    prov:wasDerivedFrom <http://example.org/node/message12> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/eu> ;
+    rdf:predicate <http://example.org/edge/data_protection_regulations> ;
+    rdf:subject <http://example.org/node/gdpr> ;
+    prov:wasDerivedFrom <http://example.org/node/message12> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/mistral_7b_instruct> ;
+    rdf:predicate <http://example.org/edge/preferred_model> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message5> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/ensure_data_protection_compliance_with_gdpr> ;
+    rdf:predicate <http://example.org/edge/purpose_when_transferring_personal_data_outside_the_eu_eea> ;
+    rdf:subject <http://example.org/node/sccs> ;
+    prov:wasDerivedFrom <http://example.org/node/message12> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/post_major_releases> ;
+    rdf:predicate <http://example.org/edge/performs_additional_tests> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/high_risk_ai_applications_large_scale_automated_processing> ;
+    rdf:predicate <http://example.org/edge/trigger_condition_under_article_35_gdpr> ;
+    rdf:subject <http://example.org/node/data_protection_impact_assessments_dpia> ;
+    prov:wasDerivedFrom <http://example.org/node/message12> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/4_years> ;
+    rdf:predicate <http://example.org/edge/budget_duration> ;
+    rdf:subject <http://example.org/node/client> ;
+    prov:wasDerivedFrom <http://example.org/node/message8> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/4_years> ;
+    rdf:predicate <http://example.org/edge/project_duration> ;
+    rdf:subject <http://example.org/node/city_of_belval> ;
+    prov:wasDerivedFrom <http://example.org/node/message1> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/annual_pentesting> ;
+    rdf:predicate <http://example.org/edge/conducts> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/3_000_000> ;
+    rdf:predicate <http://example.org/edge/value> ;
+    rdf:subject <http://example.org/node/city_of_belval_tender> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/4_years> ;
+    rdf:predicate <http://example.org/edge/duration> ;
+    rdf:subject <http://example.org/node/city_of_belval_tender> ;
+    prov:wasDerivedFrom <http://example.org/node/message0> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/collaboration> ;
+    rdf:predicate <http://example.org/edge/assists_agents_with> ;
+    rdf:subject <http://example.org/node/ai_solution> ;
+    prov:wasDerivedFrom <http://example.org/node/message4> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/intrusion_prevention_systems_ips> ;
+    rdf:predicate <http://example.org/edge/deploys> ;
+    rdf:subject <http://example.org/node/nexus_engineering> ;
+    prov:wasDerivedFrom <http://example.org/node/message7> .
+
+[] a prov:Entity ;
+    rdf:object <http://example.org/node/72_hours_of_incident_awareness> ;
+    rdf:predicate <http://example.org/edge/reporting_obligation_for_data_breaches_within> ;
+    rdf:subject <http://example.org/node/article_33_1_gdpr> ;
+    prov:wasDerivedFrom <http://example.org/node/message12> .
+

@@ -8,6 +8,7 @@ class Orchestrator_Agent:
     def __init__(self, agents:list[Agent], model:str):
         self.agents=agents
         self.model=model
+        self.memory=[]
 
     def _agent_registry(self) -> str:
         """Builds a description of all available agents for the LLM."""
@@ -92,6 +93,7 @@ Example output format:
                 messages=[
                         {'role': 'user', 'content': text},
                     ])
+        self.memory.append({agent_name:name, agent_answer:answer})
         textual_answer= response['message']['content']
         cleaned=textual_answer.lower().replace(".","").strip()
         if cleaned== "false":
@@ -101,4 +103,6 @@ Example output format:
             logging.log(25,"Orchestrator correct answered: TRUE")
             return True
         return False
+
+    
 
