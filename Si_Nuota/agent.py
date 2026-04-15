@@ -59,7 +59,7 @@ class Agent:
         response=ollama.chat(
             model=self.model,
             messages=[
-                {'role':'system', 'content':self.get_prompt()},
+                {'role':'system', 'content':self._system_prompt()},
                 *self.memory
             ]
         )
@@ -235,9 +235,9 @@ def create_agent(agent_type: str, model: str = "command-r") -> Agent:
     )
 
 
-def create_all_agents(model: str = "command-r") -> dict:
+def create_all_agents(model: str = "command-r") -> list:
     """Instantiate every agent declared in the registry."""
-    return {key: create_agent(key, model) for key in AGENT_REGISTRY}
+    return  [create_agent(key, model) for key in AGENT_REGISTRY]
 
 
 if __name__=="__main__":
