@@ -4,25 +4,14 @@ import json
 
 
 class Agent:
-    """
-    Generic specialised agent.
 
-    An agent is fully described by:
-      - a name (display label)
-      - a role (short description, e.g. "technical architect")
-      - a context (dict loaded from JSON) representing the company's knowledge
-        from this agent's point of view
-      - the underlying LLM to use
-
-    The behaviour is identical for every agent: only the role and the context change.
-    """
-
-    def __init__(self, name: str, role: str, context_file: str, model: str = "command-r"):
+    def __init__(self, name: str, role: str, context_file: str, description:str ,model: str = "command-r"):
         self.name = name
         self.role = role
         self.data = self._load_context(context_file)
         self.model = model
         self.memory = []
+        self.description=description
 
     # ---------- internal helpers ----------
 
@@ -64,12 +53,20 @@ class Agent:
 
     # ---------- public API ----------
 
-    def answer(self, message: str) -> str:
-        """Conversational turn — keeps memory of the exchange."""
+    def answer(self, message:str)-> str:
+        self.memory.append({"role":"user", "content": message})
         logging.log(25, f"{self.name} received: {message}")
-        text = self._chat(message, use_memory=True)
-        logging.log(25, f"{self.name} answered: {text}")
-        return text
+        response=ollama.chat(
+            model=self.model,
+            messages=[
+                {'role':'system', 'content':self.get_prompt()},
+                *self.memory
+            ]
+        )
+        textual_answer= response['message']['content']
+        self.memory.append({"role": "assistant", "content": textual_answer})
+        logging.log(25, f"{self.name} answered: {textual_answer}")
+        return(textual_answer)
 
     def assess(self, tender: str) -> str:
         """
@@ -130,9 +127,12 @@ class Agent:
             cleaned = answer.lower().replace(".", "").strip()
             logging.log(25, f"{self.name} coherency answered: {cleaned}")
             if cleaned == "true":
+                self.memory.append({"role": "assistant", "content": f"{self.name} coherency answered: {cleaned}"})
                 return True
             if cleaned == "false":
+                self.memory.append({"role": "assistant", "content": f"{self.name} coherency answered: {cleaned}"})
                 return False
+            self.memory.append({"role": "assistant", "content": f"{self.name} coherency answered: false"})
         return False
 
 
@@ -150,36 +150,70 @@ AGENT_REGISTRY = {
         "name": "ProjectCoordinator Agent",
         "role": "project coordinator and consortium lead",
         "context_file": "contexts/Coordinator_Agent.json",
+        "description":("Coordinates the consortium and consolidates all agent contributions into a coherent tender response for Nexus Engineering S.r.l. "
+            "Knows the company's PM methodologies, past public sector references, consortium partners, available capacity, "
+            "and governance practices as of 2024. Responsible for detecting contradictions and maintaining decision traceability.")
+
     },
     "architect": {
         "name": "TechnicalArchitect Agent",
         "role": "technical architect",
         "context_file": "contexts/Architect_Agent.json",
+        "description":(
+            "Designs and owns the technical architecture for Nexus Engineering S.r.l. tender responses. "
+            "Knows the full technology stack (LLMs, RAG, cloud, integration, security), performance benchmarks, "
+            "sovereign hosting options, and technical constraints as of 2024."
+        )
     },
     "security": {
         "name": "SecurityCompliance Agent",
         "role": "security and compliance officer",
         "context_file": "contexts/Compliance_Agent.json",
+        "description":(
+            "Owns the security and regulatory compliance posture for Nexus Engineering S.r.l. tender responses. "
+            "Knows the company's certifications, GDPR instruments, AI security controls, audit capabilities, "
+            "and experience with EU regulatory frameworks (GDPR, EU AI Act, RGS, SecNumCloud, NIS2) as of 2024."
+        )
     },
     "legal": {
         "name": "Legal Agent",
         "role": "legal counsel",
         "context_file": "contexts/Legal_Agent.json",
+        "description":(
+            "Manages legal eligibility, contractual compliance, and regulatory risk for Nexus Engineering S.r.l. tender responses. "
+            "Knows the company's legal standing, procurement experience across EU jurisdictions, IP model, insurance, "
+            "standard contractual clauses, and AI regulatory posture (GDPR, EU AI Act) as of 2024."
+        )
     },
     "budget": {
         "name": "Budget Agent",
         "role": "financial manager",
         "context_file": "contexts/Budget_Agent.json",
+        "description": (
+            "Manages financial eligibility, cost estimation, and margin analysis for Nexus Engineering S.r.l. tender responses. "
+            "Knows the company's financials, active project budgets, daily rates, overhead, cash position, "
+            "tender eligibility thresholds, and cost sensitivity parameters as of 2024."
+        ),
     },
     "ai": {
         "name": "AIInnovation Agent",
         "role": "AI and innovation lead",
         "context_file": "contexts/Ai_Agent.json",
+        "description":(
+            "Designs the AI components and innovation strategy for Nexus Engineering S.r.l. tender responses. "
+            "Knows the company's LLM stack, RAG capabilities, fine-tuning methods, explainability tools, "
+            "performance benchmarks, past AI use cases, and known trade-offs as of 2024."
+        ),
     },
     "rse": {
         "name": "CSRSustainability Agent",
         "role": "CSR and sustainability officer",
         "context_file": "contexts/Rse_Agent.json",
+        "description":(
+            "Manages the CSR and sustainability posture for Nexus Engineering S.r.l. tender responses. "
+            "Knows the company's EcoVadis rating, carbon footprint, green hosting partners, digital sobriety practices, "
+            "social commitments, AI ethics principles, and known sustainability trade-offs as of 2024."
+        ),
     },
 }
 
@@ -196,6 +230,7 @@ def create_agent(agent_type: str, model: str = "command-r") -> Agent:
         name=cfg["name"],
         role=cfg["role"],
         context_file=cfg["context_file"],
+        description=cfg["description"],
         model=model,
     )
 

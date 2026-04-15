@@ -93,7 +93,7 @@ Example output format:
                 messages=[
                         {'role': 'user', 'content': text},
                     ])
-        self.memory.append({agent_name:name, agent_answer:answer})
+        self.memory.append({"agent_name":name, "agent_answer":answer})
         textual_answer= response['message']['content']
         cleaned=textual_answer.lower().replace(".","").strip()
         if cleaned== "false":
