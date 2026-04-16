@@ -42,7 +42,6 @@ class Custom_Graph:
         self._extraction_counter=0
         self._requirement_counter=0
 
-        self._resolver=CoreferenceResolver()
         self._req_extr=RequirementsExtractor("command-r",0)
         self._con_extr=ConstraintsExtractor("command-r",0)
 
@@ -147,14 +146,14 @@ class Custom_Graph:
                 if mxg.text in self._dict:
                     URImxg=self._dict[mxg.text]
                     if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
-                        for (s,o,p) in self.graph:
+                        for (s,o,p) in self._ds:
                             if s==URImxg:
-                                self.graph.remove((s, o, p))
+                                self._ds.remove((s, o, p))
                             if p==URImxg:
                                 if isinstance(s, BNode):
-                                    self.graph.remove((s, None, None))
+                                    self._ds.remove((s, None, None))
                                 else:
-                                    self.graph.remove((s,o,p))
+                                    self._ds.remove((s,o,p))
                     else:
                         error=True
                 #----------- ricontrollare dopo ------------------             
@@ -166,31 +165,31 @@ class Custom_Graph:
                     self._ds.add((URImxg, RDF.type, PROV.Entity, self._ds.default_context))
 
                     URIactivity= self._new_activity_uri()
-                    self.graph.add((URIactivity, RDF.type, PROV.Activity, self._ds.default_context))
-                    self.graph.add((URIactivity, PROV.wasAssociatedWith, URIagent, self._ds.default_context)) 
-                    self.graph.add((URIactivity, PROV.startedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
+                    self._ds.add((URIactivity, RDF.type, PROV.Activity, self._ds.default_context))
+                    self._ds.add((URIactivity, PROV.wasAssociatedWith, URIagent, self._ds.default_context)) 
+                    self._ds.add((URIactivity, PROV.startedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
 
-                    self.graph.add((URImxg, PROV.wasGeneratedBy, URIactivity, self._ds.default_context))
+                    self._ds.add((URImxg, PROV.wasGeneratedBy, URIactivity, self._ds.default_context))
 
-                    self.graph.add((URImxg, PROV.wasAttributedTo, URIagent, self._ds.default_context))
-                    self.graph.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime) self._ds.default_context))
+                    self._ds.add((URImxg, PROV.wasAttributedTo, URIagent, self._ds.default_context))
+                    self._ds.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime) self._ds.default_context))
 
                     text=mxg.text
                     
                     #--------------- not now -------------
                     #if mxg.convPart== "question":
                     #    URInext = URIRef(self._nodeUri + self._clean_uri(messages[i + 1].node))
-                    #    self.graph.add((URImxg, self._NS.sended_at,URIRef(self._nodeUri + URInext)))
+                    #    self._ds.add((URImxg, self._NS.sended_at,URIRef(self._nodeUri + URInext)))
 
                     #elif mxg.convPart== "answer":
                     #    URIprev = URIRef(self.nodeUri + self.clean_uri(messages[i - 1].node))
-                    #    self.graph.add((URImxg, self.NS.sended_at, URIprev))
+                    #    self._ds.add((URImxg, self.NS.sended_at, URIprev))
                         # La risposta è DERIVATA dalla domanda precedente (PROV-O)
                     #    if messages[i - 1].text in self.dict:
                     #        URIprevMsg = self.dict[messages[i - 1].text]
-                    #        self.graph.add((URImxg, PROV.wasDerivedFrom, URIprevMsg))
+                    #        self._ds.add((URImxg, PROV.wasDerivedFrom, URIprevMsg))
                             # L'activity ha USATO la domanda per produrre la risposta
-                    #        self.graph.add((URIactivity, PROV.used, URIprevMsg))
+                    #        self._ds.add((URIactivity, PROV.used, URIprevMsg))
                     #   text=messages[i-1].text+"\n"+text
                     
                     requirements=self._req_extr.pipe(text)
@@ -221,7 +220,7 @@ class Custom_Graph:
 
     def _new_extraction_uri(self) -> URIRef:
         self._extraction_counter += 1
-        return URIRef(self._extractionUri + f"extraction{self._activity_counter}")
+        return URIRef(self._extractionUri + f"extraction{self._extraction_counter}")
     
     def _new_requirement_uri(self) -> URIRef:
         self._requirement_counter += 1
