@@ -1,0 +1,37 @@
+@prefix sh:       <http://www.w3.org/ns/shacl#> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix ao:       <https://belval.fr/ao/ontology#> .
+@prefix shapes:   <https://belval.fr/ao/shapes#> .
+
+prop:ProposalTripleShape
+    a sh:NodeShape ;
+    sh:targetClass ao:ProposalTriple ;
+
+    sh:property [
+        sh:path ao:subject ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+        sh:minLength 2 ;
+    ] ;
+
+    sh:property [
+        sh:path ao:predicate ;
+        sh:datatype xsd:string ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+
+    sh:property [
+        sh:path ao:object ;
+        sh:minCount 1 ;
+        sh:maxCount 1 ;
+    ] ;
+
+    sh:property [
+        sh:path ao:satisfies_requirements ;
+    ] ;
+
+    sh:property [
+        sh:path ao:is_subject_to_constraint;
+    ] ;

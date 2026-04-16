@@ -66,3 +66,4 @@ if __name__=="__main__":
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         proposal=Orchestrator.propose(question)
         save_checkpoint(agent_list)
+    
