@@ -1,118 +1,236 @@
-from rdflib import Graph, Namespace, RDF, Literal
-from rdflib.term import BNode
+from rdflib import Graph, ConjunctiveGraph, Namespace, URIRef, Literal, RDF, Namespace
+from rdflib.namespace import RDF, XSD, PROV
 from constraintsExtractor import ConstraintsExtractor
 from requirementsExtractor import RequirementsExtractor
+from mxg import Message
 
+
+
+
+
+
+import os
+import pickle
+CHECKPOINT_FILE = "checkpoint_before_graph.pkl"
+def load_checkpoint():
+    with open(CHECKPOINT_FILE, "rb") as f:
+        return pickle.load(f)
 
 class Custom_Graph:
 
-    def __init__(self, name:str):
-        self.name=name
-        self._graph=Graph()
-        self._tripletlist=[]
-        self._AO = Namespace("https://belval.fr/ao/ontology#")
-        self._graph.bind("ao", self._AO)
+    def __init__(self, agent_list:list,name:str):
+        self._EX  = Namespace("http://example.org/ontologia#")
+        self._REQ = Namespace("http://example.org/requirement/")
+        self._EXT = Namespace("http://example.org/extraction/")
+
+        self._ds = ConjunctiveGraph()
+        self._ds.bind("ex",  self._EX)
+        self._ds.bind("req", self._REQ)
+        self._ds.bind("ext", self._EXT)
+        self._ds.bind("prov",PROV)
+
+        self._agent_list=agent_list
+
+        self._nodeUri="http://example.org/node/"
+        self._activityUri = "http://example.org/activity/"
+        self._extractionUri= "http://example.org/extraction/"
+        self._edgeUri="http://example.org/edge/"
+
+        self._dict={}
+
+        self._activity_counter=0
+        self._extraction_counter=0
+        self._requirement_counter=0
+
+        self._resolver=CoreferenceResolver()
         self._req_extr=RequirementsExtractor("command-r",0)
-        self._cons_extr=ConstraintsExtractor("command-r",0)
+        self._con_extr=ConstraintsExtractor("command-r",0)
+
+        self._name=name
 
 
-    def load(self, file:str, gtype:str) -> None:
-        with open(file, "r", encoding="utf-8") as f:
-            lines=f.readlines()
-        for line in lines:
-            self._add(line, gtype)
+    def add_content(self, file:str):
+        messages=self._load(file)
+        messages=self._isolation(messages, "User")
+        saveGraph()
 
-
-
-    def _add(self, line:str, gtype:str) -> None:
-        triplet=line.strip("\n").strip(".").split(" | ")
-        match gtype:
-            case "constraints":
-                if len(triplet) == 4:
-                    if triplet[1] and triplet[2] and triplet[3]:
-                        if f"{triplet[1]} | {triplet[2]} | {triplet[3]}" not in self._tripletlist:
-                            stmt=BNode()
-                            self._graph.add((stmt, RDF.type, self._AO.Contraint))
-                            self._graph.add((stmt, self._AO.subject, Literal(triplet[1])))
-                            self._graph.add((stmt, self._AO.predicate, Literal(triplet[2])))
-                            self._graph.add((stmt, self._AO.object, Literal(triplet[3])))
-                            if triplet[0]:
-                                if triplet[0]!= None:
-                                    self._graph.add((stmt, self._AO.constraintType, Literal(triplet[0])))
-                            self._tripletlist.append(f"{triplet[1]} | {triplet[2]} | {triplet[3]}")
-            case "requirements":
-                if len(triplet) == 5:
-                    if triplet[2] and triplet[3] and triplet[4]:
-                        if f"{triplet[2]} | {triplet[3]} | {triplet[4]}" not in self._tripletlist:
-                            stmt=BNode()
-                            self._graph.add((stmt, RDF.type, self._AO.Requirement))
-                            self._graph.add((stmt, self._AO.subject, Literal(triplet[2])))
-                            self._graph.add((stmt, self._AO.predicate, Literal(triplet[3])))
-                            self._graph.add((stmt, self._AO.object, Literal(triplet[4])))
-                            if triplet[0]:
-                                if triplet[0]!= None:
-                                    self._graph.add((stmt, self._AO.category, Literal(triplet[0])))
-                            if triplet[1]:
-                                if triplet[1]!= None:
-                                    self._graph.add((stmt, self._AO.priority, Literal(triplet[1])))
-                            self._tripletlist.append(f"{triplet[2]} | {triplet[3]} | {triplet[4]}")
-
-    def savegraph(self) -> None:
-        self._graph.serialize(destination=f"{self.name}.ttl", format="turtle", encoding="utf-8")
-
-    
-    def triplet_extractor(self, file:str):
+    def _load(self, file:str)->list:
         try:
-            with open(file, "r", encoding="utf-8") as log:
-                rows=log.readlines()
-            
+            f = open(file, "r", encoding="utf-8")
         except Exception as e:
-            print(f"Exception {e}")
+            print(e)
+            return None
+        
+        rows=f.readlines()
+        f.close()
         rows=self._cleanRows(rows)
-        messages=isolation(rows, ["User", "asked"])
-        for message in messages:
-            req_list=self._req_extr.pipe(message)
-            con_list=self._cons_extr.pipe(message)
 
-
-    
-
+        messages=[]
+        for row in rows:
+            mxg=self._generate_mxg(row)
+            messages.append(mxg)
+        return messages
 
     def _cleanRows(self, rows:list)->list:
-    i=0
-    r2=[]
-    while i < len(rows)-1:
-        j=i+1
-        stringa=rows[i]
-        if "INFO" not in stringa.split(" | "):
-            while "INFO" not in rows[j].split(" | ") and "AGENT" not in rows[j].split(" | "):
-                if rows[j]!= "\n":
-                    stringa+= "\n"+rows[j]
-                i=j
-                j+=1
-            r2.append(stringa.strip())
-        i+=1
-    if "AGENT" in stringa.split(" | ") and "INFO" not in rows[len(rows)-1].split(" | "): r2.append(rows[len(rows)-1])
-    return r2
+        i=0
+        r2=[]
+        while i < len(rows)-1:
+            j=i+1
+            stringa=rows[i]
+            if "INFO" not in stringa.split(" | "):
+                while j<len(rows) and "INFO" not in rows[j].split(" | ") and "AGENT" not in rows[j].split(" | "):
+                    if rows[j]!= "\n":
+                        stringa+= "\n"+rows[j]
+                    i=j
+                    j+=1
+                r2.append(stringa.strip())
+            i+=1
+        stringa=rows[-1]
+        if "AGENT" in stringa.split(" | ") and "INFO" not in rows[len(rows)-1].split(" | "): r2.append(rows[len(rows)-1])
+        return r2
 
-    def isolation(self, messages:str, iso:list)->list:
-        isolated=[]
+    def _generate_mxg(self, text:str)-> Message:
+        split=text.split(" | ")
+        timestamp = split[0]
+        unmodified_text = split[2]
+        split=unmodified_text.split(": ")
+        mxgCorp = ": ".join(split[1:])
+        mxgInfo = split[0]
+        total = mxgInfo.split(" ")
+        node=""
+        if "received" in total:
+            node = "Orchestrator"
+            convPart = "question"
+        elif "Orchestrator" in total:
+            node="Orchestrator"
+            convPart = "answer"
+        elif "User" in total:
+            node="User"
+            convPart = "question"
+        elif "Final" in total:
+            node="Orchestrator"
+            convPart = "answer"
+        if node=="":
+            for agent in self._agent_list:
+                name=agent.name.split(" ")[0]
+                if name in total:
+                    node=agent.name
+                    convPart = "answer"
+                    
+        role = "default"
+        
+        if "coherence" in total:
+            role = "coherency"
+        elif "correct" in total:
+            role= "correction"
+        return(Message(mxgCorp, timestamp, node, convPart, role))
+
+    def _isolation(self,messages:list ,node:str)->list:
+        output=[]
         for message in messages:
-            textual=' | '.join(message.split(" | ")[2:])
-            intestation=textual.split(":")[0].split(' ')
-            to_iso=True
-            for element in iso:
-                if element not in intestation:
-                    to_iso=False
-            if to_iso==True:
-                to_add=":".join(textual.split(":")[1:])
-                isolated.append(to_add)
-        return isolated
+            if message.node==node:
+                output.append(message)
+        return output
 
+    def _generate_graph(self, message:list):
+        for i in range(len(messages)):
+            mxg=messages[i]
+            error=False
+
+            if mxg.role=="default":
+                #check if the agent is in the graph or not
+                URIagent=URIRef(self._nodeUri + self._clean_uri(mxg.node))
+                if (URIagent, RDF.type, PROV.Agent, self._ds.default_context) not in self._ds:
+                    self._ds.add((URIagent, RDF.type, PROV.Agent, self._ds.default_context))
+            
+                #----------- ricontrollare dopo ------------------
+                if mxg.text in self._dict:
+                    URImxg=self._dict[mxg.text]
+                    if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
+                        for (s,o,p) in self.graph:
+                            if s==URImxg:
+                                self.graph.remove((s, o, p))
+                            if p==URImxg:
+                                if isinstance(s, BNode):
+                                    self.graph.remove((s, None, None))
+                                else:
+                                    self.graph.remove((s,o,p))
+                    else:
+                        error=True
+                #----------- ricontrollare dopo ------------------             
+                else:
+                    URImxg=URIRef(self._nodeUri +f"message{len(self._dict.keys())}")
+                    self._dict[mxg.text]=URImxg
+                
+                if not error:
+                    self._ds.add((URImxg, RDF.type, PROV.Entity, self._ds.default_context))
+
+                    URIactivity= self._new_activity_uri()
+                    self.graph.add((URIactivity, RDF.type, PROV.Activity, self._ds.default_context))
+                    self.graph.add((URIactivity, PROV.wasAssociatedWith, URIagent, self._ds.default_context)) 
+                    self.graph.add((URIactivity, PROV.startedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
+
+                    self.graph.add((URImxg, PROV.wasGeneratedBy, URIactivity, self._ds.default_context))
+
+                    self.graph.add((URImxg, PROV.wasAttributedTo, URIagent, self._ds.default_context))
+                    self.graph.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime) self._ds.default_context))
+
+                    text=mxg.text
+                    
+                    #--------------- not now -------------
+                    #if mxg.convPart== "question":
+                    #    URInext = URIRef(self._nodeUri + self._clean_uri(messages[i + 1].node))
+                    #    self.graph.add((URImxg, self._NS.sended_at,URIRef(self._nodeUri + URInext)))
+
+                    #elif mxg.convPart== "answer":
+                    #    URIprev = URIRef(self.nodeUri + self.clean_uri(messages[i - 1].node))
+                    #    self.graph.add((URImxg, self.NS.sended_at, URIprev))
+                        # La risposta è DERIVATA dalla domanda precedente (PROV-O)
+                    #    if messages[i - 1].text in self.dict:
+                    #        URIprevMsg = self.dict[messages[i - 1].text]
+                    #        self.graph.add((URImxg, PROV.wasDerivedFrom, URIprevMsg))
+                            # L'activity ha USATO la domanda per produrre la risposta
+                    #        self.graph.add((URIactivity, PROV.used, URIprevMsg))
+                    #   text=messages[i-1].text+"\n"+text
+                    
+                    requirements=self._req_extr.pipe(text)
+                    ReqURI=self._new_extraction_uri()
+                    ng1=self._ds.get_context(ReqURI)
+                    for requirement in requirements:
+                        node=self._new_requirement_uri()
+                        ng1.add((node, RDF.type, self._EX.Requirement))
+                        ng1.add((node, RDF.subject,    URIRef(self._nodeUri + self.clean_uri(requirement["subject"]))))
+                        ng1.add((node, URIRef(self._edgeUri + self.clean_uri(requirement["predicate"])),    URIRef(self._nodeUri + self.clean_uri(requirement["object"]))))
+                        if requirement["priority"]:
+                            ng.add((node, self._EX.priority,   self._EX[self.clean_uri(requirement["priority"])]))
+                        if requirement["category"]:
+                            ng.add((node, self._EX.category,   self._EX[self.clean_uri(requirement["category"])]))
+                    self._ds.add((ReqURI, RDF.type, EX.Extraction,   self._ds.default_context))
+                    self._ds.add((ReqURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+
+
+    def _clean_uri(self, label: str) -> str:
+        label = label.strip().lower()
+        label = re.sub(r'[^a-zA-Z0-9]', '_', label)
+        label = re.sub(r'_+', '_', label)
+        return label.strip('_')     
+
+    def _new_activity_uri(self) -> URIRef:
+        self._activity_counter += 1
+        return URIRef(self._activityUri + f"activity{self._activity_counter}")
+
+    def _new_extraction_uri(self) -> URIRef:
+        self._extraction_counter += 1
+        return URIRef(self._extractionUri + f"extraction{self._activity_counter}")
+    
+    def _new_requirement_uri(self) -> URIRef:
+        self._requirement_counter += 1
+        return REQ[f"req{self._requirement_counter}"]
+
+    def saveGraph(self):
+        self._ds.serialize(destination=f"{self._name}.ttl", format="turtle", encoding="utf-8")
 
 if __name__=="__main__":
-    name=input("insert the name of the graph: ")
-    graph=Custom_Graph(name)
-    graph.load("outputConstraints.txt", "constraints")
-    graph.load("outputRequirements.txt", "requirements")
-    graph.savegraph()
+    agent_list = load_checkpoint()
+    grafo=Custom_Graph(agent_list, "Paura")
+    grafo.add_content("Nuova_Prova.log")
