@@ -10,6 +10,7 @@ from mxg import Message
 
 
 import os
+import re
 import pickle
 CHECKPOINT_FILE = "checkpoint_before_graph.pkl"
 def load_checkpoint():
@@ -51,7 +52,8 @@ class Custom_Graph:
     def add_content(self, file:str):
         messages=self._load(file)
         messages=self._isolation(messages, "User")
-        saveGraph()
+        self._generate_graph(messages)
+        self._saveGraph()
 
     def _load(self, file:str)->list:
         try:
@@ -131,7 +133,7 @@ class Custom_Graph:
                 output.append(message)
         return output
 
-    def _generate_graph(self, message:list):
+    def _generate_graph(self, messages:list):
         for i in range(len(messages)):
             mxg=messages[i]
             error=False
@@ -145,17 +147,17 @@ class Custom_Graph:
                 #----------- ricontrollare dopo ------------------
                 if mxg.text in self._dict:
                     URImxg=self._dict[mxg.text]
-                    if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
-                        for (s,o,p) in self._ds:
-                            if s==URImxg:
-                                self._ds.remove((s, o, p))
-                            if p==URImxg:
-                                if isinstance(s, BNode):
-                                    self._ds.remove((s, None, None))
-                                else:
-                                    self._ds.remove((s,o,p))
-                    else:
-                        error=True
+                    #if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
+                    #    for (s,o,p) in self._ds:
+                    #        if s==URImxg:
+                    #            self._ds.remove((s, o, p))
+                    #        if p==URImxg:
+                    #            if isinstance(s, BNode):
+                    #                self._ds.remove((s, None, None))
+                    #            else:
+                    #                self._ds.remove((s,o,p))
+                    #else:
+                    #    error=True
                 #----------- ricontrollare dopo ------------------             
                 else:
                     URImxg=URIRef(self._nodeUri +f"message{len(self._dict.keys())}")
@@ -172,7 +174,7 @@ class Custom_Graph:
                     self._ds.add((URImxg, PROV.wasGeneratedBy, URIactivity, self._ds.default_context))
 
                     self._ds.add((URImxg, PROV.wasAttributedTo, URIagent, self._ds.default_context))
-                    self._ds.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime) self._ds.default_context))
+                    self._ds.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
 
                     text=mxg.text
                     
@@ -198,13 +200,13 @@ class Custom_Graph:
                     for requirement in requirements:
                         node=self._new_requirement_uri()
                         ng1.add((node, RDF.type, self._EX.Requirement))
-                        ng1.add((node, RDF.subject,    URIRef(self._nodeUri + self.clean_uri(requirement["subject"]))))
-                        ng1.add((node, URIRef(self._edgeUri + self.clean_uri(requirement["predicate"])),    URIRef(self._nodeUri + self.clean_uri(requirement["object"]))))
+                        ng1.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(requirement["subject"]))))
+                        ng1.add((node, URIRef(self._edgeUri + self._clean_uri(requirement["predicate"])),    URIRef(self._nodeUri + self._clean_uri(requirement["object"]))))
                         if requirement["priority"]:
-                            ng.add((node, self._EX.priority,   self._EX[self.clean_uri(requirement["priority"])]))
+                            ng1.add((node, self._EX.priority,   self._EX[self._clean_uri(requirement["priority"])]))
                         if requirement["category"]:
-                            ng.add((node, self._EX.category,   self._EX[self.clean_uri(requirement["category"])]))
-                    self._ds.add((ReqURI, RDF.type, EX.Extraction,   self._ds.default_context))
+                            ng1.add((node, self._EX.category,   self._EX[self._clean_uri(requirement["category"])]))
+                    self._ds.add((ReqURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
                     self._ds.add((ReqURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
 
@@ -224,10 +226,10 @@ class Custom_Graph:
     
     def _new_requirement_uri(self) -> URIRef:
         self._requirement_counter += 1
-        return REQ[f"req{self._requirement_counter}"]
+        return self._REQ[f"req{self._requirement_counter}"]
 
-    def saveGraph(self):
-        self._ds.serialize(destination=f"{self._name}.ttl", format="turtle", encoding="utf-8")
+    def _saveGraph(self):
+        self._ds.serialize(destination=f"{self._name}.trig", format="trig", encoding="utf-8")
 
 if __name__=="__main__":
     agent_list = load_checkpoint()
