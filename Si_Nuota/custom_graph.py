@@ -23,12 +23,14 @@ class Custom_Graph:
         self._EX  = Namespace("http://example.org/ontologia#")
         self._REQ = Namespace("http://example.org/requirement/")
         self._EXT = Namespace("http://example.org/extraction/")
+        self._CON = Namespace("http://example.org/constraint/")
 
         self._ds = ConjunctiveGraph()
         self._ds.bind("ex",  self._EX)
         self._ds.bind("req", self._REQ)
         self._ds.bind("ext", self._EXT)
         self._ds.bind("prov",PROV)
+        self._ds.bind("con", self._CON)
 
         self._agent_list=agent_list
 
@@ -42,6 +44,7 @@ class Custom_Graph:
         self._activity_counter=0
         self._extraction_counter=0
         self._requirement_counter=0
+        self._constraint_counter=0
 
         self._req_extr=RequirementsExtractor("command-r",0)
         self._con_extr=ConstraintsExtractor("command-r",0)
@@ -209,6 +212,19 @@ class Custom_Graph:
                     self._ds.add((ReqURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
                     self._ds.add((ReqURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
+                    constraints=self._con_extr.pipe(text)
+                    ConURI=self._new_extraction_uri()
+                    ng2=self._ds.get_context(ConURI)
+                    for constraint in constraints:
+                        node=self._new_constraint_uri()
+                        ng2.add((node, RDF.type, self._EX.Constraint))
+                        ng2.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(constraint["subject"]))))
+                        ng2.add((node, URIRef(self._edgeUri + self._clean_uri(constraint["predicate"])),    URIRef(self._nodeUri + self._clean_uri(constraint["object"]))))
+                        if constraint["constraintType"]:
+                            ng2.add((node, self._EX.constraintType,   self._EX[self._clean_uri(constraint["constraintType"])]))
+                    self._ds.add((ConURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+                    self._ds.add((ConURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+
 
     def _clean_uri(self, label: str) -> str:
         label = label.strip().lower()
@@ -227,6 +243,10 @@ class Custom_Graph:
     def _new_requirement_uri(self) -> URIRef:
         self._requirement_counter += 1
         return self._REQ[f"req{self._requirement_counter}"]
+
+    def _new_constraint_uri(self) -> URIRef:
+        self._constraint_counter += 1
+        return self._CON[f"con{self._constraint_counter}"]
 
     def _saveGraph(self):
         trig_str = self._ds.serialize(format="trig")
