@@ -229,6 +229,7 @@ class Custom_Graph:
         return self._REQ[f"req{self._requirement_counter}"]
 
     def _saveGraph(self):
+        print("salvato")
         self._ds.serialize(destination=f"{self._name}.trig", format="trig", encoding="utf-8")
 
 if __name__=="__main__":
