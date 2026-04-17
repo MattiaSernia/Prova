@@ -38,7 +38,6 @@ class Custom_Graph:
         self._activityUri = "http://example.org/activity/"
         self._extractionUri= "http://example.org/extraction/"
         self._edgeUri="http://example.org/edge/"
-        self._extraction2Uri= "http://example.org/extraction2/"
 
         self._dict={}
 
@@ -199,7 +198,7 @@ class Custom_Graph:
                     #   text=messages[i-1].text+"\n"+text
                     
                     requirements=self._req_extr.pipe(text)
-                    ReqURI=self._new_extraction_uri()
+                    ReqURI=self._new_extraction_uri("req/")
                     ng1=self._ds.get_context(ReqURI)
                     for requirement in requirements:
                         node=self._new_requirement_uri()
@@ -214,7 +213,7 @@ class Custom_Graph:
                     self._ds.add((ReqURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
                     constraints=self._con_extr.pipe(text)
-                    ConURI=self._new_extraction2_uri()
+                    ConURI=self._new_extraction_uri("con/")
                     ng2=self._ds.get_context(ConURI)
                     for constraint in constraints:
                         node=self._new_constraint_uri()
@@ -237,13 +236,10 @@ class Custom_Graph:
         self._activity_counter += 1
         return URIRef(self._activityUri + f"activity{self._activity_counter}")
 
-    def _new_extraction_uri(self) -> URIRef:
+    def _new_extraction_uri(self, string:str="") -> URIRef:
         self._extraction_counter += 1
-        return URIRef(self._extractionUri + f"extraction{self._extraction_counter}")\
+        return URIRef(self._extractionUri + f"{string}extraction{self._extraction_counter}")
 
-    def _new_extraction2_uri(self) -> URIRef:
-        self._extraction_counter += 1
-        return URIRef(self._extraction2Uri + f"extraction{self._extraction_counter}")
     
     def _new_requirement_uri(self) -> URIRef:
         self._requirement_counter += 1
