@@ -229,8 +229,20 @@ class Custom_Graph:
         return self._REQ[f"req{self._requirement_counter}"]
 
     def _saveGraph(self):
+        trig_str = self._ds.serialize(format="trig")
+    
+        # Sostituisce il blocco anonimo { ... } con GRAPH esplicito
+        # rdflib scrive il default context come "{\n" — lo sostituiamo
+        trig_str = re.sub(
+            r'(?m)^{$',
+            'GRAPH <urn:x-arq:DefaultGraph> {',
+            trig_str
+        )
+        
+        with open(f"{self._name}.trig", "w", encoding="utf-8") as f:
+            f.write(trig_str)
         print("salvato")
-        self._ds.serialize(destination=f"{self._name}.trig", format="trig", encoding="utf-8")
+        #self._ds.serialize(destination=f"{self._name}.trig", format="trig", encoding="utf-8")
 
 if __name__=="__main__":
     agent_list = load_checkpoint()
