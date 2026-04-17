@@ -2,6 +2,7 @@ from rdflib import Graph, ConjunctiveGraph, Namespace, URIRef, Literal, RDF, Nam
 from rdflib.namespace import RDF, XSD, PROV
 from constraintsExtractor import ConstraintsExtractor
 from requirementsExtractor import RequirementsExtractor
+from proposalsExtractor import ProposalsExtractor
 from mxg import Message
 
 
@@ -24,6 +25,7 @@ class Custom_Graph:
         self._REQ = Namespace("http://example.org/requirement/")
         self._EXT = Namespace("http://example.org/extraction/")
         self._CON = Namespace("http://example.org/constraint/")
+        self._PRO = Namespace("http://example.org/proposal/")
 
         self._ds = ConjunctiveGraph()
         self._ds.bind("ex",  self._EX)
@@ -31,6 +33,7 @@ class Custom_Graph:
         self._ds.bind("ext", self._EXT)
         self._ds.bind("prov",PROV)
         self._ds.bind("con", self._CON)
+        self._ds.bind("pro", self._PRO)
 
         self._agent_list=agent_list
 
@@ -45,16 +48,18 @@ class Custom_Graph:
         self._extraction_counter=0
         self._requirement_counter=0
         self._constraint_counter=0
+        self._proposal_counter=0
 
         self._req_extr=RequirementsExtractor("command-r",0)
         self._con_extr=ConstraintsExtractor("command-r",0)
+        self._pro_extr=ProposalsExtractor("command-r",0)
 
         self._name=name
 
 
     def add_content(self, file:str):
         messages=self._load(file)
-        messages=self._isolation(messages, "User")
+        messages=self._isolation(messages, "User", "proposal")
         self._generate_graph(messages)
         self._saveGraph()
 
@@ -113,7 +118,7 @@ class Custom_Graph:
             convPart = "question"
         elif "Final" in total:
             node="Orchestrator"
-            convPart = "answer"
+            convPart = "proposal"
         if node=="":
             for agent in self._agent_list:
                 name=agent.name.split(" ")[0]
@@ -129,10 +134,12 @@ class Custom_Graph:
             role= "correction"
         return(Message(mxgCorp, timestamp, node, convPart, role))
 
-    def _isolation(self,messages:list ,node:str)->list:
+    def _isolation(self,messages:list ,node:str, convPart:str)->list:
         output=[]
         for message in messages:
             if message.node==node:
+                output.append(message)
+            elif message.convPart==convPart:
                 output.append(message)
         return output
 
@@ -187,7 +194,7 @@ class Custom_Graph:
                         self._ds.add((URImxg, self._EX.sended_at,URIRef(self._nodeUri + URInext),self._ds.default_context))
 
                     elif mxg.convPart== "answer":
-                        URIprev = URIRef(self.nodeUri + self.clean_uri(messages[i - 1].node))
+                        URIprev = URIRef(self._nodeUri + self._clean_uri(messages[i - 1].node))
                         self._ds.add((URImxg, self._EX.sended_at, URIprev, self._ds.default_context))
                         # La risposta è DERIVATA dalla domanda precedente (PROV-O)
                         if messages[i - 1].text in self._dict:
@@ -196,10 +203,22 @@ class Custom_Graph:
                             # L'activity ha USATO la domanda per produrre la risposta
                             self._ds.add((URIactivity, PROV.used, URIprevMsg, self._ds.default_context))
                         text=messages[i-1].text+"\n"+text
-                    
+
+                    elif mxg.convPart== "proposal":
+                        URIprev = URIRef(self._nodeUri + self._clean_uri(messages[i - 1].node))
+                        self._ds.add((URImxg, self._EX.sended_at, URIprev, self._ds.default_context))
+                        # La risposta è DERIVATA dalla domanda precedente (PROV-O)
+                        if messages[i - 1].text in self._dict:
+                            URIprevMsg = self._dict[messages[0].text]
+                            self._ds.add((URImxg, PROV.wasDerivedFrom, URIprevMsg,self._ds.default_context))
+                            # L'activity ha USATO la domanda per produrre la risposta
+                            self._ds.add((URIactivity, PROV.used, URIprevMsg, self._ds.default_context))
+
                     if mxg.node=="User":
                         self._userExtraction(text,URImxg)
-                    
+                    elif mxg.convPart=="proposal":
+                        self._propExtraction(text, URImxg)
+                                
     def _userExtraction(self, text: str, URImxg):
         requirements=self._req_extr.pipe(text)
         ReqURI=self._new_extraction_uri("req/")
@@ -242,7 +261,6 @@ class Custom_Graph:
     def _new_extraction_uri(self, string:str="") -> URIRef:
         self._extraction_counter += 1
         return URIRef(self._extractionUri + f"{string}extraction{self._extraction_counter}")
-
     
     def _new_requirement_uri(self) -> URIRef:
         self._requirement_counter += 1
@@ -252,6 +270,22 @@ class Custom_Graph:
         self._constraint_counter += 1
         return self._CON[f"con{self._constraint_counter}"]
 
+    def _propExtraction(self, text:str, URImxg):
+        proposals=self._pro_extr.pipe(text)
+        ProURI=self._new_extraction_uri("pro/")
+        ng=self._ds.get_context(ProURI)
+        for proposal in proposals:
+            node=self._new_proposal_uri()
+            ng.add((node, RDF.type, self._EX.Proposal))
+            ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(proposal["subject"]))))
+            ng.add((node, URIRef(self._edgeUri + self._clean_uri(proposal["predicate"])),    URIRef(self._nodeUri + self._clean_uri(proposal["object"]))))
+        self._ds.add((ProURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+        self._ds.add((ProURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+
+    def _new_proposal_uri(self)->URIRef:
+        self._proposal_counter += 1
+        return self._PRO[f"pro{self._proposal_counter}"]
+    
     def _saveGraph(self):
         trig_str = self._ds.serialize(format="trig")
     
