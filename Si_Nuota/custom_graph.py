@@ -3,6 +3,8 @@ from rdflib.namespace import RDF, XSD, PROV
 from constraintsExtractor import ConstraintsExtractor
 from requirementsExtractor import RequirementsExtractor
 from proposalsExtractor import ProposalsExtractor
+from tripletExtractorClaude import TripletExtractor
+from CoreferenceResolver import CoreferenceResolver
 from mxg import Message
 
 
@@ -26,6 +28,7 @@ class Custom_Graph:
         self._EXT = Namespace("http://example.org/extraction/")
         self._CON = Namespace("http://example.org/constraint/")
         self._PRO = Namespace("http://example.org/proposal/")
+        self._TRI = Namespace("http://example.org/triplet/")
 
         self._ds = ConjunctiveGraph()
         self._ds.bind("ex",  self._EX)
@@ -34,6 +37,7 @@ class Custom_Graph:
         self._ds.bind("prov",PROV)
         self._ds.bind("con", self._CON)
         self._ds.bind("pro", self._PRO)
+        self._ds.bind("tri", self._TRI)
 
         self._agent_list=agent_list
 
@@ -49,10 +53,12 @@ class Custom_Graph:
         self._requirement_counter=0
         self._constraint_counter=0
         self._proposal_counter=0
+        self._triplet_counter=0
 
         self._req_extr=RequirementsExtractor("command-r",0)
         self._con_extr=ConstraintsExtractor("command-r",0)
         self._pro_extr=ProposalsExtractor("command-r",0)
+        self._extractor=TripletExtractor("command-r",0)
 
         self._name=name
 
@@ -157,15 +163,12 @@ class Custom_Graph:
                 #----------- ricontrollare dopo ------------------
                 if mxg.text in self._dict:
                     URImxg=self._dict[mxg.text]
-                    #if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
-                    #    for (s,o,p) in self._ds:
-                    #        if s==URImxg:
-                    #            self._ds.remove((s, o, p))
-                    #        if p==URImxg:
-                    #            if isinstance(s, BNode):
-                    #                self._ds.remove((s, None, None))
-                    #            else:
-                    #                self._ds.remove((s,o,p))
+                    if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
+                        for (s,o,p, self._ds.default_context) in self._ds:
+                            if s==URImxg or p==URImxg:
+                                self._remove_derived_graphs(URImxg)
+                                self._ds.remove((s, o, p, self._ds.default_context))
+
                     #else:
                     #    error=True
                 #----------- ricontrollare dopo ------------------             
@@ -218,7 +221,18 @@ class Custom_Graph:
                         self._userExtraction(text,URImxg)
                     elif mxg.convPart=="proposal":
                         self._propExtraction(text, URImxg)
-                                
+                    else:
+                        self._normalExtraction(text, URImxg)
+            
+            elif mxg.role=="coherency":
+                if mxg.convPart=="answer":
+                    URImxg=self.dict[messages[i-1].text]
+                    self.graph.add((URImxg, self._EX.is_coherent,Literal(messages[i].text), self._ds.default_context))
+
+            elif mxg.role=="correction":
+                if mxg.convPart=="answer":
+                    URImxg=self.dict[messages[i-1].text]
+                    self.graph.add((URImxg, self.NS.does_answer,Literal(messages[i].text.lstrip().rstrip()), self._ds.default_context))                  
     def _userExtraction(self, text: str, URImxg):
         requirements=self._req_extr.pipe(text)
         ReqURI=self._new_extraction_uri("req/")
@@ -282,10 +296,26 @@ class Custom_Graph:
         self._ds.add((ProURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
         self._ds.add((ProURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
+    def _normalExtraction(self, text:str, URImxg):
+        triplets=self._extractor.pipe(text)
+        TriURI=self._new_extraction_uri("tri/")
+        ng=self._ds.get_context(TriURI)
+        for triplet in triplets:
+            node=self._new_triplet_uri()
+            ng.add((node, RDF.type, self._EX.Triplet))
+            ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(triplet["subject"]))))
+            ng.add((node, URIRef(self._edgeUri + self._clean_uri(triplet["predicate"])),    URIRef(self._nodeUri + self._clean_uri(triplet["object"]))))
+        self._ds.add((TriURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+        self._ds.add((TriURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+    
     def _new_proposal_uri(self)->URIRef:
         self._proposal_counter += 1
         return self._PRO[f"pro{self._proposal_counter}"]
     
+    def _new_triplet_uri(self) -> URIRef:
+        self._triplet_counter += 1
+        return self._TRI[f"req{self._triplet_counter}"]
+
     def _saveGraph(self):
         trig_str = self._ds.serialize(format="trig")
     
@@ -302,6 +332,19 @@ class Custom_Graph:
         print("salvato")
         #self._ds.serialize(destination=f"{self._name}.trig", format="trig", encoding="utf-8")
 
+    def _remove_derived_graphs(self, URImxg):
+        """Remove all named graphs (extractions) derived from this message."""
+        # 1. Find all extraction URIs linked to this message
+        extraction_uris = list(self._ds.subjects(PROV.wasDerivedFrom, URImxg))
+        
+        for ext_uri in extraction_uris:
+            # 2. Remove the entire named graph (all extracted triples inside it)
+            ng = self._ds.get_context(ext_uri)
+            self._ds.remove_context(ng)
+            
+            # 3. Remove provenance metadata from the default graph
+            #    (rdf:type ex:Extraction, prov:wasDerivedFrom, etc.)
+            self._ds.remove((ext_uri, None, None, self._ds.default_context))
 if __name__=="__main__":
     agent_list = load_checkpoint()
     grafo=Custom_Graph(agent_list, "Paura")
