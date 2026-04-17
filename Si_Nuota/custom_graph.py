@@ -182,49 +182,52 @@ class Custom_Graph:
                     text=mxg.text
                     
                     #--------------- not now -------------
-                    #if mxg.convPart== "question":
-                    #    URInext = URIRef(self._nodeUri + self._clean_uri(messages[i + 1].node))
-                    #    self._ds.add((URImxg, self._NS.sended_at,URIRef(self._nodeUri + URInext)))
+                    if mxg.convPart== "question" and i<len(messages)-1:
+                        URInext = URIRef(self._nodeUri + self._clean_uri(messages[i + 1].node))
+                        self._ds.add((URImxg, self._EX.sended_at,URIRef(self._nodeUri + URInext),self._ds.default_context))
 
-                    #elif mxg.convPart== "answer":
-                    #    URIprev = URIRef(self.nodeUri + self.clean_uri(messages[i - 1].node))
-                    #    self._ds.add((URImxg, self.NS.sended_at, URIprev))
+                    elif mxg.convPart== "answer":
+                        URIprev = URIRef(self.nodeUri + self.clean_uri(messages[i - 1].node))
+                        self._ds.add((URImxg, self._EX.sended_at, URIprev, self._ds.default_context))
                         # La risposta è DERIVATA dalla domanda precedente (PROV-O)
-                    #    if messages[i - 1].text in self.dict:
-                    #        URIprevMsg = self.dict[messages[i - 1].text]
-                    #        self._ds.add((URImxg, PROV.wasDerivedFrom, URIprevMsg))
+                        if messages[i - 1].text in self._dict:
+                            URIprevMsg = self._dict[messages[i - 1].text]
+                            self._ds.add((URImxg, PROV.wasDerivedFrom, URIprevMsg,self._ds.default_context))
                             # L'activity ha USATO la domanda per produrre la risposta
-                    #        self._ds.add((URIactivity, PROV.used, URIprevMsg))
-                    #   text=messages[i-1].text+"\n"+text
+                            self._ds.add((URIactivity, PROV.used, URIprevMsg, self._ds.default_context))
+                        text=messages[i-1].text+"\n"+text
                     
-                    requirements=self._req_extr.pipe(text)
-                    ReqURI=self._new_extraction_uri("req/")
-                    ng1=self._ds.get_context(ReqURI)
-                    for requirement in requirements:
-                        node=self._new_requirement_uri()
-                        ng1.add((node, RDF.type, self._EX.Requirement))
-                        ng1.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(requirement["subject"]))))
-                        ng1.add((node, URIRef(self._edgeUri + self._clean_uri(requirement["predicate"])),    URIRef(self._nodeUri + self._clean_uri(requirement["object"]))))
-                        if requirement["priority"]:
-                            ng1.add((node, self._EX.priority,   self._EX[self._clean_uri(requirement["priority"])]))
-                        if requirement["category"]:
-                            ng1.add((node, self._EX.category,   self._EX[self._clean_uri(requirement["category"])]))
-                    self._ds.add((ReqURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
-                    self._ds.add((ReqURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+                    if mxg.node=="User":
+                        self._userExtraction(text,URImxg)
+                    
+    def _userExtraction(self, text: str, URImxg):
+        requirements=self._req_extr.pipe(text)
+        ReqURI=self._new_extraction_uri("req/")
+        ng1=self._ds.get_context(ReqURI)
+        for requirement in requirements:
+            node=self._new_requirement_uri()
+            ng1.add((node, RDF.type, self._EX.Requirement))
+            ng1.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(requirement["subject"]))))
+            ng1.add((node, URIRef(self._edgeUri + self._clean_uri(requirement["predicate"])),    URIRef(self._nodeUri + self._clean_uri(requirement["object"]))))
+            if requirement["priority"]:
+                ng1.add((node, self._EX.priority,   self._EX[self._clean_uri(requirement["priority"])]))
+            if requirement["category"]:
+                ng1.add((node, self._EX.category,   self._EX[self._clean_uri(requirement["category"])]))
+        self._ds.add((ReqURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+        self._ds.add((ReqURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
-                    constraints=self._con_extr.pipe(text)
-                    ConURI=self._new_extraction_uri("con/")
-                    ng2=self._ds.get_context(ConURI)
-                    for constraint in constraints:
-                        node=self._new_constraint_uri()
-                        ng2.add((node, RDF.type, self._EX.Constraint))
-                        ng2.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(constraint["subject"]))))
-                        ng2.add((node, URIRef(self._edgeUri + self._clean_uri(constraint["predicate"])),    URIRef(self._nodeUri + self._clean_uri(constraint["object"]))))
-                        if constraint["constraintType"]:
-                            ng2.add((node, self._EX.constraintType,   self._EX[self._clean_uri(constraint["constraintType"])]))
-                    self._ds.add((ConURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
-                    self._ds.add((ConURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
-
+        constraints=self._con_extr.pipe(text)
+        ConURI=self._new_extraction_uri("con/")
+        ng2=self._ds.get_context(ConURI)
+        for constraint in constraints:
+            node=self._new_constraint_uri()
+            ng2.add((node, RDF.type, self._EX.Constraint))
+            ng2.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(constraint["subject"]))))
+            ng2.add((node, URIRef(self._edgeUri + self._clean_uri(constraint["predicate"])),    URIRef(self._nodeUri + self._clean_uri(constraint["object"]))))
+            if constraint["constraintType"]:
+                ng2.add((node, self._EX.constraintType,   self._EX[self._clean_uri(constraint["constraintType"])]))
+        self._ds.add((ConURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+        self._ds.add((ConURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
     def _clean_uri(self, label: str) -> str:
         label = label.strip().lower()
