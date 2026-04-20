@@ -164,13 +164,12 @@ class Custom_Graph:
                 if mxg.text in self._dict:
                     URImxg=self._dict[mxg.text]
                     if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
-                        for (s,o,p, self._ds.default_context) in self._ds:
-                            if s==URImxg or p==URImxg:
-                                self._remove_derived_graphs(URImxg)
-                                self._ds.remove((s, o, p, self._ds.default_context))
+                        self._remove_derived_graphs(URImxg)
+                        self._ds.remove((URImxg, None, None, self._ds.default_context))
+                        self._ds.remove((None, None, URImxg, self._ds.default_context))
 
-                    #else:
-                    #    error=True
+                    else:
+                        error=True
                 #----------- ricontrollare dopo ------------------             
                 else:
                     URImxg=URIRef(self._nodeUri +f"message{len(self._dict.keys())}")
@@ -226,13 +225,13 @@ class Custom_Graph:
             
             elif mxg.role=="coherency":
                 if mxg.convPart=="answer":
-                    URImxg=self.dict[messages[i-1].text]
-                    self.graph.add((URImxg, self._EX.is_coherent,Literal(messages[i].text), self._ds.default_context))
+                    URImxg=self._dict[messages[i-1].text]
+                    self._ds.add((URImxg, self._EX.is_coherent,Literal(messages[i].text), self._ds.default_context))
 
             elif mxg.role=="correction":
                 if mxg.convPart=="answer":
-                    URImxg=self.dict[messages[i-1].text]
-                    self.graph.add((URImxg, self.NS.does_answer,Literal(messages[i].text.lstrip().rstrip()), self._ds.default_context))                  
+                    URImxg=self._dict[messages[i-1].text]
+                    self._ds.add((URImxg, self._EX.does_answer,Literal(messages[i].text.lstrip().rstrip()), self._ds.default_context))                  
     def _userExtraction(self, text: str, URImxg):
         requirements=self._req_extr.pipe(text)
         ReqURI=self._new_extraction_uri("req/")
@@ -314,7 +313,7 @@ class Custom_Graph:
     
     def _new_triplet_uri(self) -> URIRef:
         self._triplet_counter += 1
-        return self._TRI[f"req{self._triplet_counter}"]
+        return self._TRI[f"tri{self._triplet_counter}"]
 
     def _saveGraph(self):
         trig_str = self._ds.serialize(format="trig")

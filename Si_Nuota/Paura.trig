@@ -7,21 +7,518 @@
 @prefix req: <http://example.org/requirement/> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://example.org/extraction/con/extraction2> {
-    con:con1 a ex:Constraint ;
-        ns1:must_be_of_assistance_to <http://example.org/node/agents> ;
-        ex:constraintType ex:technical ;
+<http://example.org/extraction/req/extraction1> {
+    req:req1 a ex:Requirement ;
+        ns1:implement <http://example.org/node/artificial_intelligence_solution> ;
+        ex:category ex:artificial_intelligence ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req10 a ex:Requirement ;
+        ns1:design <http://example.org/node/such_a_solution> ;
+        ex:category ex:it ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/it> .
+
+    req:req11 a ex:Requirement ;
+        ns1:implement <http://example.org/node/such_a_solution> ;
+        ex:category ex:it ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/it> .
+
+    req:req12 a ex:Requirement ;
+        ns1:deploy <http://example.org/node/such_a_solution> ;
+        ex:category ex:it ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/it> .
+
+    req:req13 a ex:Requirement ;
+        ns1:provide <http://example.org/node/intelligent_assistance_tool> ;
+        ex:category ex:support ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req14 a ex:Requirement ;
+        ns1:accompany <http://example.org/node/their_administrative_activities> ;
+        ex:category ex:workforce ;
+        ex:priority ex:should ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req15 a ex:Requirement ;
+        ns1:search_for_information <http://example.org/node/internal_procedures_and_applicable_regulation> ;
+        ex:category ex:search ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req16 a ex:Requirement ;
+        ns1:receive_help_with_drafting <http://example.org/node/letters_or_answers_to_users> ;
+        ex:category ex:writing ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req17 a ex:Requirement ;
+        ns1:obtain_accompaniment_in_instruction_of_files <http://example.org/node/town_planning_social_aids_civil_status> ;
+        ex:category ex:instruction ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req18 a ex:Requirement ;
+        ns1:benefit_from_suggestion_of_actions_steps <http://example.org/node/framework_of_an_administrative_process> ;
+        ex:category ex:suggestion ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req19 a ex:Requirement ;
+        ns1:integrate <http://example.org/node/its_functionalities_with_existing_practices> ;
+        ex:priority ex:must ;
         rdf:subject <http://example.org/node/solution> .
 
+    req:req2 a ex:Requirement ;
+        ns1:improve <http://example.org/node/efficiency_of_administrative_services> ;
+        ex:category ex:digital_transformation ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/city_of_belval> .
+
+    req:req20 a ex:Requirement ;
+        ns1:cause <http://example.org/node/a_rupture_in_the_agents_modes_of_work> ;
+        ex:priority ex:must_not ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req21 a ex:Requirement ;
+        ns1:access <http://example.org/node/reliable_and_up_to_date_information> ;
+        ex:category ex:assistance ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req22 a ex:Requirement ;
+        ns1:consult <http://example.org/node/sources_of_accurate_information> ;
+        ex:category ex:assistance ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req23 a ex:Requirement ;
+        ns1:propose <http://example.org/node/help_with_drafting_of_administrative_content> ;
+        ex:category ex:assistance ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req24 a ex:Requirement ;
+        ns1:provide <http://example.org/node/answers_to_users> ;
+        ex:category ex:assistance ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req25 a ex:Requirement ;
+        ns1:produce <http://example.org/node/administrative_letters> ;
+        ex:category ex:assistance ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req26 a ex:Requirement ;
+        ns1:generate <http://example.org/node/syntheses_of_files> ;
+        ex:category ex:assistance ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req27 a ex:Requirement ;
+        ns1:assist <http://example.org/node/agents> ;
+        ex:category ex:administrative_services ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req28 a ex:Requirement ;
+        ns1:propose <http://example.org/node/relevant_information> ;
+        ex:category ex:administrative_services ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req29 a ex:Requirement ;
+        ns1:recall <http://example.org/node/applicable_rules> ;
+        ex:category ex:administrative_services ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req3 a ex:Requirement ;
+        ns1:improve <http://example.org/node/quality_of_service_rendered_to_users> ;
+        ex:category ex:digital_transformation ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/city_of_belval> .
+
+    req:req30 a ex:Requirement ;
+        ns1:suggest <http://example.org/node/actions_or_verifications_to_carry_out> ;
+        ex:category ex:administrative_services ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req31 a ex:Requirement ;
+        ns1:share <http://example.org/node/relevant_information> ;
+        ex:category ex:collaboration ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents_and_services> .
+
+    req:req32 a ex:Requirement ;
+        ns1:facilitate <http://example.org/node/continuity_of_processing> ;
+        ex:category ex:collaboration ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents_and_services> .
+
+    req:req33 a ex:Requirement ;
+        ns1:understand <http://example.org/node/context_of_ongoing_files> ;
+        ex:category ex:understanding ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req34 a ex:Requirement ;
+        ns1:resume <http://example.org/node/file_processing_effectively> ;
+        ex:category ex:resumption ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/another_agent> .
+
+    req:req35 a ex:Requirement ;
+        ns1:respect <http://example.org/node/regulatory_requirements> ;
+        ex:category ex:compliance ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution_provider> .
+
+    req:req36 a ex:Requirement ;
+        ns1:guarantee <http://example.org/node/gdpr_compliance> ;
+        ex:category ex:data_protection ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/service_provider> .
+
+    req:req37 a ex:Requirement ;
+        ns1:explain <http://example.org/node/recommendations> ;
+        ex:category ex:transparency ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/local_authority> .
+
+    req:req38 a ex:Requirement ;
+        ns1:explain <http://example.org/node/proposals> ;
+        ex:category ex:transparency ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/local_authority> .
+
+    req:req39 a ex:Requirement ;
+        ns1:be_designed_as <http://example.org/node/a_tool_of_assistance> ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/the_expected_solution> .
+
+    req:req4 a ex:Requirement ;
+        ns1:address <http://example.org/node/complexity_of_procedures> ;
+        ex:category ex:digital_transformation ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req40 a ex:Requirement ;
+        ns1:have <http://example.org/node/explicit_validation_by_an_agent> ;
+        ex:category ex:decision_making ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/decisions> .
+
+    req:req41 a ex:Requirement ;
+        ns1:provide <http://example.org/node/times_of_response_compatible_with_a_daily_use> ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req42 a ex:Requirement ;
+        ns1:reduce <http://example.org/node/response_time_for_current_requests> ;
+        ex:category ex:must ;
+        ex:priority ex:solution ;
+        rdf:subject <http://example.org/node/provide> .
+
+    req:req43 a ex:Requirement ;
+        ns1:achieve <http://example.org/node/high_level> ;
+        ex:category ex:relevance ;
+        ex:priority ex:should ;
+        rdf:subject <http://example.org/node/answers> .
+
+    req:req44 a ex:Requirement ;
+        ns1:guarantee <http://example.org/node/high_level_of_availability_for_municipal_services> ;
+        ex:category ex:availability ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req45 a ex:Requirement ;
+        ns1:be <http://example.org/node/99_9> ;
+        ex:category ex:must ;
+        ex:priority ex:availability ;
+        rdf:subject <http://example.org/node/the_expected_solution> .
+
+    req:req46 a ex:Requirement ;
+        ns1:use <http://example.org/node/apis> ;
+        ex:category ex:interfaces ;
+        ex:priority ex:should ;
+        rdf:subject <http://example.org/node/interfaces> .
+
+    req:req47 a ex:Requirement ;
+        ns1:grant <http://example.org/node/particular_importance_to_data_sovereignty> ;
+        ex:category ex:data_management ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/local_authority> .
+
+    req:req48 a ex:Requirement ;
+        ns1:be_realised_on <http://example.org/node/an_infrastructure_of_secnumcloud_type> ;
+        ex:category ex:security ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/hosting> .
+
+    req:req49 a ex:Requirement ;
+        ns1:have <http://example.org/node/a_reduced_dependence_vis_vis_non_european_suppliers> ;
+        ex:category ex:security ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/hosting> .
+
+    req:req5 a ex:Requirement ;
+        ns1:reduce <http://example.org/node/multiplicity_of_sources_of_information> ;
+        ex:category ex:digital_transformation ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req50 a ex:Requirement ;
+        ns1:ensure <http://example.org/node/compliance_with_budgetary_constraints> ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/> .
+
+    req:req51 a ex:Requirement ;
+        ns1:remain_mastered <http://example.org/node/budgetary_capacities> ;
+        ex:category ex:finance ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/local_authority> .
+
+    req:req52 a ex:Requirement ;
+        ns1:optimize <http://example.org/node/costs> ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/holder> .
+
+    req:req53 a ex:Requirement ;
+        ns1:guarantee <http://example.org/node/quality_of_service> ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/holder> .
+
+    req:req54 a ex:Requirement ;
+        ns1:limit <http://example.org/node/environmental_footprint> ;
+        ex:category ex:sustainability ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/city_of_belval> .
+
+    req:req55 a ex:Requirement ;
+        ns1:ensure <http://example.org/node/compliance_with_sustainable_development_policies> ;
+        ex:category ex:sustainability ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/city_of_belval> .
+
+    req:req56 a ex:Requirement ;
+        ns1:contribute <http://example.org/node/reduction_of_energetic_consumption> ;
+        ex:category ex:energy ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/holder> .
+
+    req:req57 a ex:Requirement ;
+        ns1:rely <http://example.org/node/infrastructures_with_low_carbon_impact> ;
+        ex:category ex:climate ;
+        ex:priority ex:may ;
+        rdf:subject <http://example.org/node/holder> .
+
+    req:req58 a ex:Requirement ;
+        ns1:conduct <http://example.org/node/deployment_in_a_progressive_manner> ;
+        ex:category ex:project_management ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/project> .
+
+    req:req59 a ex:Requirement ;
+        ns1:operate <http://example.org/node/within_a_limited_scope> ;
+        ex:category ex:pilot_testing ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/pilot_phase> .
+
+    req:req6 a ex:Requirement ;
+        ns1:handle <http://example.org/node/increase_in_volume_of_requests> ;
+        ex:category ex:digital_transformation ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req60 a ex:Requirement ;
+        ns1:generalize_progressively <http://example.org/node/across_all_services> ;
+        ex:category ex:scalability ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/solution> .
+
+    req:req61 a ex:Requirement ;
+        ns1:support <http://example.org/node/change_and_training_actions_for_agents> ;
+        ex:category ex:change_management ;
+        ex:priority ex:should ;
+        rdf:subject <http://example.org/node/accompaniment> .
+
+    req:req62 a ex:Requirement ;
+        ns1:demonstrate <http://example.org/node/adherence_to_specified_standards> ;
+        ex:category ex:compliance ;
+        rdf:subject <http://example.org/node/supplier> .
+
+    req:req7 a ex:Requirement ;
+        ns1:facilitate <http://example.org/node/access_to_information> ;
+        ex:category ex:agent_support ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/agents> .
+
+    req:req8 a ex:Requirement ;
+        ns1:improve <http://example.org/node/quality_of_answers> ;
+        ex:category ex:service_quality ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/authority> .
+
+    req:req9 a ex:Requirement ;
+        ns1:reduce <http://example.org/node/response_times> ;
+        ex:category ex:process_efficiency ;
+        ex:priority ex:must ;
+        rdf:subject <http://example.org/node/authority> .
+}
+
+<http://example.org/extraction/pro/extraction3> {
+    pro:pro1 a ex:Proposal ;
+        ns1:proposes <http://example.org/node/an_innovative_solution_to_enhance_administrative_efficiency_in_belval> ;
+        rdf:subject <http://example.org/node/nexus_engineering_s_r_l> .
+
+    pro:pro10 a ex:Proposal ;
+        ns1:recommends <http://example.org/node/deployment_of_the_mistral_7b_instruct_model> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro11 a ex:Proposal ;
+        ns1:applies <http://example.org/node/fine_tuning_techniques_like_lora_or_qlora> ;
+        rdf:subject <http://example.org/node/the_consortium> .
+
+    pro:pro12 a ex:Proposal ;
+        ns1:implements <http://example.org/node/retrieval_augmented_generation_rag_with_dense_vector_retrieval_mechanisms_such_as_semantic_search> ;
+        rdf:subject <http://example.org/node/the_consortium> .
+
+    pro:pro13 a ex:Proposal ;
+        ns1:implements <http://example.org/node/post_hoc_verification_capabilities_adhering_to_gdpr_requirements_for_explicability> ;
+        rdf:subject <http://example.org/node/the_consortium> .
+
+    pro:pro14 a ex:Proposal ;
+        ns1:ensures <http://example.org/node/human_oversight> ;
+        rdf:subject <http://example.org/node/the_consortium> .
+
+    pro:pro15 a ex:Proposal ;
+        ns1:complies_with <http://example.org/node/responsibility_constraints> ;
+        rdf:subject <http://example.org/node/the_consortium> .
+
+    pro:pro16 a ex:Proposal ;
+        ns1:will_provide <http://example.org/node/agents_quick_access_to_reliable_up_to_date_information_from_internal_procedures_regulatory_texts_and_documents> ;
+        rdf:subject <http://example.org/node/nexus_engineering_s_solution> .
+
+    pro:pro17 a ex:Proposal ;
+        ns1:assists_with <http://example.org/node/drafting_administrative_content> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro18 a ex:Proposal ;
+        ns1:ensures <http://example.org/node/adherence_to_quality_standards> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro19 a ex:Proposal ;
+        ns1:will_provide <http://example.org/node/explainability_post_hoc> ;
+        rdf:subject <http://example.org/node/source_citation_integration> .
+
+    pro:pro2 a ex:Proposal ;
+        ns1:integrates <http://example.org/node/large_language_models_llms_retrieval_augmented_generation_rag_and_confidence_scoring_mechanisms> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro20 a ex:Proposal ;
+        ns1:will_analyse <http://example.org/node/files> ;
+        rdf:subject <http://example.org/node/the_proposed_solution> .
+
+    pro:pro21 a ex:Proposal ;
+        ns1:will_propose <http://example.org/node/relevant_information> ;
+        rdf:subject <http://example.org/node/the_proposed_solution> .
+
+    pro:pro22 a ex:Proposal ;
+        ns1:will_recall <http://example.org/node/applicable_rules> ;
+        rdf:subject <http://example.org/node/the_proposed_solution> .
+
+    pro:pro23 a ex:Proposal ;
+        ns1:will_suggest <http://example.org/node/actions> ;
+        rdf:subject <http://example.org/node/the_proposed_solution> .
+
+    pro:pro24 a ex:Proposal ;
+        ns1:will_facilitate <http://example.org/node/file_processing_continuity_between_agents_through_context_sharing_and_effective_resumption_capabilities> ;
+        rdf:subject <http://example.org/node/the_solution> .
+
+    pro:pro25 a ex:Proposal ;
+        ns1:anonymize <http://example.org/node/personally_identifiable_information_pii_in_training_inference_datasets> ;
+        rdf:subject <http://example.org/node/anonymization_techniques> .
+
+    pro:pro26 a ex:Proposal ;
+        ns1:ensures <http://example.org/node/post_hoc_verification_capabilities_for_agents_to_understand_the_elements_leading_to_answers_or_suggestions> ;
+        rdf:subject <http://example.org/node/the_implementation_of_rag_with_semantic_search> .
+
+    pro:pro27 a ex:Proposal ;
+        ns1:contributes_to <http://example.org/node/explainability> ;
+        rdf:subject <http://example.org/node/source_citation_integration> .
+
+    pro:pro28 a ex:Proposal ;
+        ns1:aim_to_achieve <http://example.org/node/margins_around_28> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro29 a ex:Proposal ;
+        ns1:commit_to_deliver <http://example.org/node/a_cost_optimized_solution_without_compromising_service_quality_or_environmental_sustainability> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro3 a ex:Proposal ;
+        ns1:provides <http://example.org/node/intelligent_assistance_to_municipal_agents> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro30 a ex:Proposal ;
+        ns1:ensures_compliance_with <http://example.org/node/regulatory_security_and_environmental_constraints> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro31 a ex:Proposal ;
+        ns1:addresses <http://example.org/node/all_functional_requirements> ;
+        rdf:subject <http://example.org/node/the_technical_approach> .
+
+    pro:pro32 a ex:Proposal ;
+        ns1:are_confident_in_delivering <http://example.org/node/a_successful_solution> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro33 a ex:Proposal ;
+        ns1:delivers <http://example.org/node/a_successful_solution_within_the_allocated_budget_and_timeline> ;
+        rdf:subject <http://example.org/node/the_consortium> .
+
+    pro:pro4 a ex:Proposal ;
+        ns1:ensures_compliance_with <http://example.org/node/data_protection_regulations_including_gdpr> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro5 a ex:Proposal ;
+        ns1:ensures <http://example.org/node/secure_data_storage_practices_within_the_eu> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro6 a ex:Proposal ;
+        ns1:ensures <http://example.org/node/robust_anonymization_techniques> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro7 a ex:Proposal ;
+        ns1:commits_to_deliver <http://example.org/node/a_solution_that_optimizes_costs> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro8 a ex:Proposal ;
+        ns1:maintains <http://example.org/node/expected_service_quality_standards> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+
+    pro:pro9 a ex:Proposal ;
+        ns1:reduces <http://example.org/node/environmental_impact> ;
+        rdf:subject <http://example.org/node/nexus_engineering> .
+}
+
+<http://example.org/extraction/con/extraction2> {
+    con:con1 a ex:Constraint ;
+        ns1:must_be <http://example.org/node/assistance> ;
+        ex:constraintType ex:technical ;
+        rdf:subject <http://example.org/node/artificial_intelligence_solution> .
+
     con:con10 a ex:Constraint ;
-        ns1:has_for_object <http://example.org/node/deployment> ;
-        ex:constraintType ex:regulatory ;
-        rdf:subject <http://example.org/node/present_contract> .
+        ns1:shall_involve <http://example.org/node/intelligent_assistance_tool> ;
+        ex:constraintType ex:technical ;
+        rdf:subject <http://example.org/node/accompaniment_in_file_instruction> .
 
     con:con11 a ex:Constraint ;
-        ns1:must_never_be_transferred_outside <http://example.org/node/the_european_economic_area> ;
-        ex:constraintType ex:sovereignty ;
-        rdf:subject <http://example.org/node/personal_data> .
+        ns1:shall_involve <http://example.org/node/intelligent_assistance_tool> ;
+        ex:constraintType ex:technical ;
+        rdf:subject <http://example.org/node/suggestion_of_actions_or_steps> .
 
     con:con12 a ex:Constraint ;
         ns1:will_have_to_integrate_with <http://example.org/node/existing_practices> ;
@@ -29,12 +526,12 @@
         rdf:subject <http://example.org/node/solution> .
 
     con:con13 a ex:Constraint ;
-        ns1:must_not_constitute <http://example.org/node/rupture_in_agent_s_mode_of_work> ;
+        ns1:must_not_constitute <http://example.org/node/rupture_in_agents_modes_of_work> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con14 a ex:Constraint ;
-        ns1:must_allow <http://example.org/node/agents_to_access_quickly> ;
+        ns1:must_allow <http://example.org/node/quick_access> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
@@ -49,43 +546,43 @@
         rdf:subject <http://example.org/node/solution> .
 
     con:con17 a ex:Constraint ;
-        ns1:will_have_to_propose_a_help_with_the_drafting_of_administrative_contents <http://example.org/node/notably_answers_to_the_users_administrative_letters_syntheses_of_files> ;
+        ns1:will_have_to_propose_a_help_with <http://example.org/node/drafting_of_administrative_contents_notably_answers_to_the_users_administrative_letters_syntheses_of_files> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con18 a ex:Constraint ;
-        ns1:have_to_be_compliant_with <http://example.org/node/requirements_of_quality> ;
+        ns1:will_have_to_be_adapted_and_compliant_with <http://example.org/node/the_requirements_of_quality_expected> ;
         ex:constraintType ex:regulatory ;
-        rdf:subject <http://example.org/node/contents> .
+        rdf:subject <http://example.org/node/generated_contents> .
 
     con:con19 a ex:Constraint ;
-        ns1:will_have_to_assist <http://example.org/node/agents_in_the_analysis_and_the_processing_of_files> ;
+        ns1:will_have_to_take_into_account <http://example.org/node/context_of_the_file> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con2 a ex:Constraint ;
-        ns1:must_be_implemented_within <http://example.org/node/city_of_belval> ;
-        ex:constraintType ex:sovereignty ;
-        rdf:subject <http://example.org/node/solution> .
+        ns1:comply_with <http://example.org/node/city_of_belval_digital_transformation_strategy> ;
+        ex:constraintType ex:regulatory ;
+        rdf:subject <http://example.org/node/objectives_of_the_project> .
 
     con:con20 a ex:Constraint ;
-        ns1:facilitate <http://example.org/node/continuity_of_the_processing_of_files_between_agents_and_services> ;
-        ex:constraintType ex:continuity_of_processing ;
+        ns1:will_have_to_facilitate <http://example.org/node/continuity_of_the_processing_of_the_files_between_agents_and_services> ;
+        ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con21 a ex:Constraint ;
-        ns1:allow <http://example.org/node/sharing_of_relevant_information> ;
-        ex:constraintType ex:sharing ;
+        ns1:will_have_to_allow <http://example.org/node/sharing_of_relevant_information> ;
+        ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con22 a ex:Constraint ;
-        ns1:allow <http://example.org/node/understanding_of_context_of_ongoing_file> ;
-        ex:constraintType ex:understanding ;
+        ns1:will_have_to_allow <http://example.org/node/understanding_of_the_context_of_an_ongoing_file> ;
+        ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con23 a ex:Constraint ;
-        ns1:allow <http://example.org/node/effective_resumption_of_processing_by_another_agent> ;
-        ex:constraintType ex:resumption ;
+        ns1:will_have_to_allow <http://example.org/node/effective_resumption_of_the_processing_by_another_agent> ;
+        ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con24 a ex:Constraint ;
@@ -109,54 +606,54 @@
         rdf:subject <http://example.org/node/transfer_of_data_outside> .
 
     con:con28 a ex:Constraint ;
-        ns1:will_have_to_be_protected_in_an_appropriate_manner_encryption_anonymization_if_necessary <http://example.org/node/> ;
+        ns1:will_have_to_be_protected_in_an_appropriate_manner_with <http://example.org/node/encryption_anonymization_if_necessary> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/data> .
 
     con:con29 a ex:Constraint ;
-        ns1:will_have_to <http://example.org/node/allow_understanding_of_elements_leading_to_answers> ;
+        ns1:will_have_to_be_designed <http://example.org/node/as_a_tool_of_assistance> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con3 a ex:Constraint ;
-        ns1:must_comply_with <http://example.org/node/city_of_belval_digital_transformation_strategy> ;
-        ex:constraintType ex:regulatory ;
-        rdf:subject <http://example.org/node/agents> .
-
-    con:con30 a ex:Constraint ;
-        ns1:must_be_designed_as <http://example.org/node/assistance_tool> ;
+        ns1:must_allow <http://example.org/node/assistance_for_agents_daily_mission> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
-    con:con31 a ex:Constraint ;
+    con:con30 a ex:Constraint ;
         ns1:will_be_able_to_be_automated_without <http://example.org/node/explicit_validation_of_an_agent> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/decision> .
 
-    con:con32 a ex:Constraint ;
+    con:con31 a ex:Constraint ;
         ns1:will_have_to_provide <http://example.org/node/times_of_response_compatible_with_a_daily_use> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
-    con:con33 a ex:Constraint ;
-        ns1:is_expected_to_be_lower_than <http://example.org/node/2_seconds> ;
+    con:con32 a ex:Constraint ;
+        ns1:shall_be_lower_than <http://example.org/node/2_seconds> ;
         ex:constraintType ex:technical ;
-        rdf:subject <http://example.org/node/time_of_response> .
+        rdf:subject <http://example.org/node/response_time> .
 
-    con:con34 a ex:Constraint ;
-        ns1:must_achieve <http://example.org/node/high_level_of_relevance> ;
+    con:con33 a ex:Constraint ;
+        ns1:must_have_a <http://example.org/node/high_level_of_relevance> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/answers> .
 
+    con:con34 a ex:Constraint ;
+        ns1:must_be_available <http://example.org/node/5_2_availability> ;
+        ex:constraintType ex:temporal ;
+        rdf:subject <http://example.org/node/solution> .
+
     con:con35 a ex:Constraint ;
-        ns1:shall_guarantee <http://example.org/node/high_level_of_availability> ;
+        ns1:must_be_able_to <http://example.org/node/guarantee_a_high_level_of_availability_compatible_with_the_needs_of_the_municipal_services> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con36 a ex:Constraint ;
-        ns1:is_expected_to_be <http://example.org/node/99_9_availability> ;
+        ns1:is_expected <http://example.org/node/99_9> ;
         ex:constraintType ex:technical ;
-        rdf:subject <http://example.org/node/objective> .
+        rdf:subject <http://example.org/node/objective_of_availability> .
 
     con:con37 a ex:Constraint ;
         ns1:will_have_to_integrate_with <http://example.org/node/existing_system_of_information> ;
@@ -164,29 +661,29 @@
         rdf:subject <http://example.org/node/expected_solution> .
 
     con:con38 a ex:Constraint ;
-        ns1:will_be_expected <http://example.org/node/api_type> ;
+        ns1:will_be_expected <http://example.org/node/> ;
         ex:constraintType ex:technical ;
-        rdf:subject <http://example.org/node/interfaces> .
+        rdf:subject <http://example.org/node/interfaces_of_api_type> .
 
     con:con39 a ex:Constraint ;
-        ns1:grants_a_particular_importance_to <http://example.org/node/the_sovereignty> ;
+        ns1:is_granted_a_particular_importance_by <http://example.org/node/local_authority> ;
         ex:constraintType ex:sovereignty ;
         rdf:subject <http://example.org/node/data> .
 
     con:con4 a ex:Constraint ;
-        ns1:must_allow <http://example.org/node/assistance_for_agents_daily_missions> ;
+        ns1:shall_achieve <http://example.org/node/improved_answer_quality> ;
         ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con40 a ex:Constraint ;
-        ns1:will_have_to_be_realized_on <http://example.org/node/an_infrastructure_of_secnumcloud_type_or_equivalent> ;
-        ex:constraintType ex:sovereignty ;
+        ns1:will_have_to_be_realized_on_an_infrastructure_of <http://example.org/node/secnumcloud_type_or_equivalent> ;
+        ex:constraintType ex:regulatory ;
         rdf:subject <http://example.org/node/hosting> .
 
     con:con41 a ex:Constraint ;
-        ns1:will_bring_a_particular_attention_to <http://example.org/node/vis_vis_non_european_suppliers> ;
+        ns1:must_bring_a_particular_attention_to_the_dependence_vis_vis <http://example.org/node/non_european_suppliers> ;
         ex:constraintType ex:sovereignty ;
-        rdf:subject <http://example.org/node/dependence> .
+        rdf:subject <http://example.org/node/> .
 
     con:con42 a ex:Constraint ;
         ns1:is_estimated_at <http://example.org/node/3_million_euros> ;
@@ -194,62 +691,62 @@
         rdf:subject <http://example.org/node/global_budget> .
 
     con:con43 a ex:Constraint ;
-        ns1:over_a_duration_of <http://example.org/node/4_years> ;
+        ns1:over <http://example.org/node/duration_of_4_years> ;
         ex:constraintType ex:temporal ;
         rdf:subject <http://example.org/node/global_budget> .
 
     con:con44 a ex:Constraint ;
-        ns1:will_have_to_remain_mastered_and_compatible_with <http://example.org/node/budgetary_capacities_of_the_local_authority> ;
+        ns1:will_have_to_remain_mastered_and_compatible_with <http://example.org/node/the_budgetary_capacities_of_the_local_authority> ;
         ex:constraintType ex:budgetary ;
         rdf:subject <http://example.org/node/annual_cost_of_exploitation> .
 
     con:con45 a ex:Constraint ;
-        ns1:must_allow_to_optimize <http://example.org/node/costs> ;
+        ns1:allowing_to_optimize <http://example.org/node/the> ;
         ex:constraintType ex:budgetary ;
-        rdf:subject <http://example.org/node/approach> .
+        rdf:subject <http://example.org/node/costs> .
 
     con:con46 a ex:Constraint ;
-        ns1:must_guarantee <http://example.org/node/quality_of_service> ;
+        ns1:guaranteeing <http://example.org/node/expected> ;
         ex:constraintType ex:technical ;
-        rdf:subject <http://example.org/node/approach> .
+        rdf:subject <http://example.org/node/quality_of_service> .
 
     con:con47 a ex:Constraint ;
-        ns1:must_be_limited_to <http://example.org/node/an_environmental_footprint> ;
+        ns1:must_be_limited <http://example.org/node/according_to_the_framework_of_city_of_belval_policy_of_sustainable_development> ;
         ex:constraintType ex:environmental ;
-        rdf:subject <http://example.org/node/city_of_belval_systems_of_information> .
+        rdf:subject <http://example.org/node/environmental_footprint_of_city_of_belval_systems_of_information> .
 
     con:con48 a ex:Constraint ;
-        ns1:contributing_to <http://example.org/node/reduction_of_energetic_consumption> ;
+        ns1:contributing_to_the_reduction_of <http://example.org/node/energetic_consumption> ;
         ex:constraintType ex:environmental ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con49 a ex:Constraint ;
-        ns1:rely_on <http://example.org/node/infrastructures_with_low_carbon_impact> ;
+        ns1:relying_on <http://example.org/node/infrastructures_with_low_carbon_impact> ;
         ex:constraintType ex:environmental ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con5 a ex:Constraint ;
-        ns1:must_facilitate <http://example.org/node/access_to_information> ;
-        ex:constraintType ex:technical ;
+        ns1:is_aimed_at_reducing <http://example.org/node/processing_time> ;
+        ex:constraintType ex:temporal ;
         rdf:subject <http://example.org/node/solution> .
 
     con:con50 a ex:Constraint ;
-        ns1:will_have_to_be_conducted <http://example.org/node/in_a_progressive_manner> ;
+        ns1:will_have_to_be_conducted_in <http://example.org/node/a_progressive_manner> ;
         ex:constraintType ex:temporal ;
         rdf:subject <http://example.org/node/modalities_of_deployment> .
 
     con:con51 a ex:Constraint ;
-        ns1:with <http://example.org/node/a_pilot_phase_on_a_limited_scope> ;
+        ns1:on <http://example.org/node/a_limited_scope> ;
         ex:constraintType ex:temporal ;
-        rdf:subject <http://example.org/node/modalities_of_deployment> .
+        rdf:subject <http://example.org/node/pilot_phase> .
 
     con:con52 a ex:Constraint ;
-        ns1:with <http://example.org/node/a_progressive_generalization_to_the_entirety_of_the_services> ;
+        ns1:to <http://example.org/node/the_entirety_of_the_services> ;
         ex:constraintType ex:temporal ;
-        rdf:subject <http://example.org/node/modalities_of_deployment> .
+        rdf:subject <http://example.org/node/progressive_generalization> .
 
     con:con53 a ex:Constraint ;
-        ns1:will_be_expected <http://example.org/node/an_accompaniment_to_the_change_and_actions_of_training_of_the_agents> ;
+        ns1:shall_be_expected <http://example.org/node/an_accompaniment_to_the_change_and_actions_of_training_of_the_agents> ;
         ex:constraintType ex:regulatory ;
         rdf:subject <http://example.org/node/accompaniment> .
 
@@ -259,29 +756,39 @@
         rdf:subject <http://example.org/node/offers> .
 
     con:con55 a ex:Constraint ;
-        ns1:shall_take_into_account <http://example.org/node/environmental_issues> ;
-        ex:constraintType ex:budgetary ;
+        ns1:shall_have_a_certain_level_of <http://example.org/node/security> ;
+        ex:constraintType ex:technical ;
         rdf:subject <http://example.org/node/offers> .
 
-    con:con6 a ex:Constraint ;
-        ns1:must_improve <http://example.org/node/quality_of_answers> ;
-        ex:constraintType ex:technical ;
+    con:con56 a ex:Constraint ;
+        ns1:is_limited_to <http://example.org/node/global_cost> ;
+        ex:constraintType ex:budgetary ;
         rdf:subject <http://example.org/node/solution> .
+
+    con:con57 a ex:Constraint ;
+        ns1:should_account_for <http://example.org/node/environmental_issues> ;
+        ex:constraintType ex:environmental ;
+        rdf:subject <http://example.org/node/solution> .
+
+    con:con6 a ex:Constraint ;
+        ns1:has_for_object <http://example.org/node/the_design_the_implementation_and_the_deployment> ;
+        ex:constraintType ex:regulatory ;
+        rdf:subject <http://example.org/node/present_contract> .
 
     con:con7 a ex:Constraint ;
-        ns1:must_reduce <http://example.org/node/processing_time> ;
-        ex:constraintType ex:technical ;
-        rdf:subject <http://example.org/node/solution> .
+        ns1:must_comply_with <http://example.org/node/internal_procedures> ;
+        ex:constraintType ex:regulatory ;
+        rdf:subject <http://example.org/node/the_search_for_information> .
 
     con:con8 a ex:Constraint ;
-        ns1:has_for_object <http://example.org/node/design> ;
+        ns1:must_comply_with <http://example.org/node/applicable_regulation> ;
         ex:constraintType ex:regulatory ;
-        rdf:subject <http://example.org/node/present_contract> .
+        rdf:subject <http://example.org/node/the_search_for_information> .
 
     con:con9 a ex:Constraint ;
-        ns1:has_for_object <http://example.org/node/implementation> ;
-        ex:constraintType ex:regulatory ;
-        rdf:subject <http://example.org/node/present_contract> .
+        ns1:shall_involve <http://example.org/node/intelligent_assistance_tool> ;
+        ex:constraintType ex:technical ;
+        rdf:subject <http://example.org/node/help_with_drafting_letters_and_answers> .
 }
 
 GRAPH <urn:x-arq:DefaultGraph> {
@@ -319,497 +826,5 @@ GRAPH <urn:x-arq:DefaultGraph> {
         prov:generatedAtTime "2026-04-15T16:09:29"^^xsd:dateTime ;
         prov:wasAttributedTo <http://example.org/node/user> ;
         prov:wasGeneratedBy <http://example.org/activity/activity1> .
-}
-
-<http://example.org/extraction/req/extraction1> {
-    req:req1 a ex:Requirement ;
-        ns1:use <http://example.org/node/an_artificial_intelligence_solution> ;
-        ex:category ex:assistance ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/agents_city_of_belval> .
-
-    req:req10 a ex:Requirement ;
-        ns1:reduce <http://example.org/node/processing_times> ;
-        ex:category ex:local_government ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/artificial_intelligence_solution> .
-
-    req:req11 a ex:Requirement ;
-        ns1:design <http://example.org/node/solution> ;
-        ex:category ex:it ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/contractor> .
-
-    req:req12 a ex:Requirement ;
-        ns1:implement <http://example.org/node/solution> ;
-        ex:category ex:it ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/contractor> .
-
-    req:req13 a ex:Requirement ;
-        ns1:deploy <http://example.org/node/solution> ;
-        ex:category ex:it ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/contractor> .
-
-    req:req14 a ex:Requirement ;
-        ns1:provide <http://example.org/node/intelligent_assistance_for_their_work> ;
-        ex:category ex:support ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req15 a ex:Requirement ;
-        ns1:search_for_information <http://example.org/node/internal_procedures_and_regulations> ;
-        ex:category ex:document_management ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req16 a ex:Requirement ;
-        ns1:suggest_actions_steps <http://example.org/node/administrative_processes> ;
-        ex:category ex:procedure_management ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req17 a ex:Requirement ;
-        ns1:integrate <http://example.org/node/itself_into_existing_agent_practices> ;
-        ex:category ex:agent_experience ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req18 a ex:Requirement ;
-        ns1:constitute <http://example.org/node/a_rupture_in_agent_workflow> ;
-        ex:category ex:agent_productivity ;
-        ex:priority ex:must_not ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req19 a ex:Requirement ;
-        ns1:access <http://example.org/node/reliable_and_up_to_date_information> ;
-        ex:category ex:assistance ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req2 a ex:Requirement ;
-        ns1:improve <http://example.org/node/efficiency_of_administrative_services> ;
-        ex:category ex:digital_transformation ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/city_of_belval> .
-
-    req:req20 a ex:Requirement ;
-        ns1:access <http://example.org/node/information_on_internal_procedures> ;
-        ex:category ex:assistance ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req21 a ex:Requirement ;
-        ns1:access <http://example.org/node/applicable_regulatory_texts> ;
-        ex:category ex:assistance ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req22 a ex:Requirement ;
-        ns1:access <http://example.org/node/internal_documents_guides_notes_repositories> ;
-        ex:category ex:assistance ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req23 a ex:Requirement ;
-        ns1:provide <http://example.org/node/assistance_with_drafting_of_administrative_content> ;
-        ex:category ex:administrative_services ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req24 a ex:Requirement ;
-        ns1:include <http://example.org/node/support_for_user_queries_and_responses> ;
-        ex:category ex:communication ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req25 a ex:Requirement ;
-        ns1:generate <http://example.org/node/summaries_of_files> ;
-        ex:category ex:documentation_management ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req26 a ex:Requirement ;
-        ns1:assist <http://example.org/node/agents_in_file_processing> ;
-        ex:category ex:administrative ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req27 a ex:Requirement ;
-        ns1:propose <http://example.org/node/relevant_information> ;
-        ex:category ex:administrative ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req28 a ex:Requirement ;
-        ns1:recall <http://example.org/node/applicable_rules> ;
-        ex:category ex:administrative ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req29 a ex:Requirement ;
-        ns1:suggest <http://example.org/node/actions_or_verifications> ;
-        ex:category ex:administrative ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req3 a ex:Requirement ;
-        ns1:improve <http://example.org/node/quality_of_service_rendered_to_users> ;
-        ex:category ex:service_quality ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/city_of_belval> .
-
-    req:req30 a ex:Requirement ;
-        ns1:facilitate <http://example.org/node/continuity_of_processing> ;
-        ex:category ex:collaboration ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/the_expected_solution> .
-
-    req:req31 a ex:Requirement ;
-        ns1:enable <http://example.org/node/sharing_of_relevant_information> ;
-        ex:category ex:information_management ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/the_expected_solution> .
-
-    req:req32 a ex:Requirement ;
-        ns1:provide <http://example.org/node/understanding_of_file_context> ;
-        ex:category ex:understanding ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/the_expected_solution> .
-
-    req:req33 a ex:Requirement ;
-        ns1:resume <http://example.org/node/effective_resumption_of_the_processing> ;
-        ex:category ex:task_management ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/another_agent> .
-
-    req:req34 a ex:Requirement ;
-        ns1:guarantee <http://example.org/node/strict_compliance_with_gdpr> ;
-        ex:category ex:legal ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/holder> .
-
-    req:req35 a ex:Requirement ;
-        ns1:ensure <http://example.org/node/explicability_and_transparency> ;
-        ex:category ex:ai_ethics ;
-        ex:priority ex:should ;
-        rdf:subject <http://example.org/node/authority> .
-
-    req:req36 a ex:Requirement ;
-        ns1:be_designed_as <http://example.org/node/a_tool_of_assistance> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req37 a ex:Requirement ;
-        ns1:understand <http://example.org/node/elements_leading_to_answers_or_suggestions_a_posteriori> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/stakeholders> .
-
-    req:req38 a ex:Requirement ;
-        ns1:obtain <http://example.org/node/explicit_validation_of_an_agent> ;
-        ex:category ex:artificial_intelligence ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/decision> .
-
-    req:req39 a ex:Requirement ;
-        ns1:provide <http://example.org/node/time_of_responses_compatible_with_daily_use> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req4 a ex:Requirement ;
-        ns1:reduce <http://example.org/node/complexity_of_procedures> ;
-        ex:category ex:operational_efficiency ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req40 a ex:Requirement ;
-        ns1:have <http://example.org/node/shorter_time_of_response> ;
-        ex:priority ex:should ;
-        rdf:subject <http://example.org/node/> .
-
-    req:req41 a ex:Requirement ;
-        ns1:achieve <http://example.org/node/high_level_of_relevance> ;
-        ex:priority ex:should ;
-        rdf:subject <http://example.org/node/answers> .
-
-    req:req42 a ex:Requirement ;
-        ns1:guarantee <http://example.org/node/high_availability> ;
-        ex:category ex:service_management ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req43 a ex:Requirement ;
-        ns1:ensure <http://example.org/node/99_9_availability> ;
-        ex:category ex:service_management ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req44 a ex:Requirement ;
-        ns1:integrate_with <http://example.org/node/existing_information_systems> ;
-        ex:category ex:information_technology ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req45 a ex:Requirement ;
-        ns1:have <http://example.org/node/api_type> ;
-        ex:category ex:interfaces ;
-        ex:priority ex:should ;
-        rdf:subject <http://example.org/node/n_a> .
-
-    req:req46 a ex:Requirement ;
-        ns1:grant <http://example.org/node/particular_importance_to_data_sovereignty> ;
-        ex:category ex:data_management ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/local_authority> .
-
-    req:req47 a ex:Requirement ;
-        ns1:bring <http://example.org/node/particular_attention_to_dependence_vis_vis_non_european_suppliers> ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/> .
-
-    req:req48 a ex:Requirement ;
-        ns1:keep <http://example.org/node/annual_costs_at_a_sustainable_level> ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/> .
-
-    req:req49 a ex:Requirement ;
-        ns1:allow <http://example.org/node/optimization_of_costs> ;
-        rdf:subject <http://example.org/node/holder> .
-
-    req:req5 a ex:Requirement ;
-        ns1:obtain <http://example.org/node/single_source_of_information_for_regulations_internal_procedures_and_business_systems> ;
-        ex:category ex:information_management ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req50 a ex:Requirement ;
-        ns1:guarantee <http://example.org/node/quality_of_service> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/holder> .
-
-    req:req51 a ex:Requirement ;
-        ns1:limit <http://example.org/node/environmental_footprint> ;
-        ex:category ex:sustainability ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/city_of_belval> .
-
-    req:req52 a ex:Requirement ;
-        ns1:contribute_to <http://example.org/node/reduction_of_energetic_consumption> ;
-        ex:category ex:energy ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/holder> .
-
-    req:req53 a ex:Requirement ;
-        ns1:rely_upon <http://example.org/node/infrastructures_with_low_carbon_impact> ;
-        ex:category ex:sustainability ;
-        ex:priority ex:should ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req54 a ex:Requirement ;
-        ns1:deploy <http://example.org/node/project_progressively> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/> .
-
-    req:req55 a ex:Requirement ;
-        ns1:run <http://example.org/node/pilot_phase_on_a_limited_scope> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/> .
-
-    req:req56 a ex:Requirement ;
-        ns1:generalise <http://example.org/node/service_gradually> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/> .
-
-    req:req57 a ex:Requirement ;
-        ns1:support <http://example.org/node/change_and_training_actions_for_agents> ;
-        ex:category ex:training ;
-        ex:priority ex:should ;
-        rdf:subject <http://example.org/node/accompaniment> .
-
-    req:req58 a ex:Requirement ;
-        ns1:comply_with <http://example.org/node/regulatory_requirements> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/offers> .
-
-    req:req59 a ex:Requirement ;
-        ns1:address <http://example.org/node/environmental_issues> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req6 a ex:Requirement ;
-        ns1:manage <http://example.org/node/increased_volume_of_requests> ;
-        ex:category ex:workload_management ;
-        ex:priority ex:may ;
-        rdf:subject <http://example.org/node/agents> .
-
-    req:req60 a ex:Requirement ;
-        ns1:demonstrate <http://example.org/node/quality_and_relevance_to_the_need> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req61 a ex:Requirement ;
-        ns1:exhibit <http://example.org/node/innovative_capacity> ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/solution> .
-
-    req:req7 a ex:Requirement ;
-        ns1:assist <http://example.org/node/agents_in_their_daily_missions> ;
-        ex:category ex:local_government ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/local_authority> .
-
-    req:req8 a ex:Requirement ;
-        ns1:facilitate <http://example.org/node/access_to_information> ;
-        ex:category ex:local_government ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/artificial_intelligence_solution> .
-
-    req:req9 a ex:Requirement ;
-        ns1:improve <http://example.org/node/quality_of_answers> ;
-        ex:category ex:local_government ;
-        ex:priority ex:must ;
-        rdf:subject <http://example.org/node/artificial_intelligence_solution> .
-}
-
-<http://example.org/extraction/pro/extraction3> {
-    pro:pro1 a ex:Proposal ;
-        ns1:proposes <http://example.org/node/an_innovative_solution_to_enhance_administrative_efficiency_in_belval> ;
-        rdf:subject <http://example.org/node/nexus_engineering_s_r_l> .
-
-    pro:pro10 a ex:Proposal ;
-        ns1:manages <http://example.org/node/energy_consumption_efficiently> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro11 a ex:Proposal ;
-        ns1:implements <http://example.org/node/retrieval_augmented_generation_rag_with_dense_vector_retrieval_mechanisms_such_as_semantic_search> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro12 a ex:Proposal ;
-        ns1:enhances <http://example.org/node/answer_relevance_and_explainability> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro13 a ex:Proposal ;
-        ns1:implementing <http://example.org/node/ensures_agents_have_post_hoc_verification_capabilities_adhering_to_gdpr_requirements_for_explicability> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro14 a ex:Proposal ;
-        ns1:will_utilize <http://example.org/node/confidence_scoring_methods_like_shap_or_lime_setting_a_low_threshold_e_g_0_65_to_trigger_uncertainty_warnings> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro15 a ex:Proposal ;
-        ns1:ensures <http://example.org/node/human_oversight> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro16 a ex:Proposal ;
-        ns1:complies_with <http://example.org/node/responsibility_constraints> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro17 a ex:Proposal ;
-        ns1:will_provide <http://example.org/node/agents_quick_access_to_reliable_up_to_date_information_from_internal_procedures_regulatory_texts_and_documents> ;
-        rdf:subject <http://example.org/node/nexus_engineering_solution> .
-
-    pro:pro18 a ex:Proposal ;
-        ns1:provides_assistance_with <http://example.org/node/drafting_administrative_content> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro19 a ex:Proposal ;
-        ns1:guarantees <http://example.org/node/adherence_to_quality_standards> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro2 a ex:Proposal ;
-        ns1:tailors <http://example.org/node/an_approach> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro20 a ex:Proposal ;
-        ns1:will_provide <http://example.org/node/explainability_post_hoc> ;
-        rdf:subject <http://example.org/node/source_citation_integration> .
-
-    pro:pro21 a ex:Proposal ;
-        ns1:will_analyze <http://example.org/node/files> ;
-        rdf:subject <http://example.org/node/the_solution> .
-
-    pro:pro22 a ex:Proposal ;
-        ns1:proposes <http://example.org/node/relevant_information> ;
-        rdf:subject <http://example.org/node/the_solution> .
-
-    pro:pro23 a ex:Proposal ;
-        ns1:recalls <http://example.org/node/applicable_rules> ;
-        rdf:subject <http://example.org/node/the_solution> .
-
-    pro:pro24 a ex:Proposal ;
-        ns1:suggests <http://example.org/node/actions> ;
-        rdf:subject <http://example.org/node/the_solution> .
-
-    pro:pro25 a ex:Proposal ;
-        ns1:will_facilitate <http://example.org/node/file_processing_continuity_between_agents_through_context_sharing_and_effective_resumption_capabilities> ;
-        rdf:subject <http://example.org/node/the_solution> .
-
-    pro:pro26 a ex:Proposal ;
-        ns1:secures <http://example.org/node/encryption_keys_using_zero_knowledge_architecture> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro27 a ex:Proposal ;
-        ns1:anonymizes <http://example.org/node/personally_identifiable_information_pii_in_training_inference_datasets_through_microsoft_presidio_and_custom_ner_models> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro28 a ex:Proposal ;
-        ns1:ensures <http://example.org/node/user_privacy_protection_even_if_data_is_compromised_by_anonymizing_pii> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro29 a ex:Proposal ;
-        ns1:includes <http://example.org/node/post_hoc_verification_capabilities_for_agents_to_understand_the_elements_leading_to_answers_or_suggestions_through_rag_with_semantic_search> ;
-        rdf:subject <http://example.org/node/the_proposed_solution> .
-
-    pro:pro3 a ex:Proposal ;
-        ns1:integrates <http://example.org/node/large_language_models_llms_retrieval_augmented_generation_rag_and_confidence_scoring_mechanisms_to_provide_intelligent_assistance_to_municipal_agents> ;
-        rdf:subject <http://example.org/node/the_approach> .
-
-    pro:pro30 a ex:Proposal ;
-        ns1:contributes_to <http://example.org/node/explainability> ;
-        rdf:subject <http://example.org/node/source_citation_integration> .
-
-    pro:pro31 a ex:Proposal ;
-        ns1:aim_to_achieve <http://example.org/node/margins_around_28> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro32 a ex:Proposal ;
-        ns1:commits_to_deliver <http://example.org/node/a_cost_optimized_solution_without_compromising_service_quality_or_environmental_sustainability> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro33 a ex:Proposal ;
-        ns1:addresses <http://example.org/node/all_functional_requirements> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro34 a ex:Proposal ;
-        ns1:ensures <http://example.org/node/compliance_with_regulatory_security_and_environmental_constraints> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro35 a ex:Proposal ;
-        ns1:delivers <http://example.org/node/a_successful_solution> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro4 a ex:Proposal ;
-        ns1:proposes <http://example.org/node/ensures_compliance_with_data_protection_regulations_including_gdpr_through_secure_data_storage_practices_within_the_eu_and_robust_anonymization_techniques> ;
-        rdf:subject <http://example.org/node/the_consortium> .
-
-    pro:pro5 a ex:Proposal ;
-        ns1:commit_to_deliver <http://example.org/node/a_solution_that_optimizes_costs> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro6 a ex:Proposal ;
-        ns1:maintains <http://example.org/node/expected_service_quality_standards> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro7 a ex:Proposal ;
-        ns1:reduces <http://example.org/node/environmental_impact> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro8 a ex:Proposal ;
-        ns1:recommends <http://example.org/node/deployment_of_the_mistral_7b_instruct_model> ;
-        rdf:subject <http://example.org/node/nexus_engineering> .
-
-    pro:pro9 a ex:Proposal ;
-        ns1:applies <http://example.org/node/fine_tuning_techniques_like_lora_or_qlora_to_adapt_performance> ;
-        rdf:subject <http://example.org/node/the_consortium> .
 }
 
