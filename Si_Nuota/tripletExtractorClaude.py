@@ -97,8 +97,8 @@ Triplets:"""
                 "predicate": prop[1],
                 "object": prop[2]
             }
-            triplets_proposals.append(triplets_data)
-        return triplets_proposals
+            text_triplets.append(triplets_data)
+        return text_triplets
     
 
 

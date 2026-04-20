@@ -65,7 +65,7 @@ class Custom_Graph:
 
     def add_content(self, file:str):
         messages=self._load(file)
-        messages=self._isolation(messages, "User", "proposal")
+        #messages=self._isolation(messages, "User", "proposal")
         self._generate_graph(messages)
         self._saveGraph()
 
