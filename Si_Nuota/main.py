@@ -47,7 +47,7 @@ if __name__=="__main__":
     else:
         att=0
         agent_list=create_all_agents()
-        Orchestrator=Orchestrator_Agent(agent_list,'command-r')
+        Orchestrator=Orchestrator_Agent(agent_list,'ollama3.3:70b')
         question=load_question("file.txt")
         plan=Orchestrator.plan(question,att)
         while plan=={}: 
