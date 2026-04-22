@@ -293,10 +293,10 @@ class Custom_Graph:
             ng.add((node, RDF.type, self._EX.Proposal))
             ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(proposal["subject"]))))
             ng.add((node, URIRef(self._edgeUri + self._clean_uri(proposal["predicate"])),    URIRef(self._nodeUri + self._clean_uri(proposal["object"]))))
-            req_nodes=self._findreq(f"{proposal["subject"]}, {proposal["predicate"]}, {proposal["object"]}")
+            req_nodes=self._findreq(f"{proposal['subject']}, {proposal['predicate']}, {proposal['object']}")
             for subjnode in req_nodes["satisfies"]:
                 ng.add((node, self._EX.Satisfies, subjnode))
-            for subjnode in req_nodes["does_not_satisfies"]:
+            for subjnode in req_nodes["does_not_satisfy"]:
                 ng.add((node, self._EX.Does_Not_Satisfies, subjnode))
         self._ds.add((ProURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
         self._ds.add((ProURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
