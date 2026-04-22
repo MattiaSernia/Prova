@@ -46,8 +46,8 @@ if __name__=="__main__":
         agent_list = load_checkpoint()
     else:
         att=0
-        agent_list=create_all_agents()
-        Orchestrator=Orchestrator_Agent(agent_list,'ollama3.3:70b')
+        agent_list=create_all_agents('llama3.3:70b')
+        Orchestrator=Orchestrator_Agent(agent_list,'llama3.3:70b')
         question=load_question("file.txt")
         plan=Orchestrator.plan(question,att)
         while plan=={}: 

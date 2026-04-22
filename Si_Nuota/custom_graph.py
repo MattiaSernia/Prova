@@ -55,10 +55,10 @@ class Custom_Graph:
         self._proposal_counter=0
         self._triplet_counter=0
 
-        self._req_extr=RequirementsExtractor("command-r",0)
-        self._con_extr=ConstraintsExtractor("command-r",0)
-        self._pro_extr=ProposalsExtractor("command-r",0)
-        self._extractor=TripletExtractor("command-r",0)
+        self._req_extr=RequirementsExtractor("llama3.3:70b",0)
+        self._con_extr=ConstraintsExtractor("llama3.3:70b",0)
+        self._pro_extr=ProposalsExtractor("llama3.3:70b",0)
+        self._extractor=TripletExtractor("llama3.3:70b",0)
 
         self._name=name
 

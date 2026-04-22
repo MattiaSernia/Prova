@@ -5,7 +5,7 @@ import json
 
 class Agent:
 
-    def __init__(self, name: str, role: str, context_file: str, description:str ,model: str = "command-r"):
+    def __init__(self, name: str, role: str, context_file: str, description:str ,model: str):
         self.name = name
         self.role = role
         self.data = self._load_context(context_file)
@@ -231,7 +231,7 @@ AGENT_REGISTRY = {
 }
 
 
-def create_agent(agent_type: str, model: str = "command-r") -> Agent:
+def create_agent(agent_type: str, model: str) -> Agent:
     """Instantiate a single agent by its registry key."""
     if agent_type not in AGENT_REGISTRY:
         raise ValueError(
@@ -248,7 +248,7 @@ def create_agent(agent_type: str, model: str = "command-r") -> Agent:
     )
 
 
-def create_all_agents(model: str = "command-r") -> list:
+def create_all_agents(model: str) -> list:
     """Instantiate every agent declared in the registry."""
     return  [create_agent(key, model) for key in AGENT_REGISTRY]
 
