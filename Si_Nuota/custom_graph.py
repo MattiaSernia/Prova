@@ -356,14 +356,16 @@ class Custom_Graph:
         nodes=req_judge.answer(proposal)
         satlist=[]
         for element in nodes["satisfies"]:
-            satlist.append(self._searchnode(element))
+            if self._searchnode(element):
+                satlist.append(self._searchnode(element))
         not_satlist=[]
         for element in nodes["does_not_satisfy"]:
-            not_satlist.append(self._searchnode(element))
+            if self._searchnode(element):
+                not_satlist.append(self._searchnode(element))
         return {"satisfies":satlist, "does_not_satisfy":not_satlist}
     def _searchnode(self, triple:list):
         for subj in self._ds.subjects(RDF.type, self._EX.Requirement):
-            if (subj, RDF.subject, URIRef(self._nodeUri + self._clean_uri(element[0]))) in self._ds and (subj, URIRef(self._edgeUri + self._clean_uri(element[1])), URIRef(self._nodeUri + self._clean_uri(element[2]))) in self._ds:
+            if (subj, RDF.subject, URIRef(self._nodeUri + self._clean_uri(triple[0]))) in self._ds and (subj, URIRef(self._edgeUri + self._clean_uri(triple[1])), URIRef(self._nodeUri + self._clean_uri(triple[2]))) in self._ds:
                 return subj
 if __name__=="__main__":
     agent_list = load_checkpoint()
