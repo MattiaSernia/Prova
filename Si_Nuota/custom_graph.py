@@ -5,6 +5,7 @@ from requirementsExtractor import RequirementsExtractor
 from proposalsExtractor import ProposalsExtractor
 from tripletExtractorClaude import TripletExtractor
 from CoreferenceResolver import CoreferenceResolver
+from Requirementjudge import RequirementJudge
 from mxg import Message
 
 
@@ -292,6 +293,11 @@ class Custom_Graph:
             ng.add((node, RDF.type, self._EX.Proposal))
             ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(proposal["subject"]))))
             ng.add((node, URIRef(self._edgeUri + self._clean_uri(proposal["predicate"])),    URIRef(self._nodeUri + self._clean_uri(proposal["object"]))))
+            req_nodes=self._findreq(f"{proposal["subject"]}, {proposal["predicate"]}, {proposal["object"]}")
+            for subjnode in req_nodes["satisfies"]:
+                ng.add((node, self._EX.Satisfies, subjnode))
+            for subjnode in req_nodes["does_not_satisfies"]:
+                ng.add((node, self._EX.Does_Not_Satisfies, subjnode))
         self._ds.add((ProURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
         self._ds.add((ProURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
@@ -344,6 +350,21 @@ class Custom_Graph:
             # 3. Remove provenance metadata from the default graph
             #    (rdf:type ex:Extraction, prov:wasDerivedFrom, etc.)
             self._ds.remove((ext_uri, None, None, self._ds.default_context))
+
+    def _findreq(self, proposal:str)->dict:
+        req_judge=RequirementJudge("llama3.3:70b", 0, self._ds)
+        nodes=req_judge.answer(proposal)
+        satlist=[]
+        for element in nodes["satisfies"]:
+            satlist.append(self._searchnode(element))
+        not_satlist=[]
+        for element in nodes["does_not_satisfy"]:
+            not_satlist.append(self._searchnode(element))
+        return {"satisfies":satlist, "does_not_satisfy":not_satlist}
+    def _searchnode(self, triple:list):
+        for subj in self._ds.subjects(RDF.type, self._EX.Requirement):
+            if (subj, RDF.subject, URIRef(self._nodeUri + self._clean_uri(element[0]))) in self._ds and (subj, URIRef(self._edgeUri + self._clean_uri(element[1])), URIRef(self._nodeUri + self._clean_uri(element[2]))) in self._ds:
+                return subj
 if __name__=="__main__":
     agent_list = load_checkpoint()
     grafo=Custom_Graph(agent_list, "Paura")

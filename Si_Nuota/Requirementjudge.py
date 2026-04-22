@@ -53,6 +53,23 @@ class RequirementJudge:
             "[subject | predicate | object]\n\n"
             "If one section is empty, write the header followed by nothing.\n"
             "Use the requirement's own subject, predicate and object — not the proposal's.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "EXAMPLES\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            "Proposal: (consortium, will host data exclusively within, the european union)\n"
+            "SATISFIES:\n"
+            "[local authority | ensure | sovereignty of the data]\n\n"
+            "DOES_NOT_SATISFY:\n\n"
+            "---\n\n"
+            "Proposal: (consortium, will deploy, a chatbot for external users)\n"
+            "SATISFIES:\n\n"
+            "DOES_NOT_SATISFY:\n"
+            "[agents | provide | intelligent assistance tool]\n\n"
+            "---\n\n"
+            "Proposal: (consortium, will use, docker containers for microservices)\n"
+            "SATISFIES:\n\n"
+            "DOES_NOT_SATISFY:\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
             "=== YOUR CONTEXT (requirements knowledge graph — Structured JSON) ===\n"
             f"{self._requirements_text}\n"
             "=== END OF CONTEXT ==="
@@ -115,10 +132,11 @@ class RequirementJudge:
         """Parse the LLM output into two lists of triples."""
         satisfies: list[list[str]] = []
         does_not: list[list[str]]  = []
-        pattern = r"\[([^\]|]+)\|([^\]|]+)\|([^\]|]+)\]"
+        pattern = r"([^\]|]+)\|([^\]|]+)\|([^\]|]+)"
 
         current = None
         for line in text.splitlines():
+            line=line.rstrip("]").lstrip("[")
             stripped = line.strip().upper()
             if stripped.startswith("SATISFIES"):
                 current = "sat"
@@ -134,19 +152,12 @@ class RequirementJudge:
                     satisfies.append(triple)
                 elif current == "not":
                     does_not.append(triple)
-        for element in satisfies:
-            print(f'sati\n {element}\n\n')
-
-        for element in does_not:
-            print(f'does not\n {element}\n\n')
-
         return {"satisfies": satisfies, "does_not_satisfy": does_not}
 
     # ── LLM call ────────────────────────────────────────────────────────
 
     def answer(self, proposal_triple: str) -> dict:
         """Evaluate a single proposal triple against all requirements."""
-        print(proposal_triple)
         prompt = (
             f"Evaluate this proposal triple against the requirements in your context:\n"
             f"{proposal_triple}\n"
@@ -160,7 +171,6 @@ class RequirementJudge:
             ],
         )
         textual_answer = response["message"]["content"]
-        print(textual_answer + "\n\n\n\n")
         return self.parse_tuples(textual_answer)
 
     # ── Public API (same pattern as other extractors) ───────────────────
