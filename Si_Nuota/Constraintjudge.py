@@ -25,15 +25,6 @@ class ConstraintJudge:
             "You will receive a single PROPOSAL TRIPLE (subject, predicate, object) committed\n"
             "by a bidding consortium. Your job is to judge it against the constraints.\n\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            "WHAT IS A CONSTRAINT?\n"
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            "A CONSTRAINT is a non-negotiable condition that restricts the space of\n"
-            "acceptable solutions. Constraints concern: budget limits, time/duration,\n"
-            "technical thresholds (performance, uptime, response time), regulatory\n"
-            "compliance (GDPR, ISO, WCAG), infrastructure rules (hosting location,\n"
-            "cloud certification), sovereignty/data rules (no transfer outside a\n"
-            "territory), environmental rules, security requirements, etc.\n\n"
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             "STEP 1 — RELEVANCE FILTER (apply first)\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             "For each constraint, ask: does the proposal talk about the SAME TOPIC?\n"
@@ -46,18 +37,26 @@ class ConstraintJudge:
             "to only 1-3 constraints at most. If you find yourself listing more than 5\n"
             "constraints, you are probably not filtering strictly enough.\n\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            "STEP 2 — COMPLIANCE JUDGEMENT (only for relevant constraints)\n"
+            "STEP 2 — SATISFACTION JUDGEMENT (only for relevant constraints)\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
             "For the few constraints that passed Step 1:\n"
-            "- SATISFIES: the proposal directly and meaningfully complies with the constraint.\n"
-            "  The proposal must meet or exceed the limit/condition imposed by the constraint.\n"
-            "- DOES_NOT_SATISFY: the proposal is about the same topic but fails to comply\n"
-            "  (insufficient, partial, violates the limit, or mismatched).\n\n"
+            "- SATISFIES: the proposal directly and meaningfully addresses the constraint.\n"
+            "- DOES_NOT_SATISFY: the proposal is about the same topic but fails to meet it\n"
+            "  (insufficient, partial, or mismatched).\n"
+            "CRITICAL: a constraint that was SKIPPED in Step 1 must NEVER appear in\n"
+            "DOES_NOT_SATISFY. DOES_NOT_SATISFY is ONLY for constraints that share the\n"
+            "same topic as the proposal but the proposal fails to meet them.\n"
+            "If a constraint is about a DIFFERENT topic, it does not belong in ANY list.\n\n"
             "RULES:\n"
             "- Base your judgement EXCLUSIVELY on the semantic content of the triples.\n"
-            "- Output ONLY the triples, no explanation, no commentary, no numbering.\n\n"
+            "- Consider constraintType: hard constraints require strict satisfaction;\n"
+            "  soft constraints are more lenient.\n"
+            "- Output ONLY the triples, no explanation, no commentary, no numbering.\n"
+            "- Write EXACTLY ONE triple per line.\n"
+            "- Use ONLY the pipe character | as separator, never commas.\n\n"
             "OUTPUT FORMAT (strict — two sections, nothing else):\n\n"
             "SATISFIES:\n"
+            "[subject | predicate | object]\n"
             "[subject | predicate | object]\n\n"
             "DOES_NOT_SATISFY:\n"
             "[subject | predicate | object]\n\n"
@@ -79,11 +78,6 @@ class ConstraintJudge:
             "---\n\n"
             "Proposal: (consortium, will use, docker containers for microservices)\n"
             "SATISFIES:\n\n"
-            "DOES_NOT_SATISFY:\n\n"
-            "---\n\n"
-            "Proposal: (solution, guarantees, 99.95% uptime)\n"
-            "SATISFIES:\n"
-            "[order | is expected to have an availability of | 99.9%]\n\n"
             "DOES_NOT_SATISFY:\n\n"
             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
             "=== YOUR CONTEXT (constraints knowledge graph — Structured JSON) ===\n"
@@ -182,8 +176,6 @@ class ConstraintJudge:
             ],
         )
         textual_answer = response["message"]["content"]
-        print(proposal_triple)
-        print(textual_answer)
         return self.parse_tuples(textual_answer)
 
     # ── Public API (same pattern as other extractors) ───────────────────
@@ -195,7 +187,6 @@ class ConstraintJudge:
         Returns {"satisfies": [[s,p,o], …], "does_not_satisfy": [[s,p,o], …]}
         """
         triple_str = f"({proposal['subject']}, {proposal['predicate']}, {proposal['object']})"
-        print(triple_str)
         return self.answer(triple_str)
 
     def extract_proposals(self, graph) -> list[str]:
