@@ -129,7 +129,6 @@ class RequirementJudge:
     # ── Parsing ─────────────────────────────────────────────────────────
 
     def parse_tuples(self, text: str) -> dict:
-        """Parse the LLM output into two lists of triples."""
         satisfies: list[list[str]] = []
         does_not: list[list[str]]  = []
         pattern = r"([^\]|]+)\|([^\]|]+)\|([^\]|]+)"
@@ -186,10 +185,6 @@ class RequirementJudge:
         return self.answer(triple_str)
 
     def extract_proposals(self, graph) -> list[str]:
-        """Extract all ex:Proposal triples from the graph, returned as
-        strings ready to be passed to answer().
-        Format: '(subject, predicate, object)'
-        """
         proposals = []
         for subj in graph.subjects(RDF.type, self._EX.Proposal):
             s_uri = next(graph.objects(subj, RDF.subject), None)
