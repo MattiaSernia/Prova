@@ -362,15 +362,19 @@ class Custom_Graph:
         nodes=req_judge.answer(proposal)
         satlist=[]
         for element in nodes["satisfies"]:
-            if self._searchnode(element):
-                satlist.append(self._searchnode(element))
+            if self._searchnode(element,"requirement"):
+                satlist.append(self._searchnode(element,"requirement"))
         not_satlist=[]
         for element in nodes["does_not_satisfy"]:
-            if self._searchnode(element):
-                not_satlist.append(self._searchnode(element))
+            if self._searchnode(element,"requirement"):
+                not_satlist.append(self._searchnode(element,"requirement"))
         return {"satisfies":satlist, "does_not_satisfy":not_satlist}
 
-    def _searchnode(self, triple:list):
+    def _searchnode(self, triple:list, typ:str):
+        if typ=="Requirement":
+            typ=self._EX.Requirement
+        elif typ == "Constraint":
+            typ=self._EX.Constraint
         for subj in self._ds.subjects(RDF.type, self._EX.Requirement):
             if (subj, RDF.subject, URIRef(self._nodeUri + self._clean_uri(triple[0]))) in self._ds and (subj, URIRef(self._edgeUri + self._clean_uri(triple[1])), URIRef(self._nodeUri + self._clean_uri(triple[2]))) in self._ds:
                 return subj
@@ -380,12 +384,12 @@ class Custom_Graph:
         nodes=con_judge.answer(proposal)
         satlist=[]
         for element in nodes["satisfies"]:
-            if self._searchnode(element):
-                satlist.append(self._searchnode(element))
+            if self._searchnode(element,"constraint"):
+                satlist.append(self._searchnode(element,"constraint"))
         not_satlist=[]
         for element in nodes["does_not_satisfy"]:
-            if self._searchnode(element):
-                not_satlist.append(self._searchnode(element))
+            if self._searchnode(element,"constraint"):
+                not_satlist.append(self._searchnode(element,"constraint"))
         return {"satisfies":satlist, "does_not_satisfy":not_satlist}
 
 if __name__=="__main__":
