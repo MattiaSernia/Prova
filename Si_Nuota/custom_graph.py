@@ -107,6 +107,7 @@ class Custom_Graph:
         return r2
 
     def _generate_mxg(self, text:str)-> Message:
+        print("----------------------" +text)
         split=text.split(" | ")
         timestamp = split[0]
         unmodified_text = split[2]
