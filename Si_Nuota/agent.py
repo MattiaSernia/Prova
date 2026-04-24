@@ -137,7 +137,6 @@ class Agent:
             f"Data to Verify:\n{text}\n\n"
             'Constraint: Respond ONLY with "TRUE" or "FALSE". No explanation.\n\nResult:'
         )
-        logging.log(25, f"{self.name} coherency check on: {text}")
         for _ in range(3):
             answer = self._chat(prompt, use_memory=False)
             cleaned = answer.lower().replace(".", "").strip()

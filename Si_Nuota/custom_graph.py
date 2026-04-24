@@ -136,7 +136,7 @@ class Custom_Graph:
                     
         role = "default"
         
-        if "coherence" in total:
+        if "coherency" in total:
             role = "coherency"
         elif "correct" in total:
             role= "correction"
