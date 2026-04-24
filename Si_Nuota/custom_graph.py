@@ -371,11 +371,11 @@ class Custom_Graph:
         return {"satisfies":satlist, "does_not_satisfy":not_satlist}
 
     def _searchnode(self, triple:list, typ:str):
-        if typ=="Requirement":
+        if typ=="requirement":
             typ=self._EX.Requirement
-        elif typ == "Constraint":
+        elif typ == "constraint":
             typ=self._EX.Constraint
-        for subj in self._ds.subjects(RDF.type, self._EX.Requirement):
+        for subj in self._ds.subjects(RDF.type, typ):
             if (subj, RDF.subject, URIRef(self._nodeUri + self._clean_uri(triple[0]))) in self._ds and (subj, URIRef(self._edgeUri + self._clean_uri(triple[1])), URIRef(self._nodeUri + self._clean_uri(triple[2]))) in self._ds:
                 return subj
     
