@@ -7,66 +7,69 @@ class ConstraintsExtractor:
         self.model=model
         self.temperature=temperature
         self.coref=CoreferenceResolver()
-        self.context=("""You are an expert in Open Information Extraction (OIE) specialised in public procurement documents (Calls for Tender, CFT).
-
-            Your SOLE task is to extract CONSTRAINTS from a given sentence.
-            You must completely IGNORE business needs, goals, and desired outcomes.
-
-            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-            WHAT IS A CONSTRAINT?
-            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-            A CONSTRAINT expresses HOW or UNDER WHAT CONDITIONS the solution must operate.
-            It is non-negotiable and restricts the space of acceptable solutions.
-
-            Ask yourself: "Is this sentence imposing a limit, a rule, or a mandatory condition?"
-            → YES → it is a CONSTRAINT → extract it.
-            → NO  → it is a goal or desired outcome → ignore it.
-
-            CONSTRAINTS typically concern:
-            - Budget limits          (maximum cost, price ceiling, annual expenditure)
-            - Time or duration       (contract length, deadlines, delivery dates)
-            - Technical requirements (performance thresholds, uptime, response time, formats)
-            - Regulatory compliance  (laws, norms, standards: GDPR, ISO, WCAG, NIS2...)
-            - Infrastructure rules   (hosting location, cloud certification, on-premise)
-            - Sovereignty / data     (no transfer outside a territory, national hosting)
-            - Environmental rules    (emission standards, energy consumption limits)
-            - Candidate qualifications (certifications, turnover, insurance)
-            - Security requirements  (encryption, access control, audit trails)
-
-            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-            WHAT IS NOT A CONSTRAINT? (IGNORE THESE)
-            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-            Ignore anything that describes a desired capability, improvement, or outcome:
-            - "The system should help users find information faster"
-            - "The goal is to reduce processing time"
-            - "The solution must provide an intelligent assistant to staff"
-            - "The authority wants to improve service quality"
-
-            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-            OUTPUT FORMAT
-            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-            For each constraint found, output exactly one line in this format:
-            [constraintType | subject | predicate | object]
-
-            Field definitions:
-            1. constraintType (OPTIONAL) — You MUST use ONLY one of these exact values if applicable:
-                                            "Budgetary"    — cost, price, financial limits
-                                            "Temporal"     — duration, deadlines, schedule
-                                            "Technical"    — performance, formats, uptime, standards
-                                            "Regulatory"   — legal norms, compliance obligations
-                                            "Environmental"— energy, emissions, carbon footprint
-                                            "Sovereignty"  — data location, territorial restrictions
-                                            Leave blank if none apply, but KEEP the pipe.
-            2. subject   (MANDATORY) — The entity being constrained.
-            3. predicate (MANDATORY) — The limiting verb or state (e.g. "must be", "is limited to",
-                                        "must comply with", "shall not exceed", "is required to have").
-            4. object    (MANDATORY) — The exact limit, value, standard, or condition imposed.
-
-            Output ONLY the tuple lines. No numbering, no prose, no explanation.
-            If a sentence contains no constraint at all, output nothing.""")
+        self.context=("You are a strict constraint-compliance judge for public procurement.\n\n"
+            "You must answer ONLY using the CONSTRAINTS data provided below as your context.\n"
+            "You will receive a single PROPOSAL TRIPLE (subject, predicate, object) committed\n"
+            "by a bidding consortium. Your job is to judge it against the constraints.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "STEP 1 — RELEVANCE FILTER (apply first)\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "For each constraint, ask: does the proposal talk about the SAME TOPIC?\n"
+            "The proposal and the constraint must share the same functional domain\n"
+            "(e.g. both about data hosting, both about budget, both about response time,\n"
+            "both about GDPR, both about availability).\n\n"
+            "If the answer is NO — the proposal and the constraint concern DIFFERENT topics —\n"
+            "then SKIP that constraint entirely. Do NOT include it in any list.\n\n"
+            "Most constraints will be skipped. A single proposal triple typically relates\n"
+            "to only 1-3 constraints at most. If you find yourself listing more than 5\n"
+            "constraints, you are probably not filtering strictly enough.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "STEP 2 — SATISFACTION JUDGEMENT (only for relevant constraints)\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "For the few constraints that passed Step 1:\n"
+            "- SATISFIES: the proposal directly and meaningfully addresses the constraint.\n"
+            "- DOES_NOT_SATISFY: the proposal is about the same topic but fails to meet it\n"
+            "  (insufficient, partial, or mismatched).\n"
+            "CRITICAL: a constraint that was SKIPPED in Step 1 must NEVER appear in\n"
+            "DOES_NOT_SATISFY. DOES_NOT_SATISFY is ONLY for constraints that share the\n"
+            "same topic as the proposal but the proposal fails to meet them.\n"
+            "If a constraint is about a DIFFERENT topic, it does not belong in ANY list.\n\n"
+            "RULES:\n"
+            "- Base your judgement EXCLUSIVELY on the semantic content of the triples.\n"
+            "- Consider constraintType: hard constraints require strict satisfaction;\n"
+            "  soft constraints are more lenient.\n"
+            "- Output ONLY the triples, no explanation, no commentary, no numbering.\n"
+            "- Write EXACTLY ONE triple per line.\n"
+            "- Use ONLY the pipe character | as separator, never commas.\n\n"
+            "OUTPUT FORMAT (strict — two sections, nothing else):\n\n"
+            "SATISFIES:\n"
+            "[subject | predicate | object]\n"
+            "[subject | predicate | object]\n\n"
+            "DOES_NOT_SATISFY:\n"
+            "[subject | predicate | object]\n\n"
+            "If one section is empty, write the header followed by nothing.\n"
+            "Use the constraint's own subject, predicate and object — not the proposal's.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "EXAMPLES\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            "Proposal: (consortium, will host data exclusively within, the european union)\n"
+            "SATISFIES:\n"
+            "[data | must be hosted exclusively on | territory of the european union]\n"
+            "[hosting | will have to be realized on | an infrastructure of secnumcloud type or equivalent]\n\n"
+            "DOES_NOT_SATISFY:\n\n"
+            "---\n\n"
+            "Proposal: (consortium, targets, a gross margin of 28%)\n"
+            "SATISFIES:\n\n"
+            "DOES_NOT_SATISFY:\n"
+            "[global budget | is estimated at | 3 million euros over a duration of 4 years]\n\n"
+            "---\n\n"
+            "Proposal: (consortium, will use, docker containers for microservices)\n"
+            "SATISFIES:\n\n"
+            "DOES_NOT_SATISFY:\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            "=== YOUR CONTEXT (constraints knowledge graph — Structured JSON) ===\n"
+            f"{self._constraints_text}\n"
+            "=== END OF CONTEXT ===")
         
         self.examples= """━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
             EXAMPLES
