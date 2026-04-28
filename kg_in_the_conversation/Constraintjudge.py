@@ -1,0 +1,224 @@
+import ollama
+import re
+import json
+from rdflib import ConjunctiveGraph, Namespace, URIRef
+from rdflib.namespace import RDF
+
+
+class ConstraintJudge:
+
+    def __init__(self, model, temperature, graph):
+
+        self._EX   = Namespace("http://example.org/ontologia#")
+        self._EDGE = Namespace("http://example.org/edge/")
+        self._NODE = Namespace("http://example.org/node/")
+
+        self.model = model
+        self.temperature = temperature
+        # Load graph and textualize constraints once
+        self._constraints_raw = self._load_constraints(graph)
+        self._constraints_text = self._textualize(self._constraints_raw)
+
+        self.context = (
+            "You are a strict constraint-compliance judge for public procurement.\n\n"
+            "You must answer ONLY using the CONSTRAINTS data provided below as your context.\n"
+            "You will receive a single PROPOSAL TRIPLE (subject, predicate, object) committed\n"
+            "by a bidding consortium. Your job is to judge it against the constraints.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "STEP 1 — RELEVANCE FILTER (apply first)\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "For each constraint, ask: does the proposal EXPLICITLY talk about the SAME TOPIC?\n"
+            "The proposal and the constraint must share the same functional domain\n"
+            "(e.g. both about data hosting, both about budget, both about response time,\n"
+            "both about GDPR, both about availability).\n\n"
+            "If the answer is NO — the proposal and the constraint concern DIFFERENT topics —\n"
+            "then SKIP that constraint entirely. Do NOT include it in any list.\n"
+            "Skipped constraints are simply absent from the output.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "STEP 2 — SATISFACTION JUDGEMENT (only for relevant constraints)\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "For the constraints that passed Step 1:\n"
+            "- SATISFIES: the proposal directly and meaningfully addresses the constraint.\n"
+            "- DOES_NOT_SATISFY: the proposal is about the same topic but fails to meet it\n"
+            "  (insufficient, partial, or mismatched).\n\n"
+            "CRITICAL RULES:\n"
+            "- A constraint that was SKIPPED in Step 1 must NEVER appear in\n"
+            "  DOES_NOT_SATISFY. DOES_NOT_SATISFY is ONLY for constraints that share the\n"
+            "  same topic as the proposal but the proposal fails to meet them.\n"
+            "  If a constraint is about a DIFFERENT topic, it does not belong in ANY list.\n"
+            "- Do NOT infer capability from technology names.\n"
+            "  Example: 'uses microservices' does NOT satisfy 'integrate with existing systems'\n"
+            "  unless the proposal explicitly mentions integration with existing systems.\n"
+            "- Do NOT assume that a technology or approach COULD satisfy a constraint.\n"
+            "  The proposal must STATE it.\n"
+            "- Base your judgement EXCLUSIVELY on the semantic content of the triples.\n"
+            "- Consider constraintType: hard constraints require strict satisfaction;\n"
+            "  soft constraints are more lenient.\n"
+            "- Output ONLY the triples, no explanation, no commentary, no numbering.\n"
+            "- Write EXACTLY ONE triple per line.\n"
+            "- Use ONLY the pipe character | as separator, never commas.\n\n"
+            "OUTPUT FORMAT (strict — two sections, nothing else):\n\n"
+            "SATISFIES:\n"
+            "[subject | predicate | object]\n"
+            "[subject | predicate | object]\n\n"
+            "DOES_NOT_SATISFY:\n"
+            "[subject | predicate | object]\n\n"
+            "If one section is empty, write the header followed by nothing.\n"
+            "Use the constraint's own subject, predicate and object — not the proposal's.\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
+            "EXAMPLES\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            "Proposal: (consortium, will host data exclusively within, the european union)\n"
+            "SATISFIES:\n"
+            "[data | must be hosted exclusively on | territory of the european union]\n\n"
+            "DOES_NOT_SATISFY:\n\n"
+            "---\n\n"
+            "Proposal: (consortium, targets, a gross margin of 28%)\n"
+            "SATISFIES:\n\n"
+            "DOES_NOT_SATISFY:\n"
+            "[global budget | is estimated at | 3 million euros over a duration of 4 years]\n\n"
+            "---\n\n"
+            "Proposal: (consortium, will use, docker containers for microservices)\n"
+            "SATISFIES:\n\n"
+            "DOES_NOT_SATISFY:\n\n"
+            "(Note: even if microservices could theoretically integrate with existing systems\n"
+            "or satisfy hosting constraints, the proposal does not explicitly mention any of\n"
+            "these — so all unrelated constraints are correctly skipped.)\n\n"
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n"
+            "=== YOUR CONTEXT (constraints knowledge graph — Structured JSON) ===\n"
+            f"{self._constraints_text}\n"
+            "=== END OF CONTEXT ==="
+        )
+
+    # ── Graph helpers ───────────────────────────────────────────────────
+
+    @staticmethod
+    def _local(uri) -> str:
+        s = str(uri)
+        if "#" in s:
+            s = s.rsplit("#", 1)[-1]
+        else:
+            s = s.rsplit("/", 1)[-1]
+        return s.replace("_", " ")
+
+    def _load_constraints(self, g) -> list[dict]:
+        cons = []
+        for subj in g.subjects(RDF.type, self._EX.Constraint):
+            s_uri = next(g.objects(subj, RDF.subject), None)
+            s = self._local(s_uri) if s_uri else "?"
+
+            pred, obj = "", ""
+            for p, o in g.predicate_objects(subj):
+                if str(p).startswith(str(self._EDGE)):
+                    pred = self._local(p)
+                    obj  = self._local(o)
+                    break
+
+            ct_uri = next(g.objects(subj, self._EX.constraintType), None)
+
+            cons.append({
+                "subject":        s,
+                "predicate":      pred,
+                "object":         obj,
+                "constraintType": self._local(ct_uri) if ct_uri else "",
+            })
+        return cons
+
+    def _textualize(self, cons: list[dict]) -> str:
+        """Structured JSON textualization (best strategy per KG-LLM-Bench §7.1)."""
+        struct: dict = {}
+        for c in cons:
+            key = c["subject"]
+            if key not in struct:
+                struct[key] = []
+            entry = {"predicate": c["predicate"], "object": c["object"]}
+            if c["constraintType"]:
+                entry["constraintType"] = c["constraintType"]
+            struct[key].append(entry)
+        return json.dumps(struct, indent=2, ensure_ascii=False)
+
+    # ── Parsing ─────────────────────────────────────────────────────────
+
+    def parse_tuples(self, text: str) -> dict:
+        satisfies: list[list[str]] = []
+        does_not: list[list[str]]  = []
+        pattern = r"([^\]|]+)\|([^\]|]+)\|([^\]|]+)"
+
+        current = None
+        for line in text.splitlines():
+            line = line.rstrip("]").lstrip("[")
+            stripped = line.strip().upper()
+            if stripped.startswith("SATISFIES"):
+                current = "sat"
+                continue
+            elif stripped.startswith("DOES_NOT_SATISFY") or stripped.startswith("DOES NOT SATISFY"):
+                current = "not"
+                continue
+
+            matches = re.findall(pattern, line)
+            for m in matches:
+                triple = [elem.strip() for elem in m]
+                if current == "sat":
+                    satisfies.append(triple)
+                elif current == "not":
+                    does_not.append(triple)
+        return {"satisfies": satisfies, "does_not_satisfy": does_not}
+
+    # ── LLM call ────────────────────────────────────────────────────────
+
+    def answer(self, proposal_triple: str) -> dict:
+        """Evaluate a single proposal triple against all constraints."""
+        prompt = (
+            f"Evaluate this proposal triple against the constraints in your context:\n"
+            f"{proposal_triple}\n"
+        )
+
+        response = ollama.chat(
+            self.model,
+            messages=[
+                {"role": "system",  "content": self.context},
+                {"role": "user",    "content": prompt},
+            ],
+        )
+        textual_answer = response["message"]["content"]
+        return self.parse_tuples(textual_answer)
+
+    # ── Public API (same pattern as other extractors) ───────────────────
+
+    def pipe(self, proposal: dict) -> dict:
+        """Evaluate a proposal dict {"subject":…, "predicate":…, "object":…}
+        against all constraints.
+
+        Returns {"satisfies": [[s,p,o], …], "does_not_satisfy": [[s,p,o], …]}
+        """
+        triple_str = f"({proposal['subject']}, {proposal['predicate']}, {proposal['object']})"
+        return self.answer(triple_str)
+
+    def extract_proposals(self, graph) -> list[str]:
+        proposals = []
+        for subj in graph.subjects(RDF.type, self._EX.Proposal):
+            s_uri = next(graph.objects(subj, RDF.subject), None)
+            s = self._local(s_uri) if s_uri else "?"
+
+            pred, obj = "", ""
+            for p, o in graph.predicate_objects(subj):
+                if str(p).startswith(str(self._EDGE)):
+                    pred = self._local(p)
+                    obj  = self._local(o)
+                    break
+
+            proposals.append(f"({s}, {pred}, {obj})")
+        return proposals
+
+
+if __name__ == '__main__':
+    g = ConjunctiveGraph()
+    g.parse("Paura.trig", format="trig")
+    con_jud = ConstraintJudge('llama3.3:70b', 0, g)
+    proposals = con_jud.extract_proposals(g)
+    for element in proposals:
+        result = con_jud.answer(element)
+        print(f"Proposal: {element}")
+        print(f"  Satisfies:         {result['satisfies']}")
+        print(f"  Does not satisfy:  {result['does_not_satisfy']}")
+        print("---")
