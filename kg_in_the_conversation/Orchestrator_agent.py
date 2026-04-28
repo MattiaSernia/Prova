@@ -78,7 +78,7 @@ class Orchestrator_Agent:
     def plan(self, task: str="", attempt:int=0) -> dict:
         logging.log(25, f"User asked: {task}")
         self._cgraph.clear()
-        self._cgraph.add_content("Paura")
+        self._cgraph.add_content("Nuova_Prova.log")
 
         req_text = self._get_requirements_text()
         con_text = self._get_constraints_text()

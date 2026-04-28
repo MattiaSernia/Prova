@@ -54,17 +54,16 @@ if __name__=="__main__":
             att+=1
             plan=Orchestrator.plan(question,att)
         for key in plan.keys():
-            print(key+": "+plan[key])
-            #for agent in agent_list:
-                #if agent.name==key:
-                    #risposta=agent.answer(plan[key])
-                    #coherency=agent.coherency_check(risposta)
-                    #attempts=1
-                    #while coherency==False and attempts<=4:
-                        #risposta=agent.retry(plan[key], risposta)
-                        #coherency=agent.coherency_check(risposta)
-                        #attempts+=1
-                    #correct= Orchestrator.correct_answer(key,risposta, plan[key])
-        #proposal=Orchestrator.propose(question)
-        #save_checkpoint(agent_list)
+            for agent in agent_list:
+                if agent.name==key:
+                    risposta=agent.answer(plan[key])
+                    coherency=agent.coherency_check(risposta)
+                    attempts=1
+                    while coherency==False and attempts<=4:
+                        risposta=agent.retry(plan[key], risposta)
+                        coherency=agent.coherency_check(risposta)
+                        attempts+=1
+                    correct= Orchestrator.correct_answer(key,risposta, plan[key])
+        proposal=Orchestrator.propose(question)
+        save_checkpoint(agent_list)
     

@@ -86,7 +86,7 @@ class Custom_Graph:
         messages=self._load(file)
         #messages=self._isolation(messages, "User", "proposal")
         self._generate_graph(messages)
-        #self._saveGraph()
+        self._saveGraph()
 
     def _load(self, file:str)->list:
         try:
