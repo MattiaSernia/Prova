@@ -47,9 +47,9 @@ if __name__=="__main__":
     else:
         att=0
         agent_list=create_all_agents('llama3.3:70b')
-        Orchestrator=Orchestrator_Agent(agent_list,'llama3.3:70b')
+        Orchestrator=Orchestrator_Agent(agent_list,'llama3.3:70b', True, "graph_in", 0)
         question=load_question("file.txt")
-        plan=Orchestrator.plan(question,att)
+        plan=Orchestrator.plan(question, att)
         while plan=={}: 
             att+=1
             plan=Orchestrator.plan(question,att)
@@ -65,5 +65,25 @@ if __name__=="__main__":
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         proposal=Orchestrator.propose(question)
-        save_checkpoint(agent_list)
+        start=Orchestrator.complete()
+        Orchestrator2=Orchestrator_Agent(agent_list,'llama3.3:70b', False, "graph_out", start)
+        question=load_question("file.txt")
+        plan=Orchestrator2.plan(question, att)
+        while plan=={}: 
+            att+=1
+            plan=Orchestrator2.plan(question,att)
+        for key in plan.keys():
+            for agent in agent_list:
+                if agent.name==key:
+                    risposta=agent.answer(plan[key])
+                    coherency=agent.coherency_check(risposta)
+                    attempts=1
+                    while coherency==False and attempts<=4:
+                        risposta=agent.retry(plan[key], risposta)
+                        coherency=agent.coherency_check(risposta)
+                        attempts+=1
+                    correct= Orchestrator2.correct_answer(key,risposta, plan[key])
+        proposal=Orchestrator2.propose(question)
+        start=Orchestrator2.complete()
+
     

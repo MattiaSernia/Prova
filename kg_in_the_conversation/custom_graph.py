@@ -82,10 +82,11 @@ class Custom_Graph:
         self._proposal_counter    = 0
         self._triplet_counter     = 0
 
-    def add_content(self, file:str):
+    def add_content(self, file:str, on_top:bool, start:int):
         messages=self._load(file)
+        messages=messages[start:]
         #messages=self._isolation(messages, "User", "proposal")
-        self._generate_graph(messages)
+        self._generate_graph(messages, on_top)
         self._saveGraph()
 
     def _load(self, file:str)->list:
@@ -169,8 +170,11 @@ class Custom_Graph:
                 output.append(message)
         return output
 
-    def _generate_graph(self, messages:list):
-        for i in range(len(messages)):
+    def _generate_graph(self, messages:list, on_top:bool):
+        alpha=0
+        if on_top:
+            alpha=1
+        for i in range(alpha, len(messages)):
             mxg=messages[i]
             error=False
 
@@ -251,7 +255,8 @@ class Custom_Graph:
             elif mxg.role=="correction":
                 if mxg.convPart=="answer":
                     URImxg=self._dict[messages[i-1].text]
-                    self._ds.add((URImxg, self._EX.does_answer,Literal(messages[i].text.lstrip().rstrip()), self._ds.default_context))                  
+                    self._ds.add((URImxg, self._EX.does_answer,Literal(messages[i].text.lstrip().rstrip()), self._ds.default_context))       
+
     def _userExtraction(self, text: str, URImxg):
         requirements=self._req_extr.pipe(text)
         ReqURI=self._new_extraction_uri("req/")
@@ -346,8 +351,10 @@ class Custom_Graph:
         return self._TRI[f"tri{self._triplet_counter}"]
 
     def _saveGraph(self):
+
         trig_str = self._ds.serialize(format="trig")
-    
+        if os.path.exists(filepath):
+            os.remove(filepath)
         # Sostituisce il blocco anonimo { ... } con GRAPH esplicito
         # rdflib scrive il default context come "{\n" — lo sostituiamo
         trig_str = re.sub(
@@ -410,7 +417,9 @@ class Custom_Graph:
                 not_satlist.append(self._searchnode(element,"constraint"))
         return {"satisfies":satlist, "does_not_satisfy":not_satlist}
 
-if __name__=="__main__":
+    def mxgnr(self):
+        return len(self._dict.keys())
+    if __name__=="__main__":
     agent_list = load_checkpoint()
     grafo=Custom_Graph(agent_list, "Paura")
     grafo.add_content("Nuova_Prova.log")
