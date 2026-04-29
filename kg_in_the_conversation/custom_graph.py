@@ -422,7 +422,7 @@ class Custom_Graph:
 
     def rename(self, name:str):
         self._name=name
-    if __name__=="__main__":
+if __name__=="__main__":
     agent_list = load_checkpoint()
     grafo=Custom_Graph(agent_list, "Paura")
     grafo.add_content("Nuova_Prova.log")

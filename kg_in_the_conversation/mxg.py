@@ -1,6 +1,6 @@
 from datetime import datetime
 class Message:
-    def __init__(self, text:str, timestamp:str, node:str, convPart=str, role=str):
+    def __init__(self, text:str, timestamp:str, node:str, convPart:str, role:str):
         self.text = text
         self.timestamp = datetime.strptime(timestamp.split(',')[0], "%Y-%m-%d %H:%M:%S")
         self.node = node
