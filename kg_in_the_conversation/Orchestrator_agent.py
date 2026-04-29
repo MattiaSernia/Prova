@@ -5,16 +5,16 @@ from agent import Agent
 from custom_graph import Custom_Graph
 from rdflib import Namespace
 from rdflib.namespace import RDF
+import copy
 
 
 class Orchestrator_Agent:
-    def __init__(self, agents:list[Agent], model:str, graph_in_prompt:bool, graph_name:str, messages:int):
+    def __init__(self, agents:list[Agent], model:str, graph_name:str):
         self.agents=agents
         self.model=model
         self.agent_answer=[]
+        self._graph_name=graph_name
         self._cgraph=Custom_Graph(agents, graph_name)
-        self._graph_in_prompt=graph_in_prompt
-        self._messages=messages
 
     def _agent_registry(self) -> str:
         lines = []
@@ -77,12 +77,14 @@ class Orchestrator_Agent:
             struct[s].append(entry)
         return json.dumps(struct, indent=2, ensure_ascii=False)
     
-    def plan(self, task: str="", attempt:int=0) -> dict:
-        logging.log(25, f"User asked: {task}")
-        self._cgraph.clear()
-        self._cgraph.add_content("Conversation.log", False, self._messages)
+    def plan(self, task: str="", attempt:int=0, graph_in_prompt) -> dict:
+        if att==0 and graph_in_prompt:
+            logging.log(25, f"User asked: {task}")
+            self._cgraph.add_content("Conversation.log", False, 0)
+            self._ngraph=copy.deepcopy(self._cgraph)
+            self._ngraph.rename(f"{self._graph_name}_nokg")
 
-        if self._graph_in_prompt:
+        if graph_in_prompt:
             req_text = self._get_requirements_text()
             con_text = self._get_constraints_text()
             kg_context = (
@@ -302,8 +304,11 @@ class Orchestrator_Agent:
         
         proposal = response.message.content
         logging.log(25, f"Final proposal generated: {proposal}")
+        self.agent_answer=[]
         return proposal
 
-    def complete(self):
-        self._cgraph.add_content("Conversation.log", True, self._messages)
-        return self.cgraph.mxgnr()
+    def complete(self, graph_in_prompt):
+        if graph_in_prompt:
+            self._cgraph.add_content("Conversation.log", True, 0)
+        else:
+            self._cgraph.add_content("Conversation.log", True, self.cgraph.mxgnr()-1)

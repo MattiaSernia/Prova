@@ -47,12 +47,12 @@ if __name__=="__main__":
     else:
         att=0
         agent_list=create_all_agents('llama3.3:70b')
-        Orchestrator=Orchestrator_Agent(agent_list,'llama3.3:70b', True, "graph_in", 0)
+        Orchestrator=Orchestrator_Agent(agent_list,'llama3.3:70b', "Total")
         question=load_question("file.txt")
-        plan=Orchestrator.plan(question, att)
+        plan=Orchestrator.plan(question, att, True)
         while plan=={}: 
             att+=1
-            plan=Orchestrator.plan(question,att)
+            plan=Orchestrator.plan(question,att, True)
         for key in plan.keys():
             for agent in agent_list:
                 if agent.name==key:
@@ -65,13 +65,13 @@ if __name__=="__main__":
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         proposal=Orchestrator.propose(question)
-        start=Orchestrator.complete()
-        Orchestrator2=Orchestrator_Agent(agent_list,'llama3.3:70b', False, "graph_out", start)
-        question=load_question("file.txt")
-        plan=Orchestrator2.plan(question, att)
+        Orchestrator.complete(True)
+
+        att=0
+        plan=Orchestrator.plan(question, att, False)
         while plan=={}: 
             att+=1
-            plan=Orchestrator2.plan(question,att)
+            plan=Orchestrator.plan(question,att, False)
         for key in plan.keys():
             for agent in agent_list:
                 if agent.name==key:
@@ -82,8 +82,7 @@ if __name__=="__main__":
                         risposta=agent.retry(plan[key], risposta)
                         coherency=agent.coherency_check(risposta)
                         attempts+=1
-                    correct= Orchestrator2.correct_answer(key,risposta, plan[key])
-        proposal=Orchestrator2.propose(question)
-        start=Orchestrator2.complete()
-
-    
+                    correct= Orchestrator.correct_answer(key,risposta, plan[key])
+        proposal=Orchestrator.propose(question)
+        Orchestrator.complete(False)
+        
