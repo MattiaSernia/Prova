@@ -311,4 +311,4 @@ class Orchestrator_Agent:
         if graph_in_prompt:
             self._cgraph.add_content("Conversation.log", True, 0)
         else:
-            self._ngraph.add_content("Conversation.log", True, self._cgraph.mxgnr()-1)
+            self._ngraph.add_content("Conversation.log", True, self._cgraph.mxgnr())

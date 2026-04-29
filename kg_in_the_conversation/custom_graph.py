@@ -75,6 +75,7 @@ class Custom_Graph:
         self._ds.bind("pro", self._PRO)
         self._ds.bind("tri", self._TRI)
         self._dict = {}
+        self._mex=0
         self._activity_counter    = 0
         self._extraction_counter  = 0
         self._requirement_counter = 0
@@ -85,6 +86,7 @@ class Custom_Graph:
     def add_content(self, file:str, on_top:bool, start:int):
         messages=self._load(file)
         messages=messages[start:]
+        self._mex=len(messages)
         #messages=self._isolation(messages, "User", "proposal")
         self._generate_graph(messages, on_top)
         self._saveGraph()
@@ -418,7 +420,7 @@ class Custom_Graph:
         return {"satisfies":satlist, "does_not_satisfy":not_satlist}
 
     def mxgnr(self):
-        return len(self._dict.keys())
+        return self._mex
 
     def rename(self, name:str):
         self._name=name
