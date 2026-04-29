@@ -3,7 +3,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s | %(levelname)s | %(message)s',
     handlers=[
-        logging.FileHandler("Conversation.log", encoding='utf-8'),
+        logging.FileHandler("Conversation.log", mode = 'w', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
