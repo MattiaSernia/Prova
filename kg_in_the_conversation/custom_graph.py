@@ -351,7 +351,7 @@ class Custom_Graph:
         return self._TRI[f"tri{self._triplet_counter}"]
 
     def _saveGraph(self):
-
+        filepath=f"{self._name}.trig"
         trig_str = self._ds.serialize(format="trig")
         if os.path.exists(filepath):
             os.remove(filepath)
@@ -363,7 +363,7 @@ class Custom_Graph:
             trig_str
         )
         
-        with open(f"{self._name}.trig", "w", encoding="utf-8") as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(trig_str)
         print("salvato")
         #self._ds.serialize(destination=f"{self._name}.trig", format="trig", encoding="utf-8")

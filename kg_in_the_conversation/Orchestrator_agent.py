@@ -77,8 +77,8 @@ class Orchestrator_Agent:
             struct[s].append(entry)
         return json.dumps(struct, indent=2, ensure_ascii=False)
     
-    def plan(self, task: str="", attempt:int=0, graph_in_prompt) -> dict:
-        if att==0 and graph_in_prompt:
+    def plan(self, task: str="", attempt:int=0, graph_in_prompt:bool=True) -> dict:
+        if attempt==0 and graph_in_prompt:
             logging.log(25, f"User asked: {task}")
             self._cgraph.add_content("Conversation.log", False, 0)
             self._ngraph=copy.deepcopy(self._cgraph)
@@ -311,4 +311,4 @@ class Orchestrator_Agent:
         if graph_in_prompt:
             self._cgraph.add_content("Conversation.log", True, 0)
         else:
-            self._cgraph.add_content("Conversation.log", True, self.cgraph.mxgnr()-1)
+            self._ngraph.add_content("Conversation.log", True, self._cgraph.mxgnr()-1)
