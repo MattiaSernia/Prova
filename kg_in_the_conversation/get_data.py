@@ -7,10 +7,10 @@ NODE = Namespace("http://example.org/node/")
 
 g=ConjunctiveGraph()
 
-g.parse("Paura.trig", format="trig")
+g.parse("Total_nokg.trig", format="trig")
 dizionario={}
 prop=[]
-f=open("circiollo.txt", "w")
+f=open("total_nokg.txt", "w")
 for subj in g.subjects(RDF.type, EX.Proposal):
     s_uri = next(g.objects(subj, RDF.subject), None)
     proposal_subject=s_uri.split("/")[-1].replace("_", " ")
