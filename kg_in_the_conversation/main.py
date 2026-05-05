@@ -17,7 +17,7 @@ from Orchestrator_agent import Orchestrator_Agent
 import os
 import pickle
 from custom_graph import Custom_Graph
-from validation/Validation.py import Validation
+import validation.Validation as va
 CHECKPOINT_FILE = "checkpoint_before_graph.pkl"
 
 # SALVATAGGIO CHECKPOINT
@@ -42,7 +42,7 @@ def load_question(name:str)->str:
     return text
 
 if __name__=="__main__":
-    val=Validation("llama3.3:70b",0)
+    val=va.Validation("llama3.3:70b",0)
     if os.path.exists(CHECKPOINT_FILE):
         print("🔄 Loading checkpoint...")
         agent_list = load_checkpoint()
@@ -67,9 +67,15 @@ if __name__=="__main__":
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         proposal=Orchestrator.propose(question)
+        
         with open("validation_kg.txt", "w") as f:
-            f.write(val.validate_requirements(proposal))
-            f.write(val.validate_constraints(proposal))
+            f.write("REQUIREMENTS\n")
+            for element in val.validate_requirements(proposal):
+                f.write(element+"\n")
+            f.write("\nCONSTRAINTS\n")
+            for element in val.validate_constraints(proposal):
+                f.write(element+"\n")
+    
         
         Orchestrator.complete(True)
 
@@ -90,8 +96,13 @@ if __name__=="__main__":
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         proposal=Orchestrator.propose(question)
+
         with open("validation_nokg.txt", "w") as f:
-            f.write(val.validate_requirements(proposal))
-            f.write(val.validate_constraints(proposal))
+            f.write("REQUIREMENTS\n")
+            for element in val.validate_requirements(proposal):
+                f.write(element+"\n")
+            f.write("\nCONSTRAINTS\n")
+            for element in val.validate_constraints(proposal):
+                f.write(element+"\n")
         Orchestrator.complete(False)
         
