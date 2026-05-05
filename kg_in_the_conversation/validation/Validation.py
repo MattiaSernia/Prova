@@ -1,5 +1,6 @@
 import ollama
 import json
+from typing import Optional
 class Validation:
     def __init__(self, model, temperature):
         self.model=model
@@ -58,7 +59,7 @@ class Validation:
         return data.get("satisfied", [])
 
 
-    def _validate_constraint(self, proposal: str, constraint: dict) -> tuple[bool, str | None]:
+    def _validate_constraint(self, proposal: str, constraint: dict) -> tuple:
         text = f"{constraint.get('subject', '')} {constraint.get('predicate', '')} {constraint.get('object', '')}"
         if constraint.get("constraintType"):
             text += f" ({constraint['constraintType']})"
