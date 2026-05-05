@@ -58,9 +58,11 @@ class Validation:
         data = json.loads(content)
         return data.get("satisfied", [])
 
+    def _validate_requirement(self): #TO DO
+        pass
 
-    def _validate_constraint(self, proposal: str, constraint: dict) -> tuple:
-        text = f"{constraint.get('subject', '')} {constraint.get('predicate', '')} {constraint.get('object', '')}"
+    def _validate_constraint(self, proposal: str, constraint: dict, key:str) -> tuple:
+        text = f"{key}: {constraint.get('subject', '')} {constraint.get('predicate', '')} {constraint.get('object', '')}"
         if constraint.get("constraintType"):
             text += f" ({constraint['constraintType']})"
 
@@ -88,14 +90,21 @@ class Validation:
         satisfied = bool(data.get("satisfied", False))
         return (True, text) if satisfied else (False, None)
 
-    def validate(self, proposal: str):
-        constraints = json.loads(self._constraints)
-        constraint_list=[]
-        for element in constraints.value():
-            answer=self._validate_constraint(proposal, element)
-            print(answer)
-            if answer[0]:
-                constraint_list.append(answer[1])
+    def validate(self, proposal: str, title:str):
+        with open(title, 'w') as f:
+            f.write("\nSATISFIED REQUIREMENTS\n")
+            requirements = json.loads(self.requirements)
+            for key,element in requirements.items():
+                answer=self._validate_requirement(proposal, element, key)
+                if answer[0]:
+                    f.write(f"{answer[1]}\n")
+            f.write("\nSATISFIED CONSTRAINTS\n")
+            constraints = json.loads(self._constraints)
+            for key,element in constraints.items():
+                answer=self._validate_constraint(proposal, element, key)
+                if answer[0]:
+                    f.write(f"{answer[1]}\n")
+                
 
 
 
