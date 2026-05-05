@@ -58,8 +58,36 @@ class Validation:
         data = json.loads(content)
         return data.get("satisfied", [])
 
-    def _validate_requirement(self): #TO DO
-        pass
+    def _validate_requirement(self, proposal: str, requirement: dict, key: str) -> tuple:
+        text = f"{key}: {requirement.get('subject', '')} {requirement.get('predicate', '')} {requirement.get('object', '')}"
+        if requirement.get("priority"):
+            text += f" (priority: {requirement['priority']})"
+        if requirement.get("category"):
+            text += f" (category: {requirement['category']})"
+
+        prompt = (
+            "You are an expert requirements analyst.\n\n"
+            "Below is a single requirement:\n"
+            f"{text}\n\n"
+            "Below is a proposal:\n"
+            f"{proposal}\n\n"
+            "Is this requirement satisfied by the proposal?\n"
+            'Return a JSON object with a single key "satisfied" whose value is true or false.\n'
+            'Example: {"satisfied": true}'
+        )
+
+        response = ollama.chat(
+            model=self.model,
+            messages=[{"role": "user", "content": prompt}],
+            options={"temperature": self.temperature},
+            format="json",
+        )
+
+        content = response["message"]["content"]
+        print(content)
+        data = json.loads(content)
+        satisfied = bool(data.get("satisfied", False))
+        return (True, text) if satisfied else (False, None)
 
     def _validate_constraint(self, proposal: str, constraint: dict, key:str) -> tuple:
         text = f"{key}: {constraint.get('subject', '')} {constraint.get('predicate', '')} {constraint.get('object', '')}"
@@ -93,7 +121,7 @@ class Validation:
     def validate(self, proposal: str, title:str):
         with open(title, 'w') as f:
             f.write("\nSATISFIED REQUIREMENTS\n")
-            requirements = json.loads(self.requirements)
+            requirements = json.loads(self._requirements)
             for key,element in requirements.items():
                 answer=self._validate_requirement(proposal, element, key)
                 if answer[0]:
