@@ -89,8 +89,9 @@ class Validation:
         return (True, text) if satisfied else (False, None)
 
     def validate(self, proposal: str):
+        constraints = json.loads(self._constraints)
         constraint_list=[]
-        for element in self._constraints:
+        for element in constraints.value():
             answer=self._validate_constraint(proposal, element)
             print(answer)
             if answer[0]:
