@@ -91,9 +91,10 @@ class Validation:
     def validate(self, proposal: str):
         constraint_list=[]
         for element in self._constraints:
-            print(element)
-            if element[0]:
-                constraint_list.append(element[1])
+            answer=self._validate_constraint(proposal, element)
+            print(answer)
+            if answer[0]:
+                constraint_list.append(answer[1])
 
 
 

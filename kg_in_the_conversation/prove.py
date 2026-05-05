@@ -1,7 +1,7 @@
 import validation.Validation as va
 
 val=va.Validation("llama3.3:70b", 0)
-self.validate("""Final proposal generated: ### Executive Summary
+val.validate("""Final proposal generated: ### Executive Summary
 Nexus Engineering S.r.l., as part of a consortium, is pleased to submit this tender proposal in response to the City of Belval's call for implementing an artificial intelligence solution to assist municipal agents in their daily missions. Our proposed solution leverages cutting-edge AI technologies, including Large Language Models (LLMs) and Retrieval-Augmented Generation (RAG), to provide intelligent assistance across various administrative activities. We are committed to ensuring compliance with all regulatory requirements, particularly GDPR, while prioritizing innovation, sustainability, and cost-effectiveness.
 
 ### Understanding of Requirements
