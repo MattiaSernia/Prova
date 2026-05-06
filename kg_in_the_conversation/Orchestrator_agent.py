@@ -263,36 +263,38 @@ class Orchestrator_Agent:
         return False
 
     def propose(self, task: str) -> str:
+        agents_context = "\n\n".join(self.agent_answer)
 
-        
-        agents_context = "\n\n".join(
-            self.agent_answer 
-        )
+        system = f"""You are a proposal writer for a consortium responding to a call for tenders.
+            You must write a complete, professional, and CONCRETE tender proposal.
 
-        system = """You are a proposal writer for a consortium responding to a call for tenders.
-            You must write a complete, professional tender proposal.
+            The consortium is composed of the following specialized agents (each with their domain):
+            {self._agent_registry()}
 
             ### STRICT RULES:
             - Use ONLY the information provided in the agents' answers and the original tender text.
-            - Do NOT invent capabilities, figures, references, or commitments not explicitly mentioned.
+            - Do NOT invent capabilities, figures, references, or commitments not explicitly mentioned by the agents.
             - If a requirement from the tender is not covered by any agent's answer, explicitly state it is not addressed.
-            - Do not add assumptions, general knowledge, or filler content.
+            - Be SPECIFIC: name the exact technologies, tools, frameworks, products, and figures the agents mentioned.
+            - Every claim must be traceable to an agent's answer. No filler, no generic statements.
 
-            ### Structure your proposal with these sections:
+            ### Structure your proposal as follows:
             1. Executive Summary
             2. Understanding of Requirements
-            3. Proposed Solution (per domain: technical, legal, financial, etc.)
-            4. Compliance & Certifications
-            5. Budget Overview
-            6. Conclusion"""
+            3. Proposed Solution — a single, flowing section that integrates all agents' contributions into
+               a coherent description of what the consortium intends to do: what will be built or delivered,
+               which technologies and methods will be used, what it will cost, and how constraints will be met.
+               Do NOT split this into sub-sections by agent. Write it as one unified narrative.
+            4. Unaddressed Requirements (if any requirement from the tender was not covered by any agent)
+            5. Conclusion"""
 
         user_message = f"""=== ORIGINAL CALL FOR TENDERS ===
-            {task}
+{task}
 
-            === AGENTS' ANSWERS ===
-            {agents_context}
+=== AGENTS' ANSWERS ===
+{agents_context}
 
-            Now write the proposal."""
+Write the proposal now. For each agent's domain, be concrete and specific: name exact technologies, exact costs, exact regulations, exact figures as stated by the agents."""
 
         response = ollama.chat(
             model=self.model,
@@ -301,10 +303,10 @@ class Orchestrator_Agent:
                 {"role": "user", "content": user_message},
             ]
         )
-        
+
         proposal = response.message.content
         logging.log(25, f"Final proposal generated: {proposal}")
-        self.agent_answer=[]
+        self.agent_answer = []
         return proposal
 
     def complete(self, graph_in_prompt):

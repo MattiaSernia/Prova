@@ -67,7 +67,7 @@ if __name__=="__main__":
                         attempts+=1
                     correct= Orchestrator.correct_answer(key,risposta, plan[key])
         proposal=Orchestrator.propose(question)
-        
+
         with open("validation_kg.txt", "w") as f:
             f.write("REQUIREMENTS\n")
             for element in val.validate_requirements(proposal):
@@ -75,7 +75,7 @@ if __name__=="__main__":
             f.write("\nCONSTRAINTS\n")
             for element in val.validate_constraints(proposal):
                 f.write(element+"\n")
-    
+        val.validate(proposal, "single_validation_kg.txt")
         
         Orchestrator.complete(True)
 
@@ -104,5 +104,8 @@ if __name__=="__main__":
             f.write("\nCONSTRAINTS\n")
             for element in val.validate_constraints(proposal):
                 f.write(element+"\n")
+
+        val.validate(proposal, "single_validation_nokg.txt")
+
         Orchestrator.complete(False)
         

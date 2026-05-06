@@ -26,4 +26,4 @@ Given the total contract value of 3 million euros, we estimate our projected mar
 
 ### Conclusion
 Nexus Engineering S.r.l., as part of this consortium, is committed to delivering an innovative AI solution that meets the City of Belval's requirements for assisting municipal agents while ensuring regulatory compliance, sustainability, and cost-effectiveness. We believe our proposed solution offers a balanced approach to innovation, security, and environmental responsibility, making us an ideal partner for this project.
-""")
+""", "validation_try_one.txt")
