@@ -1,3 +1,4 @@
+import logging
 from rdflib import Graph, ConjunctiveGraph, Namespace, URIRef, Literal, RDF, Namespace
 from rdflib.namespace import RDF, XSD, PROV
 from constraintsExtractor import ConstraintsExtractor
@@ -24,7 +25,7 @@ def load_checkpoint():
 
 class Custom_Graph:
 
-    def __init__(self, agent_list:list,name:str):
+    def __init__(self, agent_list:list, name:str, model:str="llama3.3:70b"):
         self._EX  = Namespace("http://example.org/ontologia#")
         self._REQ = Namespace("http://example.org/requirement/")
         self._EXT = Namespace("http://example.org/extraction/")
@@ -57,10 +58,11 @@ class Custom_Graph:
         self._proposal_counter=0
         self._triplet_counter=0
 
-        self._req_extr=RequirementsExtractor("llama3.3:70b",0)
-        self._con_extr=ConstraintsExtractor("llama3.3:70b",0)
-        self._pro_extr=ProposalsExtractor("llama3.3:70b",0)
-        self._extractor=TripletExtractor("llama3.3:70b",0)
+        _coref = CoreferenceResolver()
+        self._req_extr=RequirementsExtractor(model, 0, _coref)
+        self._con_extr=ConstraintsExtractor(model, 0, _coref)
+        self._pro_extr=ProposalsExtractor(model, 0, _coref)
+        self._extractor=TripletExtractor(model, 0, _coref)
 
         self._name=name
 
@@ -87,7 +89,6 @@ class Custom_Graph:
         messages=self._load(file)
         messages=messages[start:]
         self._mex=len(messages)
-        #messages=self._isolation(messages, "User", "proposal")
         self._generate_graph(messages, on_top)
         self._saveGraph()
 
@@ -105,7 +106,8 @@ class Custom_Graph:
         messages=[]
         for row in rows:
             mxg=self._generate_mxg(row)
-            messages.append(mxg)
+            if mxg is not None:
+                messages.append(mxg)
         return messages
 
     def _cleanRows(self, rows:list)->list:
@@ -127,7 +129,7 @@ class Custom_Graph:
         return r2
 
     def _generate_mxg(self, text:str)-> Message:
-        print("----------------------" +text)
+        logging.debug(text)
         split=text.split(" | ")
         timestamp = split[0]
         unmodified_text = split[2]
@@ -154,7 +156,11 @@ class Custom_Graph:
                 if name in total:
                     node=agent.name
                     convPart = "answer"
-                    
+
+        if node=="":
+            logging.warning(f"Unrecognized log entry, skipping: {mxgInfo[:80]!r}")
+            return None
+
         role = "default"
         
         if "coherency" in total:
@@ -369,8 +375,7 @@ class Custom_Graph:
         
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(trig_str)
-        print("salvato")
-        #self._ds.serialize(destination=f"{self._name}.trig", format="trig", encoding="utf-8")
+        logging.debug(f"Graph saved to {filepath}")
 
     def _remove_derived_graphs(self, URImxg):
         """Remove all named graphs (extractions) derived from this message."""

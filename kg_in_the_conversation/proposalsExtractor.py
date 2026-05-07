@@ -1,12 +1,12 @@
-import ollama
 import re
 from CoreferenceResolver import CoreferenceResolver
+from utils import sentence_split, ollama_chat
 
 class ProposalsExtractor:
-    def __init__(self, model, temperature):
+    def __init__(self, model, temperature, coref=None):
         self.model=model
         self.temperature=temperature
-        self.coref=CoreferenceResolver()
+        self.coref = coref if coref is not None else CoreferenceResolver()
         self.context=("""You are an expert in Open Information Extraction (OIE) specialised in tender PROPOSALS
             (the documents written BY a bidding consortium IN RESPONSE to a public Call for Tenders).
 
@@ -124,25 +124,16 @@ class ProposalsExtractor:
 
     def answer(self, text:str)->list:
         prompt = self.examples.format(sentence=text)
-        response=ollama.chat(self.model,
-                             messages=[
-                                {'role': 'system', 'content': self.context},
-                                {'role': 'user', 'content': prompt}
-                            ])
-        textual_answer= response['message']['content']
-        return self.parse_tuples(textual_answer)
-
-    def string_separator(self, text:str)->list:
-        abbrev= r"\b(Mr|Mrs|Dr|Prof|vs|etc|Jr|Sr|Fig|al)\."
-        text = re.sub(abbrev, r"\1<DOT>", text)
-        sentences= re.split(r"(?<=[.!?])\s+(?=[A-Z\"'])",text)
-        sentences=[s.replace("<DOT>", ".").strip() for s in sentences]
-        phrases=[s for s in sentences if s]
-        return phrases
+        response = ollama_chat(
+            self.model,
+            [{'role': 'system', 'content': self.context}, {'role': 'user', 'content': prompt}],
+            options={"temperature": self.temperature},
+        )
+        return self.parse_tuples(response['message']['content'])
 
     def pipe(self, text:str) -> list:
         text=self.coref.resolve(text)
-        phrases=self.string_separator(text)
+        phrases=sentence_split(text)
         text_proposals=[]
         for phrase in phrases:
             sentence_tuples=self.answer(phrase)

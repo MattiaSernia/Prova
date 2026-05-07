@@ -1,8 +1,8 @@
-import ollama
 import re
 import json
 from rdflib import ConjunctiveGraph, Namespace, URIRef
 from rdflib.namespace import RDF
+from utils import uri_to_label, ollama_chat
 
 
 class ConstraintJudge:
@@ -92,26 +92,17 @@ class ConstraintJudge:
 
     # ── Graph helpers ───────────────────────────────────────────────────
 
-    @staticmethod
-    def _local(uri) -> str:
-        s = str(uri)
-        if "#" in s:
-            s = s.rsplit("#", 1)[-1]
-        else:
-            s = s.rsplit("/", 1)[-1]
-        return s.replace("_", " ")
-
     def _load_constraints(self, g) -> list[dict]:
         cons = []
         for subj in g.subjects(RDF.type, self._EX.Constraint):
             s_uri = next(g.objects(subj, RDF.subject), None)
-            s = self._local(s_uri) if s_uri else "?"
+            s = uri_to_label(s_uri) if s_uri else "?"
 
             pred, obj = "", ""
             for p, o in g.predicate_objects(subj):
                 if str(p).startswith(str(self._EDGE)):
-                    pred = self._local(p)
-                    obj  = self._local(o)
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
                     break
 
             ct_uri = next(g.objects(subj, self._EX.constraintType), None)
@@ -120,7 +111,7 @@ class ConstraintJudge:
                 "subject":        s,
                 "predicate":      pred,
                 "object":         obj,
-                "constraintType": self._local(ct_uri) if ct_uri else "",
+                "constraintType": uri_to_label(ct_uri) if ct_uri else "",
             })
         return cons
 
@@ -173,15 +164,12 @@ class ConstraintJudge:
             f"{proposal_triple}\n"
         )
 
-        response = ollama.chat(
+        response = ollama_chat(
             self.model,
-            messages=[
-                {"role": "system",  "content": self.context},
-                {"role": "user",    "content": prompt},
-            ],
+            [{"role": "system", "content": self.context}, {"role": "user", "content": prompt}],
+            options={"temperature": self.temperature},
         )
-        textual_answer = response["message"]["content"]
-        return self.parse_tuples(textual_answer)
+        return self.parse_tuples(response["message"]["content"])
 
     # ── Public API (same pattern as other extractors) ───────────────────
 
@@ -198,13 +186,13 @@ class ConstraintJudge:
         proposals = []
         for subj in graph.subjects(RDF.type, self._EX.Proposal):
             s_uri = next(graph.objects(subj, RDF.subject), None)
-            s = self._local(s_uri) if s_uri else "?"
+            s = uri_to_label(s_uri) if s_uri else "?"
 
             pred, obj = "", ""
             for p, o in graph.predicate_objects(subj):
                 if str(p).startswith(str(self._EDGE)):
-                    pred = self._local(p)
-                    obj  = self._local(o)
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
                     break
 
             proposals.append(f"({s}, {pred}, {obj})")

@@ -1,12 +1,11 @@
-import ollama
 import re
-from triplet import Triplet
 from CoreferenceResolver import CoreferenceResolver
+from utils import ollama_chat
 class TripletExtractor:
-    def __init__(self, model, temperature):
+    def __init__(self, model, temperature, coref=None):
         self.model=model
         self.temperature=temperature
-        self.coref=CoreferenceResolver()
+        self.coref = coref if coref is not None else CoreferenceResolver()
         self.context=("""You are an expert in Open Information Extraction (OIE) for business intelligence.
 You extract factual subject-relation-object triplets from messages produced by AI agents 
 operating in the context of company management and public tender evaluation.
@@ -71,13 +70,12 @@ Triplets:"""
     
     def answer(self, text:str)->list:
         prompt = self.examples.format(sentence=text)
-        response=ollama.chat(self.model,
-                             messages=[
-                                {'role': 'system', 'content': self.context},
-                                {'role': 'user', 'content': prompt}
-                            ])
-        textual_answer= response['message']['content']
-        return self.parse_triplets(textual_answer)
+        response = ollama_chat(
+            self.model,
+            [{'role': 'system', 'content': self.context}, {'role': 'user', 'content': prompt}],
+            options={"temperature": self.temperature},
+        )
+        return self.parse_triplets(response['message']['content'])
     
     def string_separator(self, text:str)->list:     #Separazione presa da OIE_LLM.pdf
         abbrev= r"\b(Mr|Mrs|Dr|Prof|vs|etc|Jr|Sr|Fig|al)\." #trova qualsiasi parola tra quelle nella parentesi seguita dal punto (\.)

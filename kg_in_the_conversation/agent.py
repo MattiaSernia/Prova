@@ -1,6 +1,6 @@
-import ollama
 import logging
 import json
+from utils import ollama_chat
 
 
 class Agent:
@@ -44,7 +44,7 @@ class Agent:
         else:
             messages.append({"role": "user", "content": user_message})
 
-        response = ollama.chat(model=self.model, messages=messages)
+        response = ollama_chat(self.model, messages)
         text = response["message"]["content"]
 
         if use_memory:
@@ -53,20 +53,11 @@ class Agent:
 
     # ---------- public API ----------
 
-    def answer(self, message:str)-> str:
-        self.memory.append({"role":"user", "content": message})
+    def answer(self, message: str) -> str:
         logging.log(25, f"{self.name} received: {message}")
-        response=ollama.chat(
-            model=self.model,
-            messages=[
-                {'role':'system', 'content':self._system_prompt()},
-                *self.memory
-            ]
-        )
-        textual_answer= response['message']['content']
-        self.memory.append({"role": "assistant", "content": textual_answer})
-        logging.log(25, f"{self.name} answered: {textual_answer}")
-        return(textual_answer)
+        text = self._chat(message, use_memory=True)
+        logging.log(25, f"{self.name} answered: {text}")
+        return text
 
     def assess(self, tender: str) -> str:
         """
@@ -253,7 +244,7 @@ def create_all_agents(model: str) -> list:
 
 
 if __name__=="__main__":
-    agent=create_agent("legal")
+    agent=create_agent("legal", "llama3.3:70b")
     with open("file.txt", "r", encoding="utf-8") as f:
         lines=f.readlines()
         text=" ".join(lines)

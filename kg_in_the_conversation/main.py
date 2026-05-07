@@ -33,79 +33,47 @@ def load_checkpoint():
 from requirementsExtractor import RequirementsExtractor
 from constraintsExtractor import ConstraintsExtractor
 
-def load_question(name:str)->str:
-    with open(name, "r", encoding="utf-8") as file:
-        lines=file.readlines()
-        text=""
-        for line in lines:
-            text+=line+"\n"
-    return text
+def load_question(name: str) -> str:
+    with open(name, "r", encoding="utf-8") as f:
+        return "".join(line + "\n" for line in f.readlines())
 
-if __name__=="__main__":
-    val=va.Validation("llama3.3:70b",0)
+def _run_pipeline(orchestrator, agents, question, use_kg, val_file, single_val_file, val):
+    att = 0
+    plan = orchestrator.plan(question, att, use_kg)
+    while plan == {}:
+        att += 1
+        plan = orchestrator.plan(question, att, use_kg)
+    for key in plan:
+        for agent in agents:
+            if agent.name == key:
+                risposta = agent.answer(plan[key])
+                coherency = agent.coherency_check(risposta)
+                attempts = 1
+                while not coherency and attempts <= 4:
+                    risposta = agent.retry(plan[key], risposta)
+                    coherency = agent.coherency_check(risposta)
+                    attempts += 1
+                orchestrator.correct_answer(key, risposta, plan[key])
+    proposal = orchestrator.propose(question)
+    with open(val_file, "w") as f:
+        f.write("REQUIREMENTS\n")
+        for element in val.validate_requirements(proposal):
+            f.write(element + "\n")
+        f.write("\nCONSTRAINTS\n")
+        for element in val.validate_constraints(proposal):
+            f.write(element + "\n")
+    val.validate(proposal, single_val_file)
+    orchestrator.complete(use_kg)
+
+if __name__ == "__main__":
+    val = va.Validation("llama3.3:70b", 0)
     if os.path.exists(CHECKPOINT_FILE):
         print("🔄 Loading checkpoint...")
         agent_list = load_checkpoint()
     else:
-        att=0
-        agent_list=create_all_agents('llama3.3:70b')
-        Orchestrator=Orchestrator_Agent(agent_list,'llama3.3:70b', "Total")
-        question=load_question("file.txt")
-        plan=Orchestrator.plan(question, att, True)
-        while plan=={}: 
-            att+=1
-            plan=Orchestrator.plan(question,att, True)
-        for key in plan.keys():
-            for agent in agent_list:
-                if agent.name==key:
-                    risposta=agent.answer(plan[key])
-                    coherency=agent.coherency_check(risposta)
-                    attempts=1
-                    while coherency==False and attempts<=4:
-                        risposta=agent.retry(plan[key], risposta)
-                        coherency=agent.coherency_check(risposta)
-                        attempts+=1
-                    correct= Orchestrator.correct_answer(key,risposta, plan[key])
-        proposal=Orchestrator.propose(question)
+        agent_list = create_all_agents('llama3.3:70b')
+        Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', "Total")
+        question = load_question("file.txt")
+        _run_pipeline(Orchestrator, agent_list, question, True,  "validation_kg.txt",   "single_validation_kg.txt",   val)
+        _run_pipeline(Orchestrator, agent_list, question, False, "validation_nokg.txt", "single_validation_nokg.txt", val)
 
-        with open("validation_kg.txt", "w") as f:
-            f.write("REQUIREMENTS\n")
-            for element in val.validate_requirements(proposal):
-                f.write(element+"\n")
-            f.write("\nCONSTRAINTS\n")
-            for element in val.validate_constraints(proposal):
-                f.write(element+"\n")
-        val.validate(proposal, "single_validation_kg.txt")
-        
-        Orchestrator.complete(True)
-
-        att=0
-        plan=Orchestrator.plan(question, att, False)
-        while plan=={}: 
-            att+=1
-            plan=Orchestrator.plan(question,att, False)
-        for key in plan.keys():
-            for agent in agent_list:
-                if agent.name==key:
-                    risposta=agent.answer(plan[key])
-                    coherency=agent.coherency_check(risposta)
-                    attempts=1
-                    while coherency==False and attempts<=4:
-                        risposta=agent.retry(plan[key], risposta)
-                        coherency=agent.coherency_check(risposta)
-                        attempts+=1
-                    correct= Orchestrator.correct_answer(key,risposta, plan[key])
-        proposal=Orchestrator.propose(question)
-
-        with open("validation_nokg.txt", "w") as f:
-            f.write("REQUIREMENTS\n")
-            for element in val.validate_requirements(proposal):
-                f.write(element+"\n")
-            f.write("\nCONSTRAINTS\n")
-            for element in val.validate_constraints(proposal):
-                f.write(element+"\n")
-
-        val.validate(proposal, "single_validation_nokg.txt")
-
-        Orchestrator.complete(False)
-        

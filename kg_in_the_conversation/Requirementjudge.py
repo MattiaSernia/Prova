@@ -1,8 +1,8 @@
-import ollama
 import re
 import json
 from rdflib import ConjunctiveGraph, Namespace, URIRef
 from rdflib.namespace import RDF
+from utils import uri_to_label, ollama_chat
 
 
 class RequirementJudge:
@@ -77,26 +77,17 @@ class RequirementJudge:
 
     # ── Graph helpers ───────────────────────────────────────────────────
 
-    @staticmethod
-    def _local(uri) -> str:
-        s = str(uri)
-        if "#" in s:
-            s = s.rsplit("#", 1)[-1]
-        else:
-            s = s.rsplit("/", 1)[-1]
-        return s.replace("_", " ")
-
     def _load_requirements(self, g) -> list[dict]:
         reqs = []
         for subj in g.subjects(RDF.type, self._EX.Requirement):
             s_uri = next(g.objects(subj, RDF.subject), None)
-            s = self._local(s_uri) if s_uri else "?"
+            s = uri_to_label(s_uri) if s_uri else "?"
 
             pred, obj = "", ""
             for p, o in g.predicate_objects(subj):
                 if str(p).startswith(str(self._EDGE)):
-                    pred = self._local(p)
-                    obj  = self._local(o)
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
                     break
 
             pri_uri = next(g.objects(subj, self._EX.priority), None)
@@ -106,8 +97,8 @@ class RequirementJudge:
                 "subject":   s,
                 "predicate": pred,
                 "object":    obj,
-                "priority":  self._local(pri_uri) if pri_uri else "",
-                "category":  self._local(cat_uri) if cat_uri else "",
+                "priority":  uri_to_label(pri_uri) if pri_uri else "",
+                "category":  uri_to_label(cat_uri) if cat_uri else "",
             })
         return reqs
 
@@ -162,15 +153,12 @@ class RequirementJudge:
             f"{proposal_triple}\n"
         )
 
-        response = ollama.chat(
+        response = ollama_chat(
             self.model,
-            messages=[
-                {"role": "system",  "content": self.context},
-                {"role": "user",    "content": prompt},
-            ],
+            [{"role": "system", "content": self.context}, {"role": "user", "content": prompt}],
+            options={"temperature": self.temperature},
         )
-        textual_answer = response["message"]["content"]
-        return self.parse_tuples(textual_answer)
+        return self.parse_tuples(response["message"]["content"])
 
     # ── Public API (same pattern as other extractors) ───────────────────
 
@@ -188,13 +176,13 @@ class RequirementJudge:
         proposals = []
         for subj in graph.subjects(RDF.type, self._EX.Proposal):
             s_uri = next(graph.objects(subj, RDF.subject), None)
-            s = self._local(s_uri) if s_uri else "?"
+            s = uri_to_label(s_uri) if s_uri else "?"
  
             pred, obj = "", ""
             for p, o in graph.predicate_objects(subj):
                 if str(p).startswith(str(self._EDGE)):
-                    pred = self._local(p)
-                    obj  = self._local(o)
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
                     break
  
             proposals.append(f"({s}, {pred}, {obj})")

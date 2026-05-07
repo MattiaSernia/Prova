@@ -1,6 +1,8 @@
-import ollama
 import json
-from typing import Optional
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from utils import ollama_chat
 class Validation:
     def __init__(self, model, temperature):
         self.model=model
@@ -23,15 +25,13 @@ class Validation:
             "If none are satisfied return: {\"satisfied\": []}"
         )
 
-        response = ollama.chat(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+        response = ollama_chat(
+            self.model,
+            [{"role": "user", "content": prompt}],
             options={"temperature": self.temperature},
             format="json",
         )
-
-        content = response["message"]["content"]
-        data = json.loads(content)
+        data = json.loads(response["message"]["content"])
         return data.get("satisfied", [])
 
     def validate_constraints(self, proposal: str) -> list[str]:
@@ -47,15 +47,13 @@ class Validation:
             "If none are satisfied return: {\"satisfied\": []}"
         )
 
-        response = ollama.chat(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+        response = ollama_chat(
+            self.model,
+            [{"role": "user", "content": prompt}],
             options={"temperature": self.temperature},
             format="json",
         )
-
-        content = response["message"]["content"]
-        data = json.loads(content)
+        data = json.loads(response["message"]["content"])
         return data.get("satisfied", [])
 
     def _validate_requirement(self, proposal: str, requirement: dict, key: str) -> tuple:
@@ -76,16 +74,13 @@ class Validation:
             'Example: {"satisfied": true}'
         )
 
-        response = ollama.chat(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+        response = ollama_chat(
+            self.model,
+            [{"role": "user", "content": prompt}],
             options={"temperature": self.temperature},
             format="json",
         )
-
-        content = response["message"]["content"]
-        print(content)
-        data = json.loads(content)
+        data = json.loads(response["message"]["content"])
         satisfied = bool(data.get("satisfied", False))
         return (True, text) if satisfied else (False, None)
 
@@ -105,16 +100,13 @@ class Validation:
             'Example: {"satisfied": true}'
         )
 
-        response = ollama.chat(
-            model=self.model,
-            messages=[{"role": "user", "content": prompt}],
+        response = ollama_chat(
+            self.model,
+            [{"role": "user", "content": prompt}],
             options={"temperature": self.temperature},
             format="json",
         )
-
-        content = response["message"]["content"]
-        print(content)
-        data = json.loads(content)
+        data = json.loads(response["message"]["content"])
         satisfied = bool(data.get("satisfied", False))
         return (True, text) if satisfied else (False, None)
 
@@ -158,7 +150,7 @@ class Validation:
 
 if __name__=="__main__":
     Val=Validation("llama3.3:70b",0)
-    self.validate("""Final proposal generated: ### Executive Summary
+    Val.validate("""Final proposal generated: ### Executive Summary
 Nexus Engineering S.r.l., as part of a consortium, is pleased to submit this tender proposal in response to the City of Belval's call for implementing an artificial intelligence solution to assist municipal agents in their daily missions. Our proposed solution leverages cutting-edge AI technologies, including Large Language Models (LLMs) and Retrieval-Augmented Generation (RAG), to provide intelligent assistance across various administrative activities. We are committed to ensuring compliance with all regulatory requirements, particularly GDPR, while prioritizing innovation, sustainability, and cost-effectiveness.
 
 ### Understanding of Requirements

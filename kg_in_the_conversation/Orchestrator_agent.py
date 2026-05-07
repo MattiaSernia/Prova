@@ -1,10 +1,10 @@
-import ollama
 import logging
 import json
 from agent import Agent
 from custom_graph import Custom_Graph
 from rdflib import Namespace
 from rdflib.namespace import RDF
+from utils import uri_to_label, ollama_chat
 import copy
 
 
@@ -14,19 +14,13 @@ class Orchestrator_Agent:
         self.model=model
         self.agent_answer=[]
         self._graph_name=graph_name
-        self._cgraph=Custom_Graph(agents, graph_name)
+        self._cgraph=Custom_Graph(agents, graph_name, model)
 
     def _agent_registry(self) -> str:
         lines = []
         for agent in self.agents:
             lines.append(f'- "{agent.name}": {agent.description}')
         return "\n".join(lines)
-
-    @staticmethod
-    def _local(uri) -> str:
-        s = str(uri)
-        s = s.rsplit("#", 1)[-1] if "#" in s else s.rsplit("/", 1)[-1]
-        return s.replace("_", " ")
 
     def _get_requirements_text(self) -> str:
         EX   = Namespace("http://example.org/ontologia#")
@@ -35,12 +29,12 @@ class Orchestrator_Agent:
         struct: dict = {}
         for subj in ds.subjects(RDF.type, EX.Requirement):
             s_uri = next(ds.objects(subj, RDF.subject), None)
-            s = self._local(s_uri) if s_uri else "?"
+            s = uri_to_label(s_uri) if s_uri else "?"
             pred, obj = "", ""
             for p, o in ds.predicate_objects(subj):
                 if str(p).startswith(EDGE):
-                    pred = self._local(p)
-                    obj  = self._local(o)
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
                     break
             pri_uri = next(ds.objects(subj, EX.priority), None)
             cat_uri = next(ds.objects(subj, EX.category), None)
@@ -48,9 +42,9 @@ class Orchestrator_Agent:
                 struct[s] = []
             entry = {"predicate": pred, "object": obj}
             if pri_uri:
-                entry["priority"] = self._local(pri_uri)
+                entry["priority"] = uri_to_label(pri_uri)
             if cat_uri:
-                entry["category"] = self._local(cat_uri)
+                entry["category"] = uri_to_label(cat_uri)
             struct[s].append(entry)
         return json.dumps(struct, indent=2, ensure_ascii=False)
 
@@ -61,19 +55,19 @@ class Orchestrator_Agent:
         struct: dict = {}
         for subj in ds.subjects(RDF.type, EX.Constraint):
             s_uri = next(ds.objects(subj, RDF.subject), None)
-            s = self._local(s_uri) if s_uri else "?"
+            s = uri_to_label(s_uri) if s_uri else "?"
             pred, obj = "", ""
             for p, o in ds.predicate_objects(subj):
                 if str(p).startswith(EDGE):
-                    pred = self._local(p)
-                    obj  = self._local(o)
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
                     break
             ct_uri = next(ds.objects(subj, EX.constraintType), None)
             if s not in struct:
                 struct[s] = []
             entry = {"predicate": pred, "object": obj}
             if ct_uri:
-                entry["constraintType"] = self._local(ct_uri)
+                entry["constraintType"] = uri_to_label(ct_uri)
             struct[s].append(entry)
         return json.dumps(struct, indent=2, ensure_ascii=False)
     
@@ -149,18 +143,12 @@ class Orchestrator_Agent:
                     "Budget Agent": "The total contract value is 3M EUR over 4 years. Annual exploitation costs must stay within municipal budget capacity. The client expects cost optimisation without sacrificing quality. Are we financially eligible to bid, and what is the projected margin?",
                     "Legal Agent": "The tender requires strict GDPR compliance (EU-only hosting, no data transfer outside EU, encryption of sensitive data). All AI recommendations must be explainable post-hoc. No automated decision is allowed without explicit agent validation. What legal risks should we flag, and are we compliant?"
                 }}"""
-            response = ollama.chat(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": f"Call for Tenders Knowledge Graph:\n\n{kg_context}"},
-                ],
-            )
+            user_content = f"Call for Tenders Knowledge Graph:\n\n{kg_context}"
         else:
             system =  f"""You are an orchestrator managing a consortium responding to a public call for tenders.
                 You have access to these specialized agents:
                 {self._agent_registry()}
-    
+
                 ### CRITICAL CONSTRAINT — READ THIS FIRST:
                 Each agent operates in COMPLETE ISOLATION. They have NO access to the Call for Tenders document.
                 They can only answer based on their own internal knowledge (their company role and data).
@@ -168,18 +156,18 @@ class Orchestrator_Agent:
                 in a vacuum and produce a useless generic response.
                 YOUR JOB IS TO BE THEIR EYES: copy every relevant requirement, figure, constraint and
                 deadline from the tender directly into the question you write for that agent.
-    
+
                 ### Your role:
                 The user will provide you with the full text of a Call for Tenders document.
                 Your job is to read it carefully and dispatch targeted, self-contained questions
                 to the relevant agents so that together they can produce a complete bid response.
-    
+
                 ### How to build each question:
                 1. Identify which sections of the tender are relevant to that agent's domain.
                 2. Extract and paste the specific requirements, numbers, constraints and deadlines
                 that this agent needs to know.
                 3. End with a precise, answerable question about our company's capabilities or risks.
-    
+
                 ### Rules:
                 - Respond ONLY with a valid JSON object.
                 - Keys must be agent names from the list above (use only agents relevant to this tender).
@@ -189,33 +177,31 @@ class Orchestrator_Agent:
                 - Do not include any explanation, markdown, or extra text — raw JSON only.
                 - Questions will be asked in parallel, so each must be fully self-contained.
                 - USE the right name for the Agents, do not modify them
-    
+
                 ### BAD example (never do this — agent has no context to answer):
                 {{
                     "Budget Agent": "Given our budget constraints, can we deliver this project?"
                 }}
-    
+
                 ### GOOD example (agent has everything it needs to answer):
                 {{
                     "Budget Agent": "The client's global budget is 3 million EUR over 4 years. Annual operating costs must remain controlled. The tender requires a pilot phase followed by progressive rollout. Given our pricing model and current financial position, what is our projected margin on this contract, and are there cost-optimization strategies we can propose?"
                 }}
-    
+
                 Full example format:
                 {{
                     "Technical Architect Agent": "The client requires: response time < 2 seconds, 99.9% availability, API integration with civil-status and town-planning software, EDM and user directories. Hosting must be on SecNumCloud-certified infrastructure within the EU. No dependency on non-European suppliers. Can our current stack meet these requirements, and what architecture do you propose?",
                     "Budget Agent": "The total contract value is 3M EUR over 4 years. Annual exploitation costs must stay within municipal budget capacity. The client expects cost optimisation without sacrificing quality. Are we financially eligible to bid, and what is the projected margin?",
                     "Legal Agent": "The tender requires strict GDPR compliance (EU-only hosting, no data transfer outside EU, encryption of sensitive data). All AI recommendations must be explainable post-hoc. No automated decision is allowed without explicit agent validation. What legal risks should we flag, and are we compliant?"
                 }}"""
-            response = ollama.chat(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": f"Call for Tenders:\n\n{task}"},
-                ],
-            )
+            user_content = f"Call for Tenders:\n\n{task}"
 
+        response = ollama_chat(
+            self.model,
+            [{"role": "system", "content": system}, {"role": "user", "content": user_content}],
+        )
 
-        raw = response.message.content.strip()
+        raw = response["message"]["content"].strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -224,12 +210,10 @@ class Orchestrator_Agent:
 
         try:
             plan = json.loads(raw)
-            logging.log(25,f"Orchestrator Answer: {raw}")
+            logging.log(25, f"Orchestrator Answer: {raw}")
         except json.JSONDecodeError:
-            print(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n")
-            logging.warning(f"  [orchestrator] Warning: could not parse plan JSON.\n  Raw: {raw}\n Attempt nr: {attempt}")
-            logging.warning(f"Orchestrator Answer is not in json format, attempt: {attempt}")
-            plan={}
+            logging.warning(f"[orchestrator] Could not parse plan JSON (attempt {attempt}). Raw: {raw}")
+            plan = {}
         return plan
 
 
@@ -247,10 +231,7 @@ class Orchestrator_Agent:
 
             Result:"""
         logging.log(25,f"Orchestrator correct received: {answer}")
-        response=ollama.chat(model=self.model,
-                messages=[
-                        {'role': 'user', 'content': text},
-                    ])
+        response = ollama_chat(self.model, [{'role': 'user', 'content': text}])
         self.agent_answer.append(f"=== {name} ===\n{answer}")
         textual_answer= response['message']['content']
         cleaned=textual_answer.lower().replace(".","").strip()
@@ -296,15 +277,12 @@ class Orchestrator_Agent:
 
 Write the proposal now. For each agent's domain, be concrete and specific: name exact technologies, exact costs, exact regulations, exact figures as stated by the agents."""
 
-        response = ollama.chat(
-            model=self.model,
-            messages=[
-                {"role": "system", "content": system},
-                {"role": "user", "content": user_message},
-            ]
+        response = ollama_chat(
+            self.model,
+            [{"role": "system", "content": system}, {"role": "user", "content": user_message}],
         )
 
-        proposal = response.message.content
+        proposal = response["message"]["content"]
         logging.log(25, f"Final proposal generated: {proposal}")
         self.agent_answer = []
         return proposal
