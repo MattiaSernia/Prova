@@ -58,6 +58,11 @@ class Custom_Graph:
         self._proposal_counter=0
         self._triplet_counter=0
 
+        self._prev_message = None
+        self._prev_message_uri = None
+        self._first_message_uri = None
+        self._mex = 0
+
         _coref = CoreferenceResolver()
         self._req_extr=RequirementsExtractor(model, 0, _coref)
         self._con_extr=ConstraintsExtractor(model, 0, _coref)
@@ -77,13 +82,99 @@ class Custom_Graph:
         self._ds.bind("pro", self._PRO)
         self._ds.bind("tri", self._TRI)
         self._dict = {}
-        self._mex=0
+        self._mex = 0
         self._activity_counter    = 0
         self._extraction_counter  = 0
         self._requirement_counter = 0
         self._constraint_counter  = 0
         self._proposal_counter    = 0
         self._triplet_counter     = 0
+        self._prev_message        = None
+        self._prev_message_uri    = None
+        self._first_message_uri   = None
+
+    def add_message(self, mxg: Message):
+        """Add a single message to the graph in real-time, then save."""
+        if mxg.role == "default":
+            URIagent = URIRef(self._nodeUri + self._clean_uri(mxg.node))
+            if (URIagent, RDF.type, PROV.Agent, self._ds.default_context) not in self._ds:
+                self._ds.add((URIagent, RDF.type, PROV.Agent, self._ds.default_context))
+
+            if mxg.text in self._dict:
+                URImxg = self._dict[mxg.text]
+                if (URImxg, self._EX.is_coherent, Literal('FALSE'), self._ds.default_context) in self._ds \
+                   or (URImxg, self._EX.does_answer, Literal('FALSE'), self._ds.default_context) in self._ds:
+                    self._remove_derived_graphs(URImxg)
+                    self._ds.remove((URImxg, None, None, self._ds.default_context))
+                    self._ds.remove((None, None, URImxg, self._ds.default_context))
+                else:
+                    # duplicate already processed — update state pointer and skip
+                    self._prev_message = mxg
+                    self._prev_message_uri = URImxg
+                    self._mex += 1
+                    return
+            else:
+                URImxg = URIRef(self._nodeUri + f"message{len(self._dict.keys())}")
+                self._dict[mxg.text] = URImxg
+
+            self._ds.add((URImxg, RDF.type, PROV.Entity, self._ds.default_context))
+
+            URIactivity = self._new_activity_uri()
+            self._ds.add((URIactivity, RDF.type, PROV.Activity, self._ds.default_context))
+            self._ds.add((URIactivity, PROV.wasAssociatedWith, URIagent, self._ds.default_context))
+            self._ds.add((URIactivity, PROV.startedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
+            self._ds.add((URImxg, PROV.wasGeneratedBy, URIactivity, self._ds.default_context))
+            self._ds.add((URImxg, PROV.wasAttributedTo, URIagent, self._ds.default_context))
+            self._ds.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
+
+            text = mxg.text
+
+            if mxg.convPart == "question":
+                # sended_at added retroactively when the answer arrives
+                pass
+            elif mxg.convPart == "answer":
+                if self._prev_message is not None:
+                    URIprev = URIRef(self._nodeUri + self._clean_uri(self._prev_message.node))
+                    self._ds.add((URImxg, self._EX.sent_To, URIprev, self._ds.default_context))
+                    # retroactively set sended_at on the question pointing to this answerer
+                    if self._prev_message_uri is not None:
+                        URIanswerer = URIRef(self._nodeUri + self._clean_uri(mxg.node))
+                        self._ds.add((self._prev_message_uri, self._EX.sent_To, URIanswerer, self._ds.default_context))
+                    if self._prev_message.text in self._dict:
+                        URIprevMsg = self._dict[self._prev_message.text]
+                        self._ds.add((URImxg, PROV.wasDerivedFrom, URIprevMsg, self._ds.default_context))
+                        self._ds.add((URIactivity, PROV.used, URIprevMsg, self._ds.default_context))
+                    text = self._prev_message.text + "\n" + text
+            elif mxg.convPart == "proposal":
+                if self._prev_message is not None:
+                    URIprev = URIRef(self._nodeUri + self._clean_uri(self._prev_message.node))
+                    self._ds.add((URImxg, self._EX.sent_To, URIprev, self._ds.default_context))
+                    if self._prev_message_uri is not None and self._first_message_uri is not None:
+                        self._ds.add((URImxg, PROV.wasDerivedFrom, self._first_message_uri, self._ds.default_context))
+                        self._ds.add((URIactivity, PROV.used, self._first_message_uri, self._ds.default_context))
+
+            if mxg.node == "User":
+                self._userExtraction(text, URImxg)
+            elif mxg.convPart == "proposal":
+                self._propExtraction(text, URImxg)
+            else:
+                self._normalExtraction(text, URImxg)
+
+            if self._first_message_uri is None:
+                self._first_message_uri = URImxg
+            self._prev_message = mxg
+            self._prev_message_uri = URImxg
+
+        elif mxg.role == "coherency":
+            if mxg.convPart == "answer" and self._prev_message_uri is not None:
+                self._ds.add((self._prev_message_uri, self._EX.is_coherent, Literal(mxg.text), self._ds.default_context))
+
+        elif mxg.role == "correction":
+            if mxg.convPart == "answer" and self._prev_message_uri is not None:
+                self._ds.add((self._prev_message_uri, self._EX.does_answer, Literal(mxg.text.lstrip().rstrip()), self._ds.default_context))
+
+        self._mex += 1
+        self._saveGraph()
 
     def add_content(self, file:str, on_top:bool, start:int):
         messages=self._load(file)
