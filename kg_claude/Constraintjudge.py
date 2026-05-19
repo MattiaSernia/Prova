@@ -199,14 +199,3 @@ class ConstraintJudge:
         return proposals
 
 
-if __name__ == '__main__':
-    g = ConjunctiveGraph()
-    g.parse("Paura.trig", format="trig")
-    con_jud = ConstraintJudge('llama3.3:70b', 0, g)
-    proposals = con_jud.extract_proposals(g)
-    for element in proposals:
-        result = con_jud.answer(element)
-        print(f"Proposal: {element}")
-        print(f"  Satisfies:         {result['satisfies']}")
-        print(f"  Does not satisfy:  {result['does_not_satisfy']}")
-        print("---")

@@ -241,15 +241,3 @@ def create_agent(agent_type: str, model: str) -> Agent:
 def create_all_agents(model: str) -> list:
     """Instantiate every agent declared in the registry."""
     return  [create_agent(key, model) for key in AGENT_REGISTRY]
-
-
-if __name__=="__main__":
-    agent=create_agent("legal", "llama3.3:70b")
-    with open("file.txt", "r", encoding="utf-8") as f:
-        lines=f.readlines()
-        text=" ".join(lines)
-    print("yo")
-    answer=agent.assess(text)
-    print(answer)
-    boolean=agent.coherency_check(answer)
-    print(boolean)

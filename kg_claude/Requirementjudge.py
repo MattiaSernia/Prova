@@ -188,16 +188,3 @@ class RequirementJudge:
             proposals.append(f"({s}, {pred}, {obj})")
         return proposals
 
-if __name__=='__main__':
-        g = ConjunctiveGraph()
-        g.parse("Paura.trig", format="trig")
-        req_jud=RequirementJudge('llama3.3:70b',0 ,g)
-        proposals=req_jud.extract_proposals(g)
-        #i=0
-        for element in proposals:
-            #if i==5:
-                #break
-            capperi=req_jud.answer(element)
-            #i+=1
-
-        

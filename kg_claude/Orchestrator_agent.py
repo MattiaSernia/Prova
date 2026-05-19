@@ -301,6 +301,3 @@ Write the proposal now. For each agent's domain, be concrete and specific: name 
         logging.log(25, f"Final proposal generated: {proposal}")
         self.agent_answer = []
         return proposal
-
-    def complete(self, graph_in_prompt):
-        pass  # graph already fully built in real-time via add_message()

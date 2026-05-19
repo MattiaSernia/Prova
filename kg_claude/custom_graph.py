@@ -6,8 +6,6 @@ from requirementsExtractor import RequirementsExtractor
 from proposalsExtractor import ProposalsExtractor
 from tripletExtractorClaude import TripletExtractor
 from CoreferenceResolver import CoreferenceResolver
-from Requirementjudge import RequirementJudge
-from Constraintjudge import ConstraintJudge
 from mxg import Message
 
 
@@ -17,11 +15,6 @@ from mxg import Message
 
 import os
 import re
-import pickle
-CHECKPOINT_FILE = "checkpoint_before_graph.pkl"
-def load_checkpoint():
-    with open(CHECKPOINT_FILE, "rb") as f:
-        return pickle.load(f)
 
 class Custom_Graph:
 
@@ -176,186 +169,6 @@ class Custom_Graph:
         self._mex += 1
         self._saveGraph()
 
-    def add_content(self, file:str, on_top:bool, start:int):
-        messages=self._load(file)
-        messages=messages[start:]
-        self._mex=len(messages)
-        self._generate_graph(messages, on_top)
-        self._saveGraph()
-
-    def _load(self, file:str)->list:
-        try:
-            f = open(file, "r", encoding="utf-8")
-        except Exception as e:
-            print(e)
-            return None
-        
-        rows=f.readlines()
-        f.close()
-        rows=self._cleanRows(rows)
-
-        messages=[]
-        for row in rows:
-            mxg=self._generate_mxg(row)
-            if mxg is not None:
-                messages.append(mxg)
-        return messages
-
-    def _cleanRows(self, rows:list)->list:
-        i=0
-        r2=[]
-        while i < len(rows)-1:
-            j=i+1
-            stringa=rows[i]
-            if "INFO" not in stringa.split(" | "):
-                while j<len(rows) and "INFO" not in rows[j].split(" | ") and "AGENT" not in rows[j].split(" | "):
-                    if rows[j]!= "\n":
-                        stringa+= "\n"+rows[j]
-                    i=j
-                    j+=1
-                r2.append(stringa.strip())
-            i+=1
-        stringa=rows[-1]
-        if "AGENT" in stringa.split(" | ") and "INFO" not in rows[len(rows)-1].split(" | "): r2.append(rows[len(rows)-1])
-        return r2
-
-    def _generate_mxg(self, text:str)-> Message:
-        logging.debug(text)
-        split=text.split(" | ")
-        timestamp = split[0]
-        unmodified_text = split[2]
-        split=unmodified_text.split(": ")
-        mxgCorp = ": ".join(split[1:])
-        mxgInfo = split[0]
-        total = mxgInfo.split(" ")
-        node=""
-        if "received" in total:
-            node = "Orchestrator"
-            convPart = "question"
-        elif "Orchestrator" in total:
-            node="Orchestrator"
-            convPart = "answer"
-        elif "User" in total:
-            node="User"
-            convPart = "question"
-        elif "Final" in total:
-            node="Orchestrator"
-            convPart = "proposal"
-        if node=="":
-            for agent in self._agent_list:
-                name=agent.name.split(" ")[0]
-                if name in total:
-                    node=agent.name
-                    convPart = "answer"
-
-        if node=="":
-            logging.warning(f"Unrecognized log entry, skipping: {mxgInfo[:80]!r}")
-            return None
-
-        role = "default"
-        
-        if "coherency" in total:
-            role = "coherency"
-        elif "correct" in total:
-            role= "correction"
-        return(Message(mxgCorp, timestamp, node, convPart, role))
-
-    def _isolation(self,messages:list ,node:str, convPart:str)->list:
-        output=[]
-        for message in messages:
-            if message.node==node:
-                output.append(message)
-            elif message.convPart==convPart:
-                output.append(message)
-        return output
-
-    def _generate_graph(self, messages:list, on_top:bool):
-        alpha=0
-        if on_top:
-            alpha=1
-        for i in range(alpha, len(messages)):
-            mxg=messages[i]
-            error=False
-
-            if mxg.role=="default":
-                #check if the agent is in the graph or not
-                URIagent=URIRef(self._nodeUri + self._clean_uri(mxg.node))
-                if (URIagent, RDF.type, PROV.Agent, self._ds.default_context) not in self._ds:
-                    self._ds.add((URIagent, RDF.type, PROV.Agent, self._ds.default_context))
-            
-                #----------- ricontrollare dopo ------------------
-                if mxg.text in self._dict:
-                    URImxg=self._dict[mxg.text]
-                    if (URImxg, self._EX.is_coherent,Literal('FALSE'),self._ds.default_context) in self._ds or (URImxg, self._EX.does_answer,Literal('FALSE'), self._ds.default_context) in self._ds:
-                        self._remove_derived_graphs(URImxg)
-                        self._ds.remove((URImxg, None, None, self._ds.default_context))
-                        self._ds.remove((None, None, URImxg, self._ds.default_context))
-
-                    else:
-                        error=True
-                #----------- ricontrollare dopo ------------------             
-                else:
-                    URImxg=URIRef(self._nodeUri +f"message{len(self._dict.keys())}")
-                    self._dict[mxg.text]=URImxg
-                
-                if not error:
-                    self._ds.add((URImxg, RDF.type, PROV.Entity, self._ds.default_context))
-
-                    URIactivity= self._new_activity_uri()
-                    self._ds.add((URIactivity, RDF.type, PROV.Activity, self._ds.default_context))
-                    self._ds.add((URIactivity, PROV.wasAssociatedWith, URIagent, self._ds.default_context)) 
-                    self._ds.add((URIactivity, PROV.startedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
-
-                    self._ds.add((URImxg, PROV.wasGeneratedBy, URIactivity, self._ds.default_context))
-
-                    self._ds.add((URImxg, PROV.wasAttributedTo, URIagent, self._ds.default_context))
-                    self._ds.add((URImxg, PROV.generatedAtTime, Literal(mxg.timestamp, datatype=XSD.dateTime), self._ds.default_context))
-
-                    text=mxg.text
-                    
-                    #--------------- not now -------------
-                    if mxg.convPart== "question" and i<len(messages)-1:
-                        URInext = URIRef(self._nodeUri + self._clean_uri(messages[i + 1].node))
-                        self._ds.add((URImxg, self._EX.sent_To,URIRef(self._nodeUri + URInext),self._ds.default_context))
-
-                    elif mxg.convPart== "answer":
-                        URIprev = URIRef(self._nodeUri + self._clean_uri(messages[i - 1].node))
-                        self._ds.add((URImxg, self._EX.sent_To, URIprev, self._ds.default_context))
-                        # La risposta è DERIVATA dalla domanda precedente (PROV-O)
-                        if messages[i - 1].text in self._dict:
-                            URIprevMsg = self._dict[messages[i - 1].text]
-                            self._ds.add((URImxg, PROV.wasDerivedFrom, URIprevMsg,self._ds.default_context))
-                            # L'activity ha USATO la domanda per produrre la risposta
-                            self._ds.add((URIactivity, PROV.used, URIprevMsg, self._ds.default_context))
-                        text=messages[i-1].text+"\n"+text
-
-                    elif mxg.convPart== "proposal":
-                        URIprev = URIRef(self._nodeUri + self._clean_uri(messages[i - 1].node))
-                        self._ds.add((URImxg, self._EX.sent_To, URIprev, self._ds.default_context))
-                        # La risposta è DERIVATA dalla domanda precedente (PROV-O)
-                        if messages[i - 1].text in self._dict:
-                            URIprevMsg = self._dict[messages[0].text]
-                            self._ds.add((URImxg, PROV.wasDerivedFrom, URIprevMsg,self._ds.default_context))
-                            # L'activity ha USATO la domanda per produrre la risposta
-                            self._ds.add((URIactivity, PROV.used, URIprevMsg, self._ds.default_context))
-
-                    if mxg.node=="User":
-                        self._userExtraction(text,URImxg)
-                    elif mxg.convPart=="proposal":
-                        self._propExtraction(text, URImxg)
-                    else:
-                        self._normalExtraction(text, URImxg)
-            
-            elif mxg.role=="coherency":
-                if mxg.convPart=="answer":
-                    URImxg=self._dict[messages[i-1].text]
-                    self._ds.add((URImxg, self._EX.is_coherent,Literal(messages[i].text), self._ds.default_context))
-
-            elif mxg.role=="correction":
-                if mxg.convPart=="answer":
-                    URImxg=self._dict[messages[i-1].text]
-                    self._ds.add((URImxg, self._EX.does_answer,Literal(messages[i].text.lstrip().rstrip()), self._ds.default_context))       
-
     def _userExtraction(self, text: str, URImxg):
         requirements=self._req_extr.pipe(text)
         ReqURI=self._new_extraction_uri("req/")
@@ -416,18 +229,6 @@ class Custom_Graph:
             ng.add((node, RDF.type, self._EX.Proposal))
             ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(proposal["subject"]))))
             ng.add((node, URIRef(self._edgeUri + self._clean_uri(proposal["predicate"])),    URIRef(self._nodeUri + self._clean_uri(proposal["object"]))))
-            
-            #### satisfies da controllare
-            #req_nodes=self._findreq(f"{proposal['subject']}, {proposal['predicate']}, {proposal['object']}")
-            #for subjnode in req_nodes["satisfies"]:
-            #    ng.add((node, self._EX.Satisfies, subjnode))
-            #for subjnode in req_nodes["does_not_satisfy"]:
-            #    ng.add((node, self._EX.Does_Not_Satisfies, subjnode))
-            #con_nodes=self._findcon(f"{proposal['subject']}, {proposal['predicate']}, {proposal['object']}")
-            #for subjnode in con_nodes["satisfies"]:
-            #    ng.add((node, self._EX.Satisfies, subjnode))
-            #for subjnode in con_nodes["does_not_satisfy"]:
-            #    ng.add((node, self._EX.Does_Not_Satisfies, subjnode))
         self._ds.add((ProURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
         self._ds.add((ProURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
 
@@ -482,47 +283,8 @@ class Custom_Graph:
             #    (rdf:type ex:Extraction, prov:wasDerivedFrom, etc.)
             self._ds.remove((ext_uri, None, None, self._ds.default_context))
 
-    def _findreq(self, proposal:str)->dict:
-        req_judge=RequirementJudge("llama3.3:70b", 0, self._ds)
-        nodes=req_judge.answer(proposal)
-        satlist=[]
-        for element in nodes["satisfies"]:
-            if self._searchnode(element,"requirement"):
-                satlist.append(self._searchnode(element,"requirement"))
-        not_satlist=[]
-        for element in nodes["does_not_satisfy"]:
-            if self._searchnode(element,"requirement"):
-                not_satlist.append(self._searchnode(element,"requirement"))
-        return {"satisfies":satlist, "does_not_satisfy":not_satlist}
-
-    def _searchnode(self, triple:list, typ:str):
-        if typ=="requirement":
-            typ=self._EX.Requirement
-        elif typ == "constraint":
-            typ=self._EX.Constraint
-        for subj in self._ds.subjects(RDF.type, typ):
-            if (subj, RDF.subject, URIRef(self._nodeUri + self._clean_uri(triple[0]))) in self._ds and (subj, URIRef(self._edgeUri + self._clean_uri(triple[1])), URIRef(self._nodeUri + self._clean_uri(triple[2]))) in self._ds:
-                return subj
-    
-    def _findcon(self, proposal:str)->dict:
-        con_judge=ConstraintJudge("llama3.3:70b", 0, self._ds)
-        nodes=con_judge.answer(proposal)
-        satlist=[]
-        for element in nodes["satisfies"]:
-            if self._searchnode(element,"constraint"):
-                satlist.append(self._searchnode(element,"constraint"))
-        not_satlist=[]
-        for element in nodes["does_not_satisfy"]:
-            if self._searchnode(element,"constraint"):
-                not_satlist.append(self._searchnode(element,"constraint"))
-        return {"satisfies":satlist, "does_not_satisfy":not_satlist}
-
     def mxgnr(self):
         return self._mex
 
     def rename(self, name:str):
         self._name=name
-if __name__=="__main__":
-    agent_list = load_checkpoint()
-    grafo=Custom_Graph(agent_list, "Paura")
-    grafo.add_content("Nuova_Prova.log")
