@@ -101,28 +101,33 @@ class Orchestrator_Agent:
                 If your question does not contain the relevant facts from the tender, the agent will answer
                 in a vacuum and produce a useless generic response.
                 YOUR JOB IS TO BE THEIR EYES: copy every relevant requirement, figure, constraint and
-                deadline from the knowledge graph directly into the question you write for that agent.
+                deadline from both the knowledge graph and the original tender text directly into the
+                question you write for that agent.
 
                 ### Your role:
-                The user will provide you with a structured Knowledge Graph (KG) extracted from a Call for
-                Tenders document. The KG has two sections:
-                - REQUIREMENTS: high-level business needs and goals the client wants to achieve.
-                - CONSTRAINTS: conditions, limits and rules under which the solution must operate
-                (technical bounds, budget limits, regulatory requirements, infrastructure rules, etc.).
-                Your job is to read this KG carefully and dispatch targeted, self-contained questions
-                to the relevant agents so that together they can produce a complete bid response.
+                The user will provide you with two complementary sources:
+                1. A structured Knowledge Graph (KG) extracted from the Call for Tenders, with two sections:
+                   - REQUIREMENTS: high-level business needs and goals the client wants to achieve.
+                   - CONSTRAINTS: conditions, limits and rules under which the solution must operate
+                   (technical bounds, budget limits, regulatory requirements, infrastructure rules, etc.).
+                2. The full original Call for Tenders text.
+                Use the KG as the primary structured reference and the tender text to fill in any detail,
+                context or nuance that the KG may not have captured.
+                Your job is to dispatch targeted, self-contained questions to the relevant agents so that
+                together they can produce a complete bid response.
 
                 ### How to build each question:
                 1. Identify which requirements and constraints from the KG are relevant to that agent's domain.
-                2. Extract and include the specific requirements, figures, constraints and deadlines
+                2. Cross-reference with the tender text to capture any additional figures, context or nuance.
+                3. Extract and include the specific requirements, figures, constraints and deadlines
                 that this agent needs to know.
-                3. End with a precise, answerable question about our company's capabilities or risks.
+                4. End with a precise, answerable question about our company's capabilities or risks.
 
                 ### Rules:
                 - Respond ONLY with a valid JSON object.
                 - Keys must be agent names from the list above (use only agents relevant to this tender).
-                - Values must be specific, self-contained questions derived from the Knowledge Graph.
-                - Each question MUST quote the exact figures and constraints from the KG
+                - Values must be specific, self-contained questions derived from both sources.
+                - Each question MUST quote the exact figures and constraints
                 (budget amounts, SLA targets, regulatory frameworks, technical specs, deadlines).
                 - Do not include any explanation, markdown, or extra text — raw JSON only.
                 - Questions will be asked in parallel, so each must be fully self-contained.
@@ -144,7 +149,10 @@ class Orchestrator_Agent:
                     "Budget Agent": "The total contract value is 3M EUR over 4 years. Annual exploitation costs must stay within municipal budget capacity. The client expects cost optimisation without sacrificing quality. Are we financially eligible to bid, and what is the projected margin?",
                     "Legal Agent": "The tender requires strict GDPR compliance (EU-only hosting, no data transfer outside EU, encryption of sensitive data). All AI recommendations must be explainable post-hoc. No automated decision is allowed without explicit agent validation. What legal risks should we flag, and are we compliant?"
                 }}"""
-            user_content = f"Call for Tenders Knowledge Graph:\n\n{kg_context}"
+            user_content = (
+                f"=== CALL FOR TENDERS KNOWLEDGE GRAPH ===\n\n{kg_context}\n\n"
+                f"=== ORIGINAL CALL FOR TENDERS TEXT ===\n\n{task}"
+            )
         else:
             system =  f"""You are an orchestrator managing a consortium responding to a public call for tenders.
                 You have access to these specialized agents:
