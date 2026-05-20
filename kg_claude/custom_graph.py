@@ -299,18 +299,14 @@ class Custom_Graph:
         logging.debug(f"Graph saved to {filepath}")
 
     def _remove_derived_graphs(self, URImxg):
-        """Remove all named graphs (extractions) derived from this message."""
-        # 1. Find all extraction URIs linked to this message
-        extraction_uris = list(self._ds.subjects(PROV.wasDerivedFrom, URImxg))
-        
-        for ext_uri in extraction_uris:
-            # 2. Remove the entire named graph (all extracted triples inside it)
-            ng = self._ds.get_context(ext_uri)
-            self._ds.remove_context(ng)
-            
-            # 3. Remove provenance metadata from the default graph
-            #    (rdf:type ex:Extraction, prov:wasDerivedFrom, etc.)
-            self._ds.remove((ext_uri, None, None, self._ds.default_context))
+        """Remove all chunks and their derived extraction graphs linked to this message."""
+        chunk_uris = list(self._ds.subjects(PROV.wasDerivedFrom, URImxg))
+        for chunk_uri in chunk_uris:
+            extraction_uris = list(self._ds.subjects(PROV.wasDerivedFrom, chunk_uri))
+            for ext_uri in extraction_uris:
+                self._ds.remove_context(self._ds.get_context(ext_uri))
+                self._ds.remove((ext_uri, None, None, self._ds.default_context))
+            self._ds.remove((chunk_uri, None, None, self._ds.default_context))
 
     def mxgnr(self):
         return self._mex
