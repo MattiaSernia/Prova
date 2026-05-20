@@ -28,27 +28,20 @@ def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, val_file, s
     while plan == {}:
         att += 1
         plan = orchestrator.plan(question, att, use_kg)
+    kg_context = orchestrator.get_kg_context() if kg_agents else None
     for key in plan:
         for agent in agents:
             if agent.name == key:
-                agent_question = plan[key]
                 if kg_agents:
-                    kg_context = orchestrator.get_kg_context()
-                    agent_question = (
-                        f"=== KNOWLEDGE GRAPH ===\n{kg_context}\n=== END KNOWLEDGE GRAPH ===\n\n"
-                        "The Knowledge Graph above describes the client's requirements and constraints. "
-                        "Use it only to understand what is needed. "
-                        "Answer the following question using ONLY your company context.\n\n"
-                        f"{plan[key]}"
-                    )
+                    agent.set_kg_context(kg_context)
                 orchestrator.add_message(Message.now(plan[key], "Orchestrator", "question", "default"))
-                risposta = agent.answer(agent_question)
+                risposta = agent.answer(plan[key])
                 orchestrator.add_message(Message.now(risposta, agent.name, "answer", "default"))
                 coherency = agent.coherency_check(risposta)
                 orchestrator.add_message(Message.now(str(coherency).upper(), agent.name, "answer", "coherency"))
                 attempts = 1
                 while not coherency and attempts <= 4:
-                    risposta = agent.retry(agent_question, risposta)
+                    risposta = agent.retry(plan[key], risposta)
                     orchestrator.add_message(Message.now(risposta, agent.name, "answer", "default"))
                     coherency = agent.coherency_check(risposta)
                     orchestrator.add_message(Message.now(str(coherency).upper(), agent.name, "answer", "coherency"))

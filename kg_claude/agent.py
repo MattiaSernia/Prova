@@ -12,6 +12,10 @@ class Agent:
         self.model = model
         self.memory = []
         self.description=description
+        self.kg_context = None
+
+    def set_kg_context(self, kg: str):
+        self.kg_context = kg
 
     # ---------- internal helpers ----------
 
@@ -21,7 +25,7 @@ class Agent:
             return json.load(f)
 
     def _system_prompt(self) -> str:
-        return (
+        prompt = (
             f'You are "{self.name}", a specialised assistant acting as {self.role} '
             f"for the company.\n\n"
             "You must answer ONLY using the data provided below as your context. "
@@ -35,6 +39,15 @@ class Agent:
             f"{json.dumps(self.data, indent=2, ensure_ascii=False)}\n"
             "=== END OF CONTEXT ==="
         )
+        if self.kg_context is not None:
+            prompt += (
+                "\n\n=== KNOWLEDGE GRAPH (client requirements and constraints — for reference only) ===\n"
+                f"{self.kg_context}\n"
+                "=== END OF KNOWLEDGE GRAPH ===\n"
+                "Use the Knowledge Graph above only to understand what the client needs. "
+                "Answer exclusively based on your company context."
+            )
+        return prompt
 
     def _chat(self, user_message: str, use_memory: bool = True) -> str:
         messages = [{"role": "system", "content": self._system_prompt()}]
