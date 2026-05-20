@@ -71,6 +71,18 @@ class Orchestrator_Agent:
             struct[s].append(entry)
         return json.dumps(struct, indent=2, ensure_ascii=False)
     
+    def get_kg_context(self) -> str:
+        req_text = self._get_requirements_text()
+        con_text = self._get_constraints_text()
+        return (
+            "=== REQUIREMENTS (structured JSON) ===\n"
+            f"{req_text}\n"
+            "=== END REQUIREMENTS ===\n\n"
+            "=== CONSTRAINTS (structured JSON) ===\n"
+            f"{con_text}\n"
+            "=== END CONSTRAINTS ==="
+        )
+
     def add_message(self, mxg: Message):
         self._cgraph.add_message(mxg)
 
