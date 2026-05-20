@@ -3,10 +3,11 @@ from CoreferenceResolver import CoreferenceResolver
 from utils import sentence_split, ollama_chat
 
 class RequirementsExtractor:
-    def __init__(self, model, temperature, coref=None):
+    def __init__(self, model, temperature, coref=None, chunk_dim:int=0):
         self.model=model
         self.temperature=temperature
         self.coref = coref if coref is not None else CoreferenceResolver()
+        self._chunk_dim=chunk_dim
         self.context=("""You are an expert in Open Information Extraction (OIE) specialised in public procurement documents (Calls for Tender, CFT).
 
             Your SOLE task is to extract high-level BUSINESS NEEDS and GOALS from a given sentence.
@@ -124,9 +125,10 @@ class RequirementsExtractor:
 
     def pipe(self, text:str) -> list:
         text=self.coref.resolve(text)
-        phrases=sentence_split(text)
-        text_requirements=[]
+        phrases=sentence_split(text, self._chunk_dim)
+        chunk_requirements={}
         for phrase in phrases:
+            text_requirements=[]
             sentence_tuples=self.answer(phrase)
             for req in sentence_tuples:
                 requirement_data = {
@@ -137,4 +139,5 @@ class RequirementsExtractor:
                     "object": req[4]
                 }
                 text_requirements.append(requirement_data)
-        return text_requirements
+            chunk_requirements[phrase]=text_requirements
+        return chunk_requirements

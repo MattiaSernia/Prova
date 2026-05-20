@@ -3,10 +3,11 @@ from CoreferenceResolver import CoreferenceResolver
 from utils import sentence_split, ollama_chat
 
 class ProposalsExtractor:
-    def __init__(self, model, temperature, coref=None):
+    def __init__(self, model, temperature, coref=None, chunk_dim:int=0):
         self.model=model
         self.temperature=temperature
         self.coref = coref if coref is not None else CoreferenceResolver()
+        self._chunk_dim=chunk_dim
         self.context=("""You are an expert in Open Information Extraction (OIE) specialised in tender PROPOSALS
             (the documents written BY a bidding consortium IN RESPONSE to a public Call for Tenders).
 
@@ -131,11 +132,12 @@ class ProposalsExtractor:
         )
         return self.parse_tuples(response['message']['content'])
 
-    def pipe(self, text:str) -> list:
+    def pipe(self, text:str) -> dict:
         text=self.coref.resolve(text)
-        phrases=sentence_split(text)
-        text_proposals=[]
+        phrases=sentence_split(text, self._chunk_dim)
+        chunk_proposals={}
         for phrase in phrases:
+            text_proposals=[]
             sentence_tuples=self.answer(phrase)
             for prop in sentence_tuples:
                 proposal_data = {
@@ -144,4 +146,5 @@ class ProposalsExtractor:
                     "object": prop[2]
                 }
                 text_proposals.append(proposal_data)
-        return text_proposals
+            chunk_proposals[phrase]=text_proposals
+        return chunk_proposals

@@ -3,10 +3,11 @@ from CoreferenceResolver import CoreferenceResolver
 from utils import sentence_split, ollama_chat
 
 class ConstraintsExtractor:
-    def __init__(self, model, temperature, coref=None):
+    def __init__(self, model, temperature, coref=None, chunk_dim:int=0):
         self.model=model
         self.temperature=temperature
         self.coref = coref if coref is not None else CoreferenceResolver()
+        self._chunk_dim=chunk_dim
         self.context=("""You are an expert in Open Information Extraction (OIE) specialised in public procurement documents (Calls for Tender, CFT).
 
             Your SOLE task is to extract CONSTRAINTS from a given sentence.
@@ -133,11 +134,12 @@ class ConstraintsExtractor:
         )
         return self.parse_tuples(response['message']['content'])
 
-    def pipe(self, text:str) -> list:
+    def pipe(self, text:str) -> dict:
         text=self.coref.resolve(text)
-        phrases=sentence_split(text)
-        text_constraints=[]
+        phrases=sentence_split(text, self._chunk_dim)
+        chunk_constraints={}
         for phrase in phrases:
+            text_constraints=[]
             sentence_tuples=self.answer(phrase)
             for const in sentence_tuples:
                 constraint_data = {
@@ -147,4 +149,5 @@ class ConstraintsExtractor:
                     "object": const[3]
                 }
                 text_constraints.append(constraint_data)
-        return text_constraints
+            chunk_constraints[phrase]=text_constraints
+        return chunk_constraints

@@ -1,11 +1,12 @@
 import re
 from CoreferenceResolver import CoreferenceResolver
-from utils import ollama_chat
+from utils import ollama_chat, sentence_split
 class TripletExtractor:
-    def __init__(self, model, temperature, coref=None):
+    def __init__(self, model, temperature, coref=None, chunk_dim:int=0):
         self.model=model
         self.temperature=temperature
         self.coref = coref if coref is not None else CoreferenceResolver()
+        self._chunk_dim=chunk_dim
         self.context=("""You are an expert in Open Information Extraction (OIE) for business intelligence.
 You extract factual subject-relation-object triplets from messages produced by AI agents 
 operating in the context of company management and public tender evaluation.
@@ -77,15 +78,19 @@ Triplets:"""
         )
         return self.parse_triplets(response['message']['content'])
     
-    def pipe(self, text:str) -> list:
+    def pipe(self, text:str) -> dict:
         text=self.coref.resolve(text)
-        text_triplets=[]
-        sentence_tuples=self.answer(text)
-        for prop in sentence_tuples:
-            triplets_data = {
-                "subject": prop[0],
-                "predicate": prop[1],
-                "object": prop[2]
-            }
-            text_triplets.append(triplets_data)
-        return text_triplets
+        phrases=sentence_split(text, self._chunk_dim)
+        chunk_triplets={}
+        for phrase in phrases:
+            text_triplets=[]
+            sentence_tuples=self.answer(phrase)
+            for prop in sentence_tuples:
+                triplets_data = {
+                    "subject": prop[0],
+                    "predicate": prop[1],
+                    "object": prop[2]
+                }
+                text_triplets.append(triplets_data)
+            chunk_triplets[phrase]=text_triplets
+        return chunk_triplets

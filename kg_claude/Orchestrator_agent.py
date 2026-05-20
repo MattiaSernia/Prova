@@ -6,16 +6,15 @@ from rdflib import Namespace
 from rdflib.namespace import RDF
 from utils import uri_to_label, ollama_chat
 from mxg import Message
-import copy
 
 
 class Orchestrator_Agent:
-    def __init__(self, agents:list[Agent], model:str, graph_name:str):
+    def __init__(self, agents:list[Agent], model:str, graph_name:str, chunk_dimension:int):
         self.agents=agents
         self.model=model
         self.agent_answer=[]
         self._graph_name=graph_name
-        self._cgraph=Custom_Graph(agents, graph_name, model)
+        self._cgraph=Custom_Graph(agents, graph_name, model, chunk_dimension)
 
     def _agent_registry(self) -> str:
         lines = []
@@ -72,19 +71,13 @@ class Orchestrator_Agent:
             struct[s].append(entry)
         return json.dumps(struct, indent=2, ensure_ascii=False)
     
-    def add_message(self, mxg: Message, use_kg: bool):
-        """Forward a message to the appropriate graph."""
-        if use_kg:
-            self._cgraph.add_message(mxg)
-        else:
-            self._ngraph.add_message(mxg)
+    def add_message(self, mxg: Message):
+        self._cgraph.add_message(mxg)
 
     def plan(self, task: str="", attempt:int=0, graph_in_prompt:bool=True) -> dict:
-        if attempt==0 and graph_in_prompt:
+        if attempt==0:
             logging.log(25, f"User asked: {task}")
             self._cgraph.add_message(Message.now(task, "User", "question", "default"))
-            self._ngraph=copy.deepcopy(self._cgraph)
-            self._ngraph.rename(f"{self._graph_name}_nokg")
 
         if graph_in_prompt:
             req_text = self._get_requirements_text()
@@ -223,12 +216,7 @@ class Orchestrator_Agent:
             logging.warning(f"[orchestrator] Could not parse plan JSON (attempt {attempt}). Raw: {raw}")
             plan = {}
 
-        plan_mxg = Message.now(raw, "Orchestrator", "answer", "default")
-        if graph_in_prompt:
-            self._cgraph.add_message(plan_mxg)
-        else:
-            self._ngraph.add_message(plan_mxg)
-
+        self._cgraph.add_message(Message.now(raw, "Orchestrator", "answer", "default"))
         return plan
 
 

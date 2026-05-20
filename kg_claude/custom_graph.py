@@ -1,5 +1,5 @@
 import logging
-from rdflib import Graph, ConjunctiveGraph, Namespace, URIRef, Literal, RDF, Namespace
+from rdflib import ConjunctiveGraph, Namespace, URIRef, Literal
 from rdflib.namespace import RDF, XSD, PROV
 from constraintsExtractor import ConstraintsExtractor
 from requirementsExtractor import RequirementsExtractor
@@ -18,7 +18,7 @@ import re
 
 class Custom_Graph:
 
-    def __init__(self, agent_list:list, name:str, model:str="llama3.3:70b"):
+    def __init__(self, agent_list:list, name:str, model:str="llama3.3:70b", chunk_dim:int=0):
         self._EX  = Namespace("http://example.org/ontologia#")
         self._REQ = Namespace("http://example.org/requirement/")
         self._EXT = Namespace("http://example.org/extraction/")
@@ -50,6 +50,7 @@ class Custom_Graph:
         self._constraint_counter=0
         self._proposal_counter=0
         self._triplet_counter=0
+        self._chunk_counter=0
 
         self._prev_message = None
         self._prev_message_uri = None
@@ -57,13 +58,12 @@ class Custom_Graph:
         self._mex = 0
 
         _coref = CoreferenceResolver()
-        self._req_extr=RequirementsExtractor(model, 0, _coref)
-        self._con_extr=ConstraintsExtractor(model, 0, _coref)
-        self._pro_extr=ProposalsExtractor(model, 0, _coref)
-        self._extractor=TripletExtractor(model, 0, _coref)
+        self._req_extr=RequirementsExtractor(model, 0, _coref, chunk_dim)
+        self._con_extr=ConstraintsExtractor(model, 0, _coref, chunk_dim)
+        self._pro_extr=ProposalsExtractor(model, 0, _coref, chunk_dim)
+        self._extractor=TripletExtractor(model, 0, _coref, chunk_dim)
 
         self._name=name
-
 
     def clear(self):
         self._ds = ConjunctiveGraph()
@@ -82,6 +82,7 @@ class Custom_Graph:
         self._constraint_counter  = 0
         self._proposal_counter    = 0
         self._triplet_counter     = 0
+        self._chunk_counter       = 0
         self._prev_message        = None
         self._prev_message_uri    = None
         self._first_message_uri   = None
@@ -170,33 +171,47 @@ class Custom_Graph:
         self._saveGraph()
 
     def _userExtraction(self, text: str, URImxg):
-        requirements=self._req_extr.pipe(text)
-        ReqURI=self._new_extraction_uri("req/")
-        ng1=self._ds.get_context(ReqURI)
-        for requirement in requirements:
-            node=self._new_requirement_uri()
-            ng1.add((node, RDF.type, self._EX.Requirement))
-            ng1.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(requirement["subject"]))))
-            ng1.add((node, URIRef(self._edgeUri + self._clean_uri(requirement["predicate"])),    URIRef(self._nodeUri + self._clean_uri(requirement["object"]))))
-            if requirement["priority"]:
-                ng1.add((node, self._EX.priority,   self._EX[self._clean_uri(requirement["priority"])]))
-            if requirement["category"]:
-                ng1.add((node, self._EX.category,   self._EX[self._clean_uri(requirement["category"])]))
-        self._ds.add((ReqURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
-        self._ds.add((ReqURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+        chunks=self._req_extr.pipe(text)
+        for chunk in chunks.keys():
+            #### --------------domani continuare da qui, dobbiamo creare il nodo chiamato chunk--------------    
+            ChunkURI=self._new_chunk_uri()
+            ReqURI=self._new_extraction_uri("req/")
+            ng1=self._ds.get_context(ReqURI)
+            for requirement in chunks[chunk]:
+                node=self._new_requirement_uri()
+                ng1.add((node, RDF.type, self._EX.Requirement))
+                ng1.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(requirement["subject"]))))
+                ng1.add((node, URIRef(self._edgeUri + self._clean_uri(requirement["predicate"])),    URIRef(self._nodeUri + self._clean_uri(requirement["object"]))))
+                if requirement["priority"]:
+                    ng1.add((node, self._EX.priority,   self._EX[self._clean_uri(requirement["priority"])]))
+                if requirement["category"]:
+                    ng1.add((node, self._EX.category,   self._EX[self._clean_uri(requirement["category"])]))
+            self._ds.add((ReqURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+            self._ds.add((ReqURI, PROV.wasDerivedFrom, ChunkURI,   self._ds.default_context))
+            self._ds.add((ChunkURI, PROV.wasDerivedFrom,URImxg ,   self._ds.default_context))
+            self._ds.add((ChunkURI, RDF.type ,PROV.Entity ,   self._ds.default_context))
+            self._ds.add((ChunkURI, self._EX.hasText ,Literal(chunk) ,   self._ds.default_context))
 
-        constraints=self._con_extr.pipe(text)
-        ConURI=self._new_extraction_uri("con/")
-        ng2=self._ds.get_context(ConURI)
-        for constraint in constraints:
-            node=self._new_constraint_uri()
-            ng2.add((node, RDF.type, self._EX.Constraint))
-            ng2.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(constraint["subject"]))))
-            ng2.add((node, URIRef(self._edgeUri + self._clean_uri(constraint["predicate"])),    URIRef(self._nodeUri + self._clean_uri(constraint["object"]))))
-            if constraint["constraintType"]:
-                ng2.add((node, self._EX.constraintType,   self._EX[self._clean_uri(constraint["constraintType"])]))
-        self._ds.add((ConURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
-        self._ds.add((ConURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+
+
+
+        chunks_con=self._con_extr.pipe(text)
+        for chunk in chunks_con.keys():
+            ChunkURI=self._new_chunk_uri()
+            ConURI=self._new_extraction_uri("con/")
+            ng2=self._ds.get_context(ConURI)
+            for constraint in chunks_con[chunk]:
+                node=self._new_constraint_uri()
+                ng2.add((node, RDF.type, self._EX.Constraint))
+                ng2.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(constraint["subject"]))))
+                ng2.add((node, URIRef(self._edgeUri + self._clean_uri(constraint["predicate"])),    URIRef(self._nodeUri + self._clean_uri(constraint["object"]))))
+                if constraint["constraintType"]:
+                    ng2.add((node, self._EX.constraintType,   self._EX[self._clean_uri(constraint["constraintType"])]))
+            self._ds.add((ConURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+            self._ds.add((ConURI, PROV.wasDerivedFrom, ChunkURI,   self._ds.default_context))
+            self._ds.add((ChunkURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+            self._ds.add((ChunkURI, RDF.type, PROV.Entity,   self._ds.default_context))
+            self._ds.add((ChunkURI, self._EX.hasText, Literal(chunk),   self._ds.default_context))
 
     def _clean_uri(self, label: str) -> str:
         label = label.strip().lower()
@@ -219,30 +234,44 @@ class Custom_Graph:
     def _new_constraint_uri(self) -> URIRef:
         self._constraint_counter += 1
         return self._CON[f"con{self._constraint_counter}"]
+  
+    def _new_chunk_uri(self) -> URIRef:
+        self._chunk_counter += 1
+        return URIRef(self._nodeUri + f"chunk{self._chunk_counter}")
 
     def _propExtraction(self, text:str, URImxg):
-        proposals=self._pro_extr.pipe(text)
-        ProURI=self._new_extraction_uri("pro/")
-        ng=self._ds.get_context(ProURI)
-        for proposal in proposals:
-            node=self._new_proposal_uri()
-            ng.add((node, RDF.type, self._EX.Proposal))
-            ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(proposal["subject"]))))
-            ng.add((node, URIRef(self._edgeUri + self._clean_uri(proposal["predicate"])),    URIRef(self._nodeUri + self._clean_uri(proposal["object"]))))
-        self._ds.add((ProURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
-        self._ds.add((ProURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+        chunks_pro=self._pro_extr.pipe(text)
+        for chunk in chunks_pro.keys():
+            ChunkURI=self._new_chunk_uri()
+            ProURI=self._new_extraction_uri("pro/")
+            ng=self._ds.get_context(ProURI)
+            for proposal in chunks_pro[chunk]:
+                node=self._new_proposal_uri()
+                ng.add((node, RDF.type, self._EX.Proposal))
+                ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(proposal["subject"]))))
+                ng.add((node, URIRef(self._edgeUri + self._clean_uri(proposal["predicate"])),    URIRef(self._nodeUri + self._clean_uri(proposal["object"]))))
+            self._ds.add((ProURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+            self._ds.add((ProURI, PROV.wasDerivedFrom, ChunkURI,   self._ds.default_context))
+            self._ds.add((ChunkURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+            self._ds.add((ChunkURI, RDF.type, PROV.Entity,   self._ds.default_context))
+            self._ds.add((ChunkURI, self._EX.hasText, Literal(chunk),   self._ds.default_context))
 
     def _normalExtraction(self, text:str, URImxg):
-        triplets=self._extractor.pipe(text)
-        TriURI=self._new_extraction_uri("tri/")
-        ng=self._ds.get_context(TriURI)
-        for triplet in triplets:
-            node=self._new_triplet_uri()
-            ng.add((node, RDF.type, self._EX.Triplet))
-            ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(triplet["subject"]))))
-            ng.add((node, URIRef(self._edgeUri + self._clean_uri(triplet["predicate"])),    URIRef(self._nodeUri + self._clean_uri(triplet["object"]))))
-        self._ds.add((TriURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
-        self._ds.add((TriURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+        chunks_tri=self._extractor.pipe(text)
+        for chunk in chunks_tri.keys():
+            ChunkURI=self._new_chunk_uri()
+            TriURI=self._new_extraction_uri("tri/")
+            ng=self._ds.get_context(TriURI)
+            for triplet in chunks_tri[chunk]:
+                node=self._new_triplet_uri()
+                ng.add((node, RDF.type, self._EX.Triplet))
+                ng.add((node, RDF.subject,    URIRef(self._nodeUri + self._clean_uri(triplet["subject"]))))
+                ng.add((node, URIRef(self._edgeUri + self._clean_uri(triplet["predicate"])),    URIRef(self._nodeUri + self._clean_uri(triplet["object"]))))
+            self._ds.add((TriURI, RDF.type, self._EX.Extraction,   self._ds.default_context))
+            self._ds.add((TriURI, PROV.wasDerivedFrom, ChunkURI,   self._ds.default_context))
+            self._ds.add((ChunkURI, PROV.wasDerivedFrom, URImxg,   self._ds.default_context))
+            self._ds.add((ChunkURI, RDF.type, PROV.Entity,   self._ds.default_context))
+            self._ds.add((ChunkURI, self._EX.hasText, Literal(chunk),   self._ds.default_context))
     
     def _new_proposal_uri(self)->URIRef:
         self._proposal_counter += 1
