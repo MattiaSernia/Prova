@@ -41,11 +41,13 @@ class Agent:
         )
         if self.kg_context is not None:
             prompt += (
-                "\n\n=== KNOWLEDGE GRAPH (client requirements and constraints — for reference only) ===\n"
+                "\n\n=== KNOWLEDGE GRAPH (client requirements and constraints) ===\n"
                 f"{self.kg_context}\n"
                 "=== END OF KNOWLEDGE GRAPH ===\n"
-                "Use the Knowledge Graph above only to understand what the client needs. "
-                "Answer exclusively based on your company context."
+                "The Knowledge Graph above lists the client's requirements and constraints. "
+                "When answering, try to address and satisfy as many of them as possible. "
+                "However, you must answer exclusively based on your company context: "
+                "do NOT invent capabilities or data that are not present in your context."
             )
         return prompt
 
