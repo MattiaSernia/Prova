@@ -6,6 +6,9 @@ from math import ceil
 
 
 def ollama_chat(model: str, messages: list, max_retries: int = 3, **kwargs) -> dict:
+    if "options" not in kwargs:
+        kwargs["options"] = {}
+    kwargs["options"].setdefault("num_ctx", 32768)
     for attempt in range(max_retries):
         try:
             return ollama.chat(model, messages=messages, **kwargs)
