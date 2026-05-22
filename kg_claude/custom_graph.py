@@ -151,7 +151,7 @@ class Custom_Graph:
                 self._userExtraction(text, URImxg)
             elif mxg.convPart == "proposal":
                 self._propExtraction(text, URImxg)
-            else:
+            elif mxg.node != "Orchestrator":
                 self._normalExtraction(text, URImxg)
 
             if self._first_message_uri is None:
