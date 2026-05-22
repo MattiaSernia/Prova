@@ -71,6 +71,35 @@ class Orchestrator_Agent:
             struct[s].append(entry)
         return json.dumps(struct, indent=2, ensure_ascii=False)
     
+    def _get_triplets_text(self) -> str:
+        EX   = Namespace("http://example.org/ontologia#")
+        EDGE = "http://example.org/edge/"
+        ds   = self._cgraph._ds
+        struct: dict = {}
+        for subj in ds.subjects(RDF.type, EX.Triplet):
+            s_uri = next(ds.objects(subj, RDF.subject), None)
+            s = uri_to_label(s_uri) if s_uri else "?"
+            pred, obj = "", ""
+            for p, o in ds.predicate_objects(subj):
+                if str(p).startswith(EDGE):
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
+                    break
+            agent_name = "unknown"
+            for _, _, _, ctx in ds.quads((subj, RDF.type, EX.Triplet, None)):
+                chunk_uri = next(ds.objects(ctx.identifier, PROV.wasDerivedFrom), None)
+                if chunk_uri:
+                    msg_uri = next(ds.objects(chunk_uri, PROV.wasDerivedFrom), None)
+                    if msg_uri:
+                        agent_uri = next(ds.objects(msg_uri, PROV.wasAttributedTo), None)
+                        if agent_uri:
+                            agent_name = uri_to_label(agent_uri).replace("_", " ").title()
+                break
+            if agent_name not in struct:
+                struct[agent_name] = []
+            struct[agent_name].append({"subject": s, "predicate": pred, "object": obj})
+        return json.dumps(struct, indent=2, ensure_ascii=False)
+
     def get_kg_context(self) -> str:
         req_text = self._get_requirements_text()
         con_text = self._get_constraints_text()
@@ -266,7 +295,7 @@ class Orchestrator_Agent:
             return True
         return False
 
-    def propose(self, task: str) -> str:
+    def propose(self, task: str, use_triplets: bool = False) -> str:
         agents_context = "\n\n".join(self.agent_answer)
 
         system = f"""You are a proposal writer for a consortium responding to a call for tenders.
@@ -292,11 +321,15 @@ class Orchestrator_Agent:
             4. Unaddressed Requirements (if any requirement from the tender was not covered by any agent)
             5. Conclusion"""
 
+        triplets_section = ""
+        if use_triplets:
+            triplets_section = f"\n\n=== STRUCTURED TRIPLETS EXTRACTED FROM AGENT CONVERSATIONS ===\n{self._get_triplets_text()}\n=== END TRIPLETS ==="
+
         user_message = f"""=== ORIGINAL CALL FOR TENDERS ===
 {task}
 
 === AGENTS' ANSWERS ===
-{agents_context}
+{agents_context}{triplets_section}
 
 Write the proposal now. For each agent's domain, be concrete and specific: name exact technologies, exact costs, exact regulations, exact figures as stated by the agents."""
 
