@@ -3,7 +3,7 @@ import json
 from agent import Agent
 from custom_graph import Custom_Graph
 from rdflib import Namespace
-from rdflib.namespace import RDF
+from rdflib.namespace import RDF, PROV
 from utils import uri_to_label, ollama_chat
 from mxg import Message
 
