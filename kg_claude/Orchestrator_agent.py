@@ -75,17 +75,20 @@ class Orchestrator_Agent:
         EX   = Namespace("http://example.org/ontologia#")
         EDGE = "http://example.org/edge/"
         ds   = self._cgraph._ds
-        struct: dict = {}
+
+        def local(uri):
+            s = str(uri)
+            return s.rsplit("#", 1)[-1] if "#" in s else s.rsplit("/", 1)[-1]
+
+        lines = []
         for subj in ds.subjects(RDF.type, EX.Triplet):
+            parts = ["a ex:Triplet"]
             s_uri = next(ds.objects(subj, RDF.subject), None)
-            s = uri_to_label(s_uri) if s_uri else "?"
-            pred, obj = "", ""
+            if s_uri:
+                parts.append(f"rdf:subject node:{local(s_uri)}")
             for p, o in ds.predicate_objects(subj):
                 if str(p).startswith(EDGE):
-                    pred = uri_to_label(p)
-                    obj  = uri_to_label(o)
-                    break
-            agent_name = "unknown"
+                    parts.append(f"edge:{local(p)} node:{local(o)}")
             for _, _, _, ctx in ds.quads((subj, RDF.type, EX.Triplet, None)):
                 chunk_uri = next(ds.objects(ctx.identifier, PROV.wasDerivedFrom), None)
                 if chunk_uri:
@@ -93,23 +96,57 @@ class Orchestrator_Agent:
                     if msg_uri:
                         agent_uri = next(ds.objects(msg_uri, PROV.wasAttributedTo), None)
                         if agent_uri:
-                            agent_name = uri_to_label(agent_uri).replace("_", " ").title()
+                            parts.append(f"ex:extractedBy node:{local(agent_uri)}")
                 break
-            if agent_name not in struct:
-                struct[agent_name] = []
-            struct[agent_name].append({"subject": s, "predicate": pred, "object": obj})
-        return json.dumps(struct, indent=2, ensure_ascii=False)
+            lines.append(f"tri:{local(subj)} " + " ; ".join(parts) + " .")
+        return "\n".join(lines)
+
+    def _get_kg_turtle_light(self) -> str:
+        EX   = Namespace("http://example.org/ontologia#")
+        EDGE = "http://example.org/edge/"
+        ds   = self._cgraph._ds
+
+        def local(uri):
+            s = str(uri)
+            return s.rsplit("#", 1)[-1] if "#" in s else s.rsplit("/", 1)[-1]
+
+        lines = []
+        for subj in ds.subjects(RDF.type, EX.Requirement):
+            parts = ["a ex:Requirement"]
+            s_uri = next(ds.objects(subj, RDF.subject), None)
+            if s_uri:
+                parts.append(f"rdf:subject node:{local(s_uri)}")
+            for p, o in ds.predicate_objects(subj):
+                if str(p).startswith(EDGE):
+                    parts.append(f"edge:{local(p)} node:{local(o)}")
+            pri_uri = next(ds.objects(subj, EX.priority), None)
+            if pri_uri:
+                parts.append(f"ex:priority ex:{local(pri_uri)}")
+            cat_uri = next(ds.objects(subj, EX.category), None)
+            if cat_uri:
+                parts.append(f"ex:category ex:{local(cat_uri)}")
+            lines.append(f"req:{local(subj)} " + " ; ".join(parts) + " .")
+
+        for subj in ds.subjects(RDF.type, EX.Constraint):
+            parts = ["a ex:Constraint"]
+            s_uri = next(ds.objects(subj, RDF.subject), None)
+            if s_uri:
+                parts.append(f"rdf:subject node:{local(s_uri)}")
+            for p, o in ds.predicate_objects(subj):
+                if str(p).startswith(EDGE):
+                    parts.append(f"edge:{local(p)} node:{local(o)}")
+            ct_uri = next(ds.objects(subj, EX.constraintType), None)
+            if ct_uri:
+                parts.append(f"ex:constraintType ex:{local(ct_uri)}")
+            lines.append(f"con:{local(subj)} " + " ; ".join(parts) + " .")
+
+        return "\n".join(lines)
 
     def get_kg_context(self) -> str:
-        req_text = self._get_requirements_text()
-        con_text = self._get_constraints_text()
         return (
-            "=== REQUIREMENTS (structured JSON) ===\n"
-            f"{req_text}\n"
-            "=== END REQUIREMENTS ===\n\n"
-            "=== CONSTRAINTS (structured JSON) ===\n"
-            f"{con_text}\n"
-            "=== END CONSTRAINTS ==="
+            "=== KNOWLEDGE GRAPH (Turtle Light) ===\n"
+            f"{self._get_kg_turtle_light()}\n"
+            "=== END KNOWLEDGE GRAPH ==="
         )
 
     def add_message(self, mxg: Message):
@@ -121,16 +158,7 @@ class Orchestrator_Agent:
             self._cgraph.add_message(Message.now(task, "User", "question", "default"))
 
         if graph_in_prompt:
-            req_text = self._get_requirements_text()
-            con_text = self._get_constraints_text()
-            kg_context = (
-                "=== REQUIREMENTS (structured JSON) ===\n"
-                f"{req_text}\n"
-                "=== END REQUIREMENTS ===\n\n"
-                "=== CONSTRAINTS (structured JSON) ===\n"
-                f"{con_text}\n"
-                "=== END CONSTRAINTS ==="
-            )
+            kg_context = self.get_kg_context()
 
             system = f"""You are an orchestrator managing a consortium responding to a public call for tenders.
                 You have access to these specialized agents:
@@ -147,9 +175,11 @@ class Orchestrator_Agent:
 
                 ### Your role:
                 The user will provide you with two complementary sources:
-                1. A structured Knowledge Graph (KG) extracted from the Call for Tenders, with two sections:
-                   - REQUIREMENTS: high-level business needs and goals the client wants to achieve.
-                   - CONSTRAINTS: conditions, limits and rules under which the solution must operate
+                1. A structured Knowledge Graph (KG) extracted from the Call for Tenders, serialized in
+                   Turtle Light format (simplified Turtle: no prefix declarations, subject-factorised,
+                   one line per subject). It contains two types of nodes:
+                   - ex:Requirement — high-level business needs and goals the client wants to achieve.
+                   - ex:Constraint  — conditions, limits and rules under which the solution must operate
                    (technical bounds, budget limits, regulatory requirements, infrastructure rules, etc.).
                 2. The full original Call for Tenders text.
                 Use the KG as the primary structured reference and the tender text to fill in any detail,

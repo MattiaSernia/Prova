@@ -13,9 +13,13 @@ class Agent:
         self.memory = []
         self.description=description
         self.kg_context = None
+        self.cft_context = None
 
     def set_kg_context(self, kg: str):
         self.kg_context = kg
+
+    def set_cft_context(self, cft: str):
+        self.cft_context = cft
 
     # ---------- internal helpers ----------
 
@@ -46,6 +50,16 @@ class Agent:
                 "=== END OF KNOWLEDGE GRAPH ===\n"
                 "The Knowledge Graph above lists the client's requirements and constraints. "
                 "When answering, try to address and satisfy as many of them as possible. "
+                "However, you must answer exclusively based on your company context: "
+                "do NOT invent capabilities or data that are not present in your context."
+            )
+        if self.cft_context is not None:
+            prompt += (
+                "\n\n=== CALL FOR TENDERS ===\n"
+                f"{self.cft_context}\n"
+                "=== END OF CALL FOR TENDERS ===\n"
+                "The Call for Tenders above describes the client's full request. "
+                "When answering, try to address as many of its requirements and constraints as possible. "
                 "However, you must answer exclusively based on your company context: "
                 "do NOT invent capabilities or data that are not present in your context."
             )

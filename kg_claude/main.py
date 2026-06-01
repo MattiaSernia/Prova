@@ -22,7 +22,7 @@ def load_question(name: str) -> str:
     with open(name, "r", encoding="utf-8") as f:
         return "".join(line + "\n" for line in f.readlines())
 
-def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, triplets_in_proposal, val_file, single_val_file, val):
+def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, val_file, single_val_file, val):
     att = 0
     plan = orchestrator.plan(question, att, use_kg)
     while plan == {}:
@@ -34,6 +34,8 @@ def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, triplets_in
             if agent.name == key:
                 if kg_agents:
                     agent.set_kg_context(kg_context)
+                if cft_agents:
+                    agent.set_cft_context(question)
                 orchestrator.add_message(Message.now(plan[key], "Orchestrator", "question", "default"))
                 risposta = agent.answer(plan[key])
                 orchestrator.add_message(Message.now(risposta, agent.name, "answer", "default"))
@@ -65,6 +67,7 @@ if __name__ == "__main__":
     mode.add_argument("--no-kg", action="store_true", help="Run without knowledge graph in prompt")
     mode.add_argument("--kg-agents", action="store_true", help="Pass KG to agents in addition to orchestrator")
     mode.add_argument("--kg-agents-triplets", action="store_true", help="Pass KG to agents and include extracted triplets in proposal (implies --kg-agents)")
+    mode.add_argument("--kg-cft-agents", action="store_true", help="Pass KG to orchestrator only, CFT text to agents")
     parser.add_argument(
         "--chunk-dimension",
         type=int,
@@ -76,20 +79,23 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.no_kg:
-        use_kg, kg_agents, triplets_in_proposal = False, False, False
+        use_kg, kg_agents, cft_agents, triplets_in_proposal = False, False, False, False
         graph_name, val_file, single_val_file = "Total_nokg", "validation_nokg.txt", "single_validation_nokg.txt"
     elif args.kg_agents:
-        use_kg, kg_agents, triplets_in_proposal = True, True, False
+        use_kg, kg_agents, cft_agents, triplets_in_proposal = True, True, False, False
         graph_name, val_file, single_val_file = "Total_kgagents", "validation_kgagents.txt", "single_validation_kgagents.txt"
     elif args.kg_agents_triplets:
-        use_kg, kg_agents, triplets_in_proposal = True, True, True
+        use_kg, kg_agents, cft_agents, triplets_in_proposal = True, True, False, True
         graph_name, val_file, single_val_file = "Total_kgagents_tri", "validation_kgagents_tri.txt", "single_validation_kgagents_tri.txt"
+    elif args.kg_cft_agents:
+        use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, True, False
+        graph_name, val_file, single_val_file = "Total_kgcft", "validation_kgcft.txt", "single_validation_kgcft.txt"
     else:
-        use_kg, kg_agents, triplets_in_proposal = True, False, False
+        use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, False, False
         graph_name, val_file, single_val_file = "Total", "validation_kg.txt", "single_validation_kg.txt"
 
     val = va.Validation("llama3.3:70b", 0)
     agent_list = create_all_agents('llama3.3:70b')
     Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension)
     question = load_question("file.txt")
-    _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, triplets_in_proposal, val_file, single_val_file, val)
+    _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, val_file, single_val_file, val)
