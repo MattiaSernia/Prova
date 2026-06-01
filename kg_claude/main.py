@@ -88,7 +88,7 @@ if __name__ == "__main__":
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, True, False, True
         graph_name, val_file, single_val_file = "Total_kgagents_tri", "validation_kgagents_tri.txt", "single_validation_kgagents_tri.txt"
     elif args.kg_cft_agents:
-        use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, True, False
+        use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, True, True
         graph_name, val_file, single_val_file = "Total_kgcft", "validation_kgcft.txt", "single_validation_kgcft.txt"
     else:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, False, False
