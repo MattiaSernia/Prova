@@ -5,6 +5,7 @@ from constraintsExtractor import ConstraintsExtractor
 from requirementsExtractor import RequirementsExtractor
 from proposalsExtractor import ProposalsExtractor
 from tripletExtractorClaude import TripletExtractor
+from phi4TripletExtractor import Phi4TripletExtractor
 from CoreferenceResolver import CoreferenceResolver
 from mxg import Message
 
@@ -18,7 +19,7 @@ import re
 
 class Custom_Graph:
 
-    def __init__(self, agent_list:list, name:str, model:str="llama3.3:70b", chunk_dim:int=0):
+    def __init__(self, agent_list:list, name:str, model:str="llama3.3:70b", chunk_dim:int=0, extractor_type:str="llama"):
         self._EX  = Namespace("http://example.org/ontologia#")
         self._REQ = Namespace("http://example.org/requirement/")
         self._EXT = Namespace("http://example.org/extraction/")
@@ -61,7 +62,10 @@ class Custom_Graph:
         self._req_extr=RequirementsExtractor(model, 0, _coref, chunk_dim)
         self._con_extr=ConstraintsExtractor(model, 0, _coref, chunk_dim)
         self._pro_extr=ProposalsExtractor(model, 0, _coref, chunk_dim)
-        self._extractor=TripletExtractor(model, 0, _coref, chunk_dim)
+        if extractor_type == "phi4":
+            self._extractor = Phi4TripletExtractor("hf.co/FinaPolat/phi4_adaptableIE_v2-gguf:Q4_K_M", _coref, chunk_dim)
+        else:
+            self._extractor = TripletExtractor(model, 0, _coref, chunk_dim)
 
         self._name=name
 

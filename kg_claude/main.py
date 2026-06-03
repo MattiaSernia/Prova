@@ -69,6 +69,12 @@ if __name__ == "__main__":
     mode.add_argument("--kg-agents-triplets", action="store_true", help="Pass KG to agents and include extracted triplets in proposal (implies --kg-agents)")
     mode.add_argument("--kg-cft-agents", action="store_true", help="Pass KG to orchestrator only, CFT text to agents")
     parser.add_argument(
+        "--extractor",
+        choices=["llama", "phi4"],
+        default="llama",
+        help="Triplet extractor to use (default: llama)",
+    )
+    parser.add_argument(
         "--chunk-dimension",
         type=int,
         choices=range(0, 110, 10),
@@ -96,6 +102,6 @@ if __name__ == "__main__":
 
     val = va.Validation("llama3.3:70b", 0)
     agent_list = create_all_agents('llama3.3:70b')
-    Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension)
+    Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor)
     question = load_question("file.txt")
     _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, val_file, single_val_file, val)
