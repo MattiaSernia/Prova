@@ -326,8 +326,10 @@ class Orchestrator_Agent:
         return False
 
     def propose(self, task: str, use_triplets: bool = False) -> str:
-        agents_context = "\n\n".join(self.agent_answer)
-
+        agents_context=""
+        if not use_triplets:
+            agents_context = "\n\n".join(self.agent_answer)
+        
         system = f"""You are a proposal writer for a consortium responding to a call for tenders.
             You must write a complete, professional, and CONCRETE tender proposal.
 
