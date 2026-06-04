@@ -1,14 +1,24 @@
 import logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s | %(levelname)s | %(message)s',
-    handlers=[
-        logging.FileHandler("Conversation.log", mode = 'w', encoding='utf-8'),
-        logging.StreamHandler()
-    ]
-)
+import os
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+_log_formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
+_stream_handler = logging.StreamHandler()
+_stream_handler.setFormatter(_log_formatter)
+logger.addHandler(_stream_handler)
+
 AGENT_LEVEL = 25  # tra INFO(20) e WARNING(30)
 logging.addLevelName(AGENT_LEVEL, "AGENT")
+
+def _setup_output_dir(mode_folder: str, format_folder: str, exp_name: str) -> str:
+    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments")
+    out  = os.path.join(base, mode_folder, format_folder, exp_name)
+    os.makedirs(out, exist_ok=True)
+    fh = logging.FileHandler(os.path.join(out, "Conversation.log"), mode="w", encoding="utf-8")
+    fh.setFormatter(_log_formatter)
+    logger.addHandler(fh)
+    return out
 
 from agent import create_all_agents
 from Orchestrator_agent import Orchestrator_Agent
@@ -84,21 +94,34 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    fmt = "TURTLE"  # TODO: diventerà args.kg_format quando aggiungiamo --kg-format
+
     if args.no_kg:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = False, False, False, False
-        graph_name, val_file, single_val_file = "Total_nokg", "validation_nokg.txt", "single_validation_nokg.txt"
+        mode_folder, exp_prefix = "no_kg", "no_kg"
+        graph_base, single_val_base = "Total_nokg", "single_validation_nokg.txt"
     elif args.kg_agents:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, True, False, False
-        graph_name, val_file, single_val_file = "Total_kgagents", "validation_kgagents.txt", "single_validation_kgagents.txt"
+        mode_folder, exp_prefix = "C_{OA}", "kg_agents"
+        graph_base, single_val_base = "Total_kgagents", "single_validation_kgagents.txt"
     elif args.kg_agents_triplets:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, True, False, True
-        graph_name, val_file, single_val_file = "Total_kgagents_tri", "validation_kgagents_tri.txt", "single_validation_kgagents_tri.txt"
+        mode_folder, exp_prefix = "C_{OAP}", "kg_triplet"
+        graph_base, single_val_base = "Total_kgagents_tri", "single_validation_kgagents_tri.txt"
     elif args.kg_cft_agents:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, True, True
-        graph_name, val_file, single_val_file = "Total_kgcft", "validation_kgcft.txt", "single_validation_kgcft.txt"
+        mode_folder, exp_prefix = "C_{OP}", "orch_only"
+        graph_base, single_val_base = "Total_kgcft", "single_validation_kgcft.txt"
     else:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, False, False
-        graph_name, val_file, single_val_file = "Total", "validation_kg.txt", "single_validation_kg.txt"
+        mode_folder, exp_prefix = "C_{O}", "kg"
+        graph_base, single_val_base = "Total", "single_validation_kg.txt"
+
+    exp_name  = f"{exp_prefix}_{args.chunk_dimension}"
+    out_dir   = _setup_output_dir(mode_folder, fmt, exp_name)
+    graph_name    = os.path.join(out_dir, graph_base)
+    single_val_file = os.path.join(out_dir, single_val_base)
+    val_file      = os.path.join(out_dir, single_val_base.replace("single_", ""))
 
     val = va.Validation("llama3.3:70b", 0)
     agent_list = create_all_agents('llama3.3:70b')
