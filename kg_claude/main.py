@@ -11,9 +11,10 @@ logger.addHandler(_stream_handler)
 AGENT_LEVEL = 25  # tra INFO(20) e WARNING(30)
 logging.addLevelName(AGENT_LEVEL, "AGENT")
 
-def _setup_output_dir(mode_folder: str, format_folder: str, exp_name: str) -> str:
+def _setup_output_dir(mode_folder: str, format_folder: str, extractor: str, exp_name: str) -> str:
     base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments")
-    out  = os.path.join(base, mode_folder, format_folder, exp_name)
+    parts = [base, mode_folder] + ([format_folder, extractor] if format_folder else []) + [exp_name]
+    out  = os.path.join(*parts)
     os.makedirs(out, exist_ok=True)
     fh = logging.FileHandler(os.path.join(out, "Conversation.log"), mode="w", encoding="utf-8")
     fh.setFormatter(_log_formatter)
@@ -74,10 +75,16 @@ def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents,
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--no-kg", action="store_true", help="Run without knowledge graph in prompt")
-    mode.add_argument("--kg-agents", action="store_true", help="Pass KG to agents in addition to orchestrator")
-    mode.add_argument("--kg-agents-triplets", action="store_true", help="Pass KG to agents and include extracted triplets in proposal (implies --kg-agents)")
-    mode.add_argument("--kg-cft-agents", action="store_true", help="Pass KG to orchestrator only, CFT text to agents")
+    mode.add_argument("--c-null", action="store_true", help="Run without knowledge graph in prompt")
+    mode.add_argument("--c-oa", action="store_true", help="Pass KG to agents in addition to orchestrator")
+    mode.add_argument("--c-oap", action="store_true", help="Pass KG to agents and include extracted triplets in proposal")
+    mode.add_argument("--c-op", action="store_true", help="Pass KG to orchestrator only, CFT text to agents")
+    parser.add_argument(
+        "--kg-format",
+        choices=["json", "turtle-light"],
+        default="turtle-light",
+        help="KG serialization format in prompts (default: turtle-light)",
+    )
     parser.add_argument(
         "--extractor",
         choices=["llama", "phi4"],
@@ -94,37 +101,40 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    fmt = "TURTLE"  # TODO: diventerà args.kg_format quando aggiungiamo --kg-format
+    fmt = "TURTLE" if args.kg_format == "turtle-light" else "JSON"
 
-    if args.no_kg:
+    if args.c_null:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = False, False, False, False
-        mode_folder, exp_prefix = "no_kg", "no_kg"
+        mode_folder, exp_prefix = "C_null", "C_null"
         graph_base, single_val_base = "Total_nokg", "single_validation_nokg.txt"
-    elif args.kg_agents:
+    elif args.c_oa:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, True, False, False
-        mode_folder, exp_prefix = "C_{OA}", "kg_agents"
+        mode_folder, exp_prefix = "C_{OA}", "C_{OA}"
         graph_base, single_val_base = "Total_kgagents", "single_validation_kgagents.txt"
-    elif args.kg_agents_triplets:
+    elif args.c_oap:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, True, False, True
-        mode_folder, exp_prefix = "C_{OAP}", "kg_triplet"
+        mode_folder, exp_prefix = "C_{OAP}", "C_{OAP}"
         graph_base, single_val_base = "Total_kgagents_tri", "single_validation_kgagents_tri.txt"
-    elif args.kg_cft_agents:
+    elif args.c_op:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, True, True
-        mode_folder, exp_prefix = "C_{OP}", "orch_only"
+        mode_folder, exp_prefix = "C_{OP}", "C_{OP}"
         graph_base, single_val_base = "Total_kgcft", "single_validation_kgcft.txt"
     else:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = True, False, False, False
-        mode_folder, exp_prefix = "C_{O}", "kg"
+        mode_folder, exp_prefix = "C_{O}", "C_{O}"
         graph_base, single_val_base = "Total", "single_validation_kg.txt"
 
     exp_name  = f"{exp_prefix}_{args.chunk_dimension}"
-    out_dir   = _setup_output_dir(mode_folder, fmt, exp_name)
+    if args.c_null:
+        out_dir = _setup_output_dir(mode_folder, "", "", exp_name)
+    else:
+        out_dir = _setup_output_dir(mode_folder, fmt, args.extractor, exp_name)
     graph_name    = os.path.join(out_dir, graph_base)
     single_val_file = os.path.join(out_dir, single_val_base)
     val_file      = os.path.join(out_dir, single_val_base.replace("single_", ""))
 
     val = va.Validation("llama3.3:70b", 0)
     agent_list = create_all_agents('llama3.3:70b')
-    Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor)
+    Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor, args.kg_format)
     question = load_question("file.txt")
     _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, val_file, single_val_file, val)

@@ -9,11 +9,12 @@ from mxg import Message
 
 
 class Orchestrator_Agent:
-    def __init__(self, agents:list[Agent], model:str, graph_name:str, chunk_dimension:int, extractor_type:str="llama"):
+    def __init__(self, agents:list[Agent], model:str, graph_name:str, chunk_dimension:int, extractor_type:str="llama", kg_format:str="turtle-light"):
         self.agents=agents
         self.model=model
         self.agent_answer=[]
         self._graph_name=graph_name
+        self._kg_format=kg_format
         self._cgraph=Custom_Graph(agents, graph_name, model, chunk_dimension, extractor_type)
 
     def _agent_registry(self) -> str:
@@ -101,6 +102,35 @@ class Orchestrator_Agent:
             lines.append(f"tri:{local(subj)} " + " ; ".join(parts) + " .")
         return "\n".join(lines)
 
+    def _get_triplets_json(self) -> str:
+        EX   = Namespace("http://example.org/ontologia#")
+        EDGE = "http://example.org/edge/"
+        ds   = self._cgraph._ds
+        struct: dict = {}
+        for subj in ds.subjects(RDF.type, EX.Triplet):
+            s_uri = next(ds.objects(subj, RDF.subject), None)
+            s = uri_to_label(s_uri) if s_uri else "?"
+            pred, obj = "", ""
+            for p, o in ds.predicate_objects(subj):
+                if str(p).startswith(EDGE):
+                    pred = uri_to_label(p)
+                    obj  = uri_to_label(o)
+                    break
+            agent_name = "unknown"
+            for _, _, _, ctx in ds.quads((subj, RDF.type, EX.Triplet, None)):
+                chunk_uri = next(ds.objects(ctx.identifier, PROV.wasDerivedFrom), None)
+                if chunk_uri:
+                    msg_uri = next(ds.objects(chunk_uri, PROV.wasDerivedFrom), None)
+                    if msg_uri:
+                        agent_uri = next(ds.objects(msg_uri, PROV.wasAttributedTo), None)
+                        if agent_uri:
+                            agent_name = uri_to_label(agent_uri).replace("_", " ").title()
+                break
+            if agent_name not in struct:
+                struct[agent_name] = []
+            struct[agent_name].append({"subject": s, "predicate": pred, "object": obj})
+        return json.dumps(struct, indent=2, ensure_ascii=False)
+
     def _get_kg_turtle_light(self) -> str:
         EX   = Namespace("http://example.org/ontologia#")
         EDGE = "http://example.org/edge/"
@@ -143,6 +173,15 @@ class Orchestrator_Agent:
         return "\n".join(lines)
 
     def get_kg_context(self) -> str:
+        if self._kg_format == "json":
+            return (
+                "=== REQUIREMENTS (JSON) ===\n"
+                f"{self._get_requirements_text()}\n"
+                "=== END REQUIREMENTS ===\n\n"
+                "=== CONSTRAINTS (JSON) ===\n"
+                f"{self._get_constraints_text()}\n"
+                "=== END CONSTRAINTS ==="
+            )
         return (
             "=== KNOWLEDGE GRAPH (Turtle Light) ===\n"
             f"{self._get_kg_turtle_light()}\n"
@@ -176,8 +215,8 @@ class Orchestrator_Agent:
                 ### Your role:
                 The user will provide you with two complementary sources:
                 1. A structured Knowledge Graph (KG) extracted from the Call for Tenders, serialized in
-                   Turtle Light format (simplified Turtle: no prefix declarations, subject-factorised,
-                   one line per subject). It contains two types of nodes:
+                   {"Turtle Light format (simplified Turtle: no prefix declarations, subject-factorised, one line per subject)" if self._kg_format == "turtle-light" else "JSON format"}.
+                   It contains two types of nodes:
                    - ex:Requirement — high-level business needs and goals the client wants to achieve.
                    - ex:Constraint  — conditions, limits and rules under which the solution must operate
                    (technical bounds, budget limits, regulatory requirements, infrastructure rules, etc.).
@@ -355,7 +394,8 @@ class Orchestrator_Agent:
 
         triplets_section = ""
         if use_triplets:
-            triplets_section = f"\n\n=== STRUCTURED TRIPLETS EXTRACTED FROM AGENT CONVERSATIONS ===\n{self._get_triplets_text()}\n=== END TRIPLETS ==="
+            triplets_content = self._get_triplets_json() if self._kg_format == "json" else self._get_triplets_text()
+            triplets_section = f"\n\n=== STRUCTURED TRIPLETS EXTRACTED FROM AGENT CONVERSATIONS ===\n{triplets_content}\n=== END TRIPLETS ==="
 
         user_message = f"""=== ORIGINAL CALL FOR TENDERS ===
 {task}
