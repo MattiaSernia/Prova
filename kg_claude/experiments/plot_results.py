@@ -12,21 +12,21 @@ TOTAL_CON = 19
 
 # (label, lista di (chunk_dim, path_validation_file))
 CONFIGS = [
-    ("$C_{O}^{JSON}(M_1)$", [
+    ("$C_{O}^{J}(M_1)$", [
         (0,   os.path.join(BASE, "C_{O}/JSON/kg_0/single_validation_kg.txt")),
         (10,  os.path.join(BASE, "C_{O}/JSON/kg_10/single_validation_kg.txt")),
         (30,  os.path.join(BASE, "C_{O}/JSON/kg_30/single_validation_kg.txt")),
         (50,  os.path.join(BASE, "C_{O}/JSON/kg_50/single_validation_kg.txt")),
         (100, os.path.join(BASE, "C_{O}/JSON/kg_100/single_validation_kg.txt")),
     ]),
-    ("$C_{OA}^{JSON}(M_1)$", [
+    ("$C_{OA}^{J}(M_1)$", [
         (0,   os.path.join(BASE, "C_{OA}/JSON/kg_agents_0/single_validation_kgagents.txt")),
         (10,  os.path.join(BASE, "C_{OA}/JSON/kg_agents_10/single_validation_kgagents.txt")),
         (30,  os.path.join(BASE, "C_{OA}/JSON/kg_agents_30/single_validation_kgagents.txt")),
         (50,  os.path.join(BASE, "C_{OA}/JSON/kg_agents_50/single_validation_kgagents.txt")),
         (100, os.path.join(BASE, "C_{OA}/JSON/kg_agents_100/single_validation_kgagents.txt")),
     ]),
-    ("$C_{OAP}^{JSON}(M_1)$", [
+    ("$C_{OAP}^{J}(M_1)$", [
         (0,   os.path.join(BASE, "C_{OAP}/JSON/kg_triplet_0/single_validation_kgagents_tri.txt")),
         (10,  os.path.join(BASE, "C_{OAP}/JSON/kg_triplet_10/single_validation_kgagents_tri.txt")),
         (30,  os.path.join(BASE, "C_{OAP}/JSON/kg_triplet_30/single_validation_kgagents_tri.txt")),
@@ -34,11 +34,11 @@ CONFIGS = [
         (100, os.path.join(BASE, "C_{OAP}/JSON/kg_triplet_100/single_validation_kgagents_tri.txt")),
     ]),
     ("$C_{\\emptyset}$", [
-        (0,   os.path.join(BASE, "no_kg/no_kg_0/single_validation_nokg.txt")),
-        (10,  os.path.join(BASE, "no_kg/no_kg_10/single_validation_nokg.txt")),
-        (30,  os.path.join(BASE, "no_kg/no_kg_30/single_validation_nokg.txt")),
-        (50,  os.path.join(BASE, "no_kg/no_kg_50/single_validation_nokg.txt")),
-        (100, os.path.join(BASE, "no_kg/no_kg_100/single_validation_nokg.txt")),
+        (0,   os.path.join(BASE, "C_null/C_null_0/single_validation_nokg.txt")),
+        (10,  os.path.join(BASE, "C_null/C_null_10/single_validation_nokg.txt")),
+        (30,  os.path.join(BASE, "C_null/C_null_30/single_validation_nokg.txt")),
+        (50,  os.path.join(BASE, "C_null/C_null_50/single_validation_nokg.txt")),
+        (100, os.path.join(BASE, "C_null/C_null_100/single_validation_nokg.txt")),
     ]),
 ]
 
@@ -73,7 +73,7 @@ for label, entries in CONFIGS:
 MARKERS = ["o", "s", "^", "D", "v"]
 COLORS  = ["#2196F3", "#4CAF50", "#FF5722", "#9C27B0", "#FF9800"]
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5), sharey=False)
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10), sharey=False)
 
 for i, (label, (xs, req_pcts, con_pcts)) in enumerate(data.items()):
     kw = dict(marker=MARKERS[i], color=COLORS[i], linewidth=2, markersize=7)
@@ -93,7 +93,7 @@ for ax, title, total in [
     ax.grid(axis="y", linestyle="--", alpha=0.5)
     ax.legend(fontsize=9)
 
-fig.suptitle("Impact of Chunk Dimension on Validation — per Configuration", fontsize=14, y=1.02)
+fig.suptitle("Impact of Chunk Dimension on Validation per Configuration", fontsize=14, y=1.02)
 plt.tight_layout()
 
 out = os.path.join(BASE, "chunk_dimension_comparison.png")
