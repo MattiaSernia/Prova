@@ -6,6 +6,9 @@ from requirementsExtractor import RequirementsExtractor
 from proposalsExtractor import ProposalsExtractor
 from tripletExtractorClaude import TripletExtractor
 from phi4TripletExtractor import Phi4TripletExtractor
+from phi4RequirementsExtractor import Phi4RequirementsExtractor
+from phi4ConstraintsExtractor import Phi4ConstraintsExtractor
+from phi4ProposalsExtractor import Phi4ProposalsExtractor
 from CoreferenceResolver import CoreferenceResolver
 from mxg import Message
 
@@ -59,12 +62,16 @@ class Custom_Graph:
         self._mex = 0
 
         _coref = CoreferenceResolver()
-        self._req_extr=RequirementsExtractor(model, 0, _coref, chunk_dim)
-        self._con_extr=ConstraintsExtractor(model, 0, _coref, chunk_dim)
-        self._pro_extr=ProposalsExtractor(model, 0, _coref, chunk_dim)
+        _phi4  = "hf.co/FinaPolat/phi4_adaptableIE_v2-gguf:Q4_K_M"
         if extractor_type == "phi4":
-            self._extractor = Phi4TripletExtractor("hf.co/FinaPolat/phi4_adaptableIE_v2-gguf:Q4_K_M", _coref, chunk_dim)
+            self._req_extr  = Phi4RequirementsExtractor(_phi4, _coref, chunk_dim)
+            self._con_extr  = Phi4ConstraintsExtractor(_phi4, _coref, chunk_dim)
+            self._pro_extr  = Phi4ProposalsExtractor(_phi4, _coref, chunk_dim)
+            self._extractor = Phi4TripletExtractor(_phi4, _coref, chunk_dim)
         else:
+            self._req_extr  = RequirementsExtractor(model, 0, _coref, chunk_dim)
+            self._con_extr  = ConstraintsExtractor(model, 0, _coref, chunk_dim)
+            self._pro_extr  = ProposalsExtractor(model, 0, _coref, chunk_dim)
             self._extractor = TripletExtractor(model, 0, _coref, chunk_dim)
 
         self._name=name
