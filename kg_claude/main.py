@@ -11,9 +11,9 @@ logger.addHandler(_stream_handler)
 AGENT_LEVEL = 25  # tra INFO(20) e WARNING(30)
 logging.addLevelName(AGENT_LEVEL, "AGENT")
 
-def _setup_output_dir(mode_folder: str, format_folder: str, extractor: str, exp_name: str) -> str:
+def _setup_output_dir(mode_folder: str, format_folder: str, text_folder: str, extractor: str, exp_name: str) -> str:
     base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments")
-    parts = [base, mode_folder] + ([format_folder, extractor] if format_folder else []) + [exp_name]
+    parts = [base, mode_folder] + ([format_folder, text_folder, extractor] if format_folder else []) + [exp_name]
     out  = os.path.join(*parts)
     os.makedirs(out, exist_ok=True)
     fh = logging.FileHandler(os.path.join(out, "Conversation.log"), mode="w", encoding="utf-8")
@@ -33,19 +33,19 @@ def load_question(name: str) -> str:
     with open(name, "r", encoding="utf-8") as f:
         return "".join(line + "\n" for line in f.readlines())
 
-def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, val_file, single_val_file, val):
+def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, no_text, val_file, single_val_file, val):
     att = 0
-    plan = orchestrator.plan(question, att, use_kg)
+    plan = orchestrator.plan(question, att, use_kg, no_text)
     while plan == {}:
         att += 1
-        plan = orchestrator.plan(question, att, use_kg)
+        plan = orchestrator.plan(question, att, use_kg, no_text)
     kg_context = orchestrator.get_kg_context() if kg_agents else None
     for key in plan:
         for agent in agents:
             if agent.name == key:
                 if kg_agents:
                     agent.set_kg_context(kg_context)
-                if cft_agents:
+                if cft_agents and not no_text:
                     agent.set_cft_context(question)
                 orchestrator.add_message(Message.now(plan[key], "Orchestrator", "question", "default"))
                 risposta = agent.answer(plan[key])
@@ -61,7 +61,7 @@ def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents,
                     attempts += 1
                 correction = orchestrator.correct_answer(key, risposta, plan[key])
                 orchestrator.add_message(Message.now(str(correction).upper(), "Orchestrator", "answer", "correction"))
-    proposal = orchestrator.propose(question, triplets_in_proposal)
+    proposal = orchestrator.propose(question, triplets_in_proposal, no_text)
     orchestrator.add_message(Message.now(proposal, "Orchestrator", "proposal", "default"))
     # with open(val_file, "w") as f:
     #     f.write("REQUIREMENTS\n")
@@ -79,6 +79,11 @@ if __name__ == "__main__":
     mode.add_argument("--c-oa", action="store_true", help="Pass KG to agents in addition to orchestrator")
     mode.add_argument("--c-oap", action="store_true", help="Pass KG to agents and include extracted triplets in proposal")
     mode.add_argument("--c-op", action="store_true", help="Pass KG to orchestrator only, CFT text to agents")
+    parser.add_argument(
+        "--no-text",
+        action="store_true",
+        help="Pass only structured graph, no raw text alongside it",
+    )
     parser.add_argument(
         "--kg-format",
         choices=["json", "turtle-light"],
@@ -125,10 +130,11 @@ if __name__ == "__main__":
         graph_base, single_val_base = "Total", "single_validation_kg.txt"
 
     exp_name  = f"{exp_prefix}_{args.chunk_dimension}"
+    text_folder = "NO_TEXT" if args.no_text else "TEXT"
     if args.c_null:
-        out_dir = _setup_output_dir(mode_folder, "", "", exp_name)
+        out_dir = _setup_output_dir(mode_folder, "", "", "", exp_name)
     else:
-        out_dir = _setup_output_dir(mode_folder, fmt, args.extractor, exp_name)
+        out_dir = _setup_output_dir(mode_folder, fmt, text_folder, args.extractor, exp_name)
     graph_name    = os.path.join(out_dir, graph_base)
     single_val_file = os.path.join(out_dir, single_val_base)
     val_file      = os.path.join(out_dir, single_val_base.replace("single_", ""))
@@ -137,4 +143,4 @@ if __name__ == "__main__":
     agent_list = create_all_agents('llama3.3:70b')
     Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor, args.kg_format)
     question = load_question("file.txt")
-    _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, val_file, single_val_file, val)
+    _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, args.no_text, val_file, single_val_file, val)

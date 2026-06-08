@@ -191,7 +191,7 @@ class Orchestrator_Agent:
     def add_message(self, mxg: Message):
         self._cgraph.add_message(mxg)
 
-    def plan(self, task: str="", attempt:int=0, graph_in_prompt:bool=True) -> dict:
+    def plan(self, task: str="", attempt:int=0, graph_in_prompt:bool=True, no_text:bool=False) -> dict:
         if attempt==0:
             logging.log(25, f"User asked: {task}")
             self._cgraph.add_message(Message.now(task, "User", "question", "default"))
@@ -259,10 +259,13 @@ class Orchestrator_Agent:
                     "Budget Agent": "The total contract value is 3M EUR over 4 years. Annual exploitation costs must stay within municipal budget capacity. The client expects cost optimisation without sacrificing quality. Are we financially eligible to bid, and what is the projected margin?",
                     "Legal Agent": "The tender requires strict GDPR compliance (EU-only hosting, no data transfer outside EU, encryption of sensitive data). All AI recommendations must be explainable post-hoc. No automated decision is allowed without explicit agent validation. What legal risks should we flag, and are we compliant?"
                 }}"""
-            user_content = (
-                f"=== CALL FOR TENDERS KNOWLEDGE GRAPH ===\n\n{kg_context}\n\n"
-                f"=== ORIGINAL CALL FOR TENDERS TEXT ===\n\n{task}"
-            )
+            if no_text:
+                user_content = f"=== CALL FOR TENDERS KNOWLEDGE GRAPH ===\n\n{kg_context}"
+            else:
+                user_content = (
+                    f"=== CALL FOR TENDERS KNOWLEDGE GRAPH ===\n\n{kg_context}\n\n"
+                    f"=== ORIGINAL CALL FOR TENDERS TEXT ===\n\n{task}"
+                )
         else:
             system =  f"""You are an orchestrator managing a consortium responding to a public call for tenders.
                 You have access to these specialized agents:
@@ -364,10 +367,8 @@ class Orchestrator_Agent:
             return True
         return False
 
-    def propose(self, task: str, use_triplets: bool = False) -> str:
-        agents_context=""
-        if not use_triplets:
-            agents_context = "\n\n".join(self.agent_answer)
+    def propose(self, task: str, use_triplets: bool = False, no_text: bool = False) -> str:
+        agents_context = "" if no_text else "\n\n".join(self.agent_answer)
         
         system = f"""You are a proposal writer for a consortium responding to a call for tenders.
             You must write a complete, professional, and CONCRETE tender proposal.
@@ -397,13 +398,16 @@ class Orchestrator_Agent:
             triplets_content = self._get_triplets_json() if self._kg_format == "json" else self._get_triplets_text()
             triplets_section = f"\n\n=== STRUCTURED TRIPLETS EXTRACTED FROM AGENT CONVERSATIONS ===\n{triplets_content}\n=== END TRIPLETS ==="
 
-        user_message = f"""=== ORIGINAL CALL FOR TENDERS ===
-{task}
+        cft_section = "" if no_text else f"=== ORIGINAL CALL FOR TENDERS ===\n{task}\n\n"
+        agents_section = "" if not agents_context else f"=== AGENTS' ANSWERS ===\n{agents_context}"
 
-=== AGENTS' ANSWERS ===
-{agents_context}{triplets_section}
-
-Write the proposal now. For each agent's domain, be concrete and specific: name exact technologies, exact costs, exact regulations, exact figures as stated by the agents."""
+        user_message = (
+            f"{cft_section}"
+            f"{agents_section}"
+            f"{triplets_section}\n\n"
+            "Write the proposal now. For each agent's domain, be concrete and specific: "
+            "name exact technologies, exact costs, exact regulations, exact figures as stated by the agents."
+        )
 
         response = ollama_chat(
             self.model,
