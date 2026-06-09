@@ -13,9 +13,13 @@ logging.addLevelName(AGENT_LEVEL, "AGENT")
 
 def _setup_output_dir(mode_folder: str, format_folder: str, text_folder: str, extractor: str, schema_folder: str, exp_name: str) -> str:
     base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments")
-    extractor_parts = [extractor] + ([schema_folder] if schema_folder else [])
-    parts = [base, mode_folder] + ([format_folder, text_folder] + extractor_parts if format_folder else []) + [exp_name]
-    out  = os.path.join(*parts)
+    if not format_folder:
+        # c_null: no KG, no extractor/format/text levels
+        parts = [base, mode_folder, exp_name]
+    else:
+        extractor_parts = [extractor] + ([schema_folder] if schema_folder else [])
+        parts = [base] + extractor_parts + [format_folder, text_folder, exp_name]
+    out = os.path.join(*parts)
     os.makedirs(out, exist_ok=True)
     fh = logging.FileHandler(os.path.join(out, "Conversation.log"), mode="w", encoding="utf-8")
     fh.setFormatter(_log_formatter)
@@ -94,8 +98,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--extractor",
         choices=["llama", "phi4"],
-        default="llama",
-        help="Triplet extractor to use (default: llama)",
+        default="phi4",
+        help="Triplet extractor to use (default: phi4)",
     )
     parser.add_argument(
         "--no-schema",
