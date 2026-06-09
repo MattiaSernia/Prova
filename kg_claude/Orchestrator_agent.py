@@ -369,44 +369,40 @@ class Orchestrator_Agent:
 
     def propose(self, task: str, use_triplets: bool = False, no_text: bool = False) -> str:
         agents_context = "" if no_text else "\n\n".join(self.agent_answer)
-        
-        system = f"""You are a proposal writer for a consortium responding to a call for tenders.
-            You must write a complete, professional, and CONCRETE tender proposal.
 
-            The consortium is composed of the following specialized agents (each with their domain):
-            {self._agent_registry()}
+        system = """You are writing a bid response on behalf of a consortium.
 
-            ### STRICT RULES:
-            - Use ONLY the information provided in the agents' answers and the original tender text.
-            - Do NOT invent capabilities, figures, references, or commitments not explicitly mentioned by the agents.
-            - If a requirement from the tender is not covered by any agent's answer, explicitly state it is not addressed.
-            - Be SPECIFIC: name the exact technologies, tools, frameworks, products, and figures the agents mentioned.
-            - Every claim must be traceable to an agent's answer. No filler, no generic statements.
+Your only job: go through every requirement and constraint in the Call for Tenders and state, point by point, exactly how the consortium meets it — or explicitly flag that it is not covered.
 
-            ### Structure your proposal as follows:
-            1. Executive Summary
-            2. Understanding of Requirements
-            3. Proposed Solution — a single, flowing section that integrates all agents' contributions into
-               a coherent description of what the consortium intends to do: what will be built or delivered,
-               which technologies and methods will be used, what it will cost, and how constraints will be met.
-               Do NOT split this into sub-sections by agent. Write it as one unified narrative.
-            4. Unaddressed Requirements (if any requirement from the tender was not covered by any agent)
-            5. Conclusion"""
+Rules (no exceptions):
+- Ground every claim in the agents' answers. If an agent did not say it, do not write it.
+- Copy exact figures, technologies, costs, regulations, and deadlines from the agents' answers.
+- No introductions, no conclusions, no summaries. Start directly with the first requirement.
+- No filler sentences ("we are pleased to", "our team is committed to", etc.).
+- If a requirement has no coverage in the agents' answers, skip it entirely.
+- Output only the proposal text."""
 
         triplets_section = ""
+        kg_section = ""
         if use_triplets:
             triplets_content = self._get_triplets_json() if self._kg_format == "json" else self._get_triplets_text()
-            triplets_section = f"\n\n=== STRUCTURED TRIPLETS EXTRACTED FROM AGENT CONVERSATIONS ===\n{triplets_content}\n=== END TRIPLETS ==="
+            triplets_section = f"\n\n=== TRIPLETS EXTRACTED FROM AGENT CONVERSATIONS ===\n{triplets_content}\n=== END TRIPLETS ==="
+            kg_section = (
+                f"\n\n=== REQUIREMENTS AND CONSTRAINTS — address and respect each one ===\n"
+                f"{self.get_kg_context()}\n"
+                f"=== END REQUIREMENTS AND CONSTRAINTS ==="
+            )
 
-        cft_section = "" if no_text else f"=== ORIGINAL CALL FOR TENDERS ===\n{task}\n\n"
+        cft_section = "" if no_text else f"=== CALL FOR TENDERS ===\n{task}\n\n"
         agents_section = "" if not agents_context else f"=== AGENTS' ANSWERS ===\n{agents_context}"
 
         user_message = (
             f"{cft_section}"
             f"{agents_section}"
-            f"{triplets_section}\n\n"
-            "Write the proposal now. For each agent's domain, be concrete and specific: "
-            "name exact technologies, exact costs, exact regulations, exact figures as stated by the agents."
+            f"{triplets_section}"
+            f"{kg_section}\n\n"
+            "Address each requirement and constraint listed above in order. "
+            "For each one, state exactly what the consortium offers, using only what the agents said."
         )
 
         response = ollama_chat(
