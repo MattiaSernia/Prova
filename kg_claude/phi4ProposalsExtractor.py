@@ -58,8 +58,6 @@ class Phi4ProposalsExtractor:
             f"Extract the information in the following format: `{self._OUTPUT_FORMAT}`.\n"
             "If no proposals are found, return an empty list: [].\n"
             "Please provide only the extracted information without any explanations.\n\n"
-            f"Text: {text}"
-            if self._no_schema else
             f"Schema: {self._SCHEMA}\n"
             f"Text: {text}"
         )

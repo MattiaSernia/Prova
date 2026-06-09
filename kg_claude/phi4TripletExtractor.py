@@ -44,7 +44,7 @@ class Phi4TripletExtractor:
         self._no_schema = no_schema
 
     def _build_prompt(self, text: str) -> str:
-        return (
+        base = (
             "Information Extraction is the process of automatically identifying and "
             "extracting structured information from unstructured text data.\n"
             "Always extract numbers, dates, and currency values regardless of the specific task.\n\n"
@@ -56,11 +56,11 @@ class Phi4TripletExtractor:
             f"Extract the information in the following format: `{self._OUTPUT_FORMAT}`.\n"
             "If no matching entities are found, return an empty list: [].\n"
             "Please provide only the extracted information without any explanations.\n\n"
-            f"Text: {text}"
-            if self._no_schema else
-            f"Schema: {self._SCHEMA}\n"
-            f"Text: {text}"
         )
+        if self._no_schema:
+            return base + f"Text: {text}"
+        else:
+            return base + f"Schema: {self._SCHEMA}\nText: {text}"
 
     def _parse(self, raw: str) -> list:
         raw = raw.strip()
