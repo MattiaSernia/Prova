@@ -37,10 +37,11 @@ class Phi4TripletExtractor:
 
     _OUTPUT_FORMAT = '[{"subject": "...", "predicate": "...", "object": "..."}]'
 
-    def __init__(self, model: str, coref=None, chunk_dim: int = 0):
+    def __init__(self, model: str, coref=None, chunk_dim: int = 0, no_schema: bool = False):
         self.model = model
         self.coref = coref if coref is not None else CoreferenceResolver()
         self._chunk_dim = chunk_dim
+        self._no_schema = no_schema
 
     def _build_prompt(self, text: str) -> str:
         return (
@@ -55,6 +56,8 @@ class Phi4TripletExtractor:
             f"Extract the information in the following format: `{self._OUTPUT_FORMAT}`.\n"
             "If no matching entities are found, return an empty list: [].\n"
             "Please provide only the extracted information without any explanations.\n\n"
+            f"Text: {text}"
+            if self._no_schema else
             f"Schema: {self._SCHEMA}\n"
             f"Text: {text}"
         )

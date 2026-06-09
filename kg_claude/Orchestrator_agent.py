@@ -9,13 +9,13 @@ from mxg import Message
 
 
 class Orchestrator_Agent:
-    def __init__(self, agents:list[Agent], model:str, graph_name:str, chunk_dimension:int, extractor_type:str="llama", kg_format:str="turtle-light"):
+    def __init__(self, agents:list[Agent], model:str, graph_name:str, chunk_dimension:int, extractor_type:str="llama", kg_format:str="turtle-light", no_schema:bool=False):
         self.agents=agents
         self.model=model
         self.agent_answer=[]
         self._graph_name=graph_name
         self._kg_format=kg_format
-        self._cgraph=Custom_Graph(agents, graph_name, model, chunk_dimension, extractor_type)
+        self._cgraph=Custom_Graph(agents, graph_name, model, chunk_dimension, extractor_type, no_schema)
 
     def _agent_registry(self) -> str:
         lines = []

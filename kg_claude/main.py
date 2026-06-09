@@ -11,9 +11,10 @@ logger.addHandler(_stream_handler)
 AGENT_LEVEL = 25  # tra INFO(20) e WARNING(30)
 logging.addLevelName(AGENT_LEVEL, "AGENT")
 
-def _setup_output_dir(mode_folder: str, format_folder: str, text_folder: str, extractor: str, exp_name: str) -> str:
+def _setup_output_dir(mode_folder: str, format_folder: str, text_folder: str, extractor: str, schema_folder: str, exp_name: str) -> str:
     base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments")
-    parts = [base, mode_folder] + ([format_folder, text_folder, extractor] if format_folder else []) + [exp_name]
+    extractor_parts = [extractor] + ([schema_folder] if schema_folder else [])
+    parts = [base, mode_folder] + ([format_folder, text_folder] + extractor_parts if format_folder else []) + [exp_name]
     out  = os.path.join(*parts)
     os.makedirs(out, exist_ok=True)
     fh = logging.FileHandler(os.path.join(out, "Conversation.log"), mode="w", encoding="utf-8")
@@ -97,6 +98,11 @@ if __name__ == "__main__":
         help="Triplet extractor to use (default: llama)",
     )
     parser.add_argument(
+        "--no-schema",
+        action="store_true",
+        help="Remove ontology schema (entities/relations) from phi4 extractor prompts",
+    )
+    parser.add_argument(
         "--chunk-dimension",
         type=int,
         choices=range(0, 110, 10),
@@ -130,17 +136,18 @@ if __name__ == "__main__":
         graph_base, single_val_base = "Total", "single_validation_kg.txt"
 
     exp_name  = f"{exp_prefix}_{args.chunk_dimension}"
-    text_folder = "NO_TEXT" if args.no_text else "TEXT"
+    text_folder   = "NO_TEXT" if args.no_text else "TEXT"
+    schema_folder = ("NO_SCHEMA" if args.no_schema else "SCHEMA") if args.extractor == "phi4" else ""
     if args.c_null:
-        out_dir = _setup_output_dir(mode_folder, "", "", "", exp_name)
+        out_dir = _setup_output_dir(mode_folder, "", "", "", "", exp_name)
     else:
-        out_dir = _setup_output_dir(mode_folder, fmt, text_folder, args.extractor, exp_name)
+        out_dir = _setup_output_dir(mode_folder, fmt, text_folder, args.extractor, schema_folder, exp_name)
     graph_name    = os.path.join(out_dir, graph_base)
     single_val_file = os.path.join(out_dir, single_val_base)
     val_file      = os.path.join(out_dir, single_val_base.replace("single_", ""))
 
     val = va.Validation("llama3.3:70b", 0)
     agent_list = create_all_agents('llama3.3:70b')
-    Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor, args.kg_format)
+    Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor, args.kg_format, args.no_schema)
     question = load_question("file.txt")
     _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, args.no_text, val_file, single_val_file, val)

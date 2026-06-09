@@ -22,7 +22,7 @@ import re
 
 class Custom_Graph:
 
-    def __init__(self, agent_list:list, name:str, model:str="llama3.3:70b", chunk_dim:int=0, extractor_type:str="llama"):
+    def __init__(self, agent_list:list, name:str, model:str="llama3.3:70b", chunk_dim:int=0, extractor_type:str="llama", no_schema:bool=False):
         self._EX  = Namespace("http://example.org/ontologia#")
         self._REQ = Namespace("http://example.org/requirement/")
         self._EXT = Namespace("http://example.org/extraction/")
@@ -64,10 +64,10 @@ class Custom_Graph:
         _coref = CoreferenceResolver()
         _phi4  = "hf.co/FinaPolat/phi4_adaptableIE_v2-gguf:Q4_K_M"
         if extractor_type == "phi4":
-            self._req_extr  = Phi4RequirementsExtractor(_phi4, _coref, chunk_dim)
-            self._con_extr  = Phi4ConstraintsExtractor(_phi4, _coref, chunk_dim)
-            self._pro_extr  = Phi4ProposalsExtractor(_phi4, _coref, chunk_dim)
-            self._extractor = Phi4TripletExtractor(_phi4, _coref, chunk_dim)
+            self._req_extr  = Phi4RequirementsExtractor(_phi4, _coref, chunk_dim, no_schema)
+            self._con_extr  = Phi4ConstraintsExtractor(_phi4, _coref, chunk_dim, no_schema)
+            self._pro_extr  = Phi4ProposalsExtractor(_phi4, _coref, chunk_dim, no_schema)
+            self._extractor = Phi4TripletExtractor(_phi4, _coref, chunk_dim, no_schema)
         else:
             self._req_extr  = RequirementsExtractor(model, 0, _coref, chunk_dim)
             self._con_extr  = ConstraintsExtractor(model, 0, _coref, chunk_dim)

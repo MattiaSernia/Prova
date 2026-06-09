@@ -42,10 +42,11 @@ class Phi4RequirementsExtractor:
 
     _OUTPUT_FORMAT = '[{"subject": "...", "predicate": "...", "object": "...", "priority": "MUST|SHOULD|MAY or null", "category": "... or null"}]'
 
-    def __init__(self, model: str, coref=None, chunk_dim: int = 0):
+    def __init__(self, model: str, coref=None, chunk_dim: int = 0, no_schema: bool = False):
         self.model = model
         self.coref = coref if coref is not None else CoreferenceResolver()
         self._chunk_dim = chunk_dim
+        self._no_schema = no_schema
 
     def _build_prompt(self, text: str) -> str:
         return (
@@ -61,6 +62,8 @@ class Phi4RequirementsExtractor:
             f"Extract the information in the following format: `{self._OUTPUT_FORMAT}`.\n"
             "If no requirements are found, return an empty list: [].\n"
             "Please provide only the extracted information without any explanations.\n\n"
+            f"Text: {text}"
+            if self._no_schema else
             f"Schema: {self._SCHEMA}\n"
             f"Text: {text}"
         )
