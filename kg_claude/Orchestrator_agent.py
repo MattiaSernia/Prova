@@ -372,14 +372,13 @@ class Orchestrator_Agent:
 
         system = """You are writing a bid response on behalf of a consortium.
 
-Your only job: go through every requirement and constraint in the Call for Tenders and state, point by point, exactly how the consortium meets it — or explicitly flag that it is not covered.
+Write a single, coherent proposal text that integrates all the information from the agents' answers into a flowing, professional response to the call for tenders.
 
 Rules (no exceptions):
-- Ground every claim in the agents' answers. If an agent did not say it, do not write it.
+- Use ONLY information explicitly stated in the agents' answers. Do not invent anything.
 - Copy exact figures, technologies, costs, regulations, and deadlines from the agents' answers.
-- No introductions, no conclusions, no summaries. Start directly with the first requirement.
 - No filler sentences ("we are pleased to", "our team is committed to", etc.).
-- If a requirement has no coverage in the agents' answers, skip it entirely.
+- No bullet-point lists of requirements. Write flowing prose.
 - Output only the proposal text."""
 
         triplets_section = ""
@@ -401,8 +400,8 @@ Rules (no exceptions):
             f"{agents_section}"
             f"{triplets_section}"
             f"{kg_section}\n\n"
-            "Address each requirement and constraint listed above in order. "
-            "For each one, state exactly what the consortium offers, using only what the agents said."
+            "Write the proposal now. Use the agents' answers as your only source. "
+            "Produce a coherent, flowing text that responds to the call for tenders."
         )
 
         response = ollama_chat(
