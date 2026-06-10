@@ -96,8 +96,8 @@ for ax, pcts, title in [
 group_colors = ["#5C6BC0", "#EF5350"]   # opzione A, opzione B
 
 for ax, pcts, title in [
-    (ax_avg_req, req_pcts, "Group Averages — Requirements"),
-    (ax_avg_con, con_pcts, "Group Averages — Constraints"),
+    (ax_avg_req, req_pcts, "Group Averages: Requirements"),
+    (ax_avg_con, con_pcts, "Group Averages: Constraints"),
 ]:
     group_names, vals_a, vals_b, labels_a, labels_b = [], [], [], [], []
 
@@ -126,7 +126,7 @@ for ax, pcts, title in [
     ax.set_ylim(0, 120)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-fig.suptitle("$C_{OAP}$ — Configuration Comparison ($\\gamma=0$)", fontsize=14)
+fig.suptitle("$C_{OAP}$: Configuration Comparison ($\\gamma=0$)", fontsize=14)
 
 out = os.path.join(os.path.dirname(BASE), "coap_comparison.png")
 plt.savefig(out, dpi=150, bbox_inches="tight")
