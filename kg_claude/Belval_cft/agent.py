@@ -250,23 +250,22 @@ AGENT_REGISTRY = {
 }
 
 
-def create_agent(agent_type: str, model: str) -> Agent:
-    """Instantiate a single agent by its registry key."""
+def create_agent(agent_type: str, model: str, base_dir: str = "") -> Agent:
     if agent_type not in AGENT_REGISTRY:
         raise ValueError(
             f"Unknown agent type: {agent_type!r}. "
             f"Available: {list(AGENT_REGISTRY)}"
         )
     cfg = AGENT_REGISTRY[agent_type]
+    context_file = os.path.join(base_dir, cfg["context_file"]) if base_dir else cfg["context_file"]
     return Agent(
         name=cfg["name"],
         role=cfg["role"],
-        context_file=cfg["context_file"],
+        context_file=context_file,
         description=cfg["description"],
         model=model,
     )
 
 
-def create_all_agents(model: str) -> list:
-    """Instantiate every agent declared in the registry."""
-    return  [create_agent(key, model) for key in AGENT_REGISTRY]
+def create_all_agents(model: str, base_dir: str = "") -> list:
+    return [create_agent(key, model, base_dir) for key in AGENT_REGISTRY]

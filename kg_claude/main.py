@@ -1,5 +1,7 @@
 import logging
 import os
+import sys
+import argparse as _ap
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -11,10 +13,17 @@ logger.addHandler(_stream_handler)
 AGENT_LEVEL = 25  # tra INFO(20) e WARNING(30)
 logging.addLevelName(AGENT_LEVEL, "AGENT")
 
-def _setup_output_dir(mode_folder: str, format_folder: str, text_folder: str, extractor: str, schema_folder: str, exp_name: str) -> str:
-    base = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments")
+# pre-parse --cft so the right folder is on sys.path before imports
+_ROOT = os.path.dirname(os.path.abspath(__file__))
+_pre = _ap.ArgumentParser(add_help=False)
+_pre.add_argument("--cft", default="belval")
+_cft_args, _ = _pre.parse_known_args()
+CFT_DIR = os.path.join(_ROOT, f"{_cft_args.cft}_cft")
+sys.path.insert(0, CFT_DIR)
+
+def _setup_output_dir(cft: str, mode_folder: str, format_folder: str, text_folder: str, extractor: str, schema_folder: str, exp_name: str) -> str:
+    base = os.path.join(_ROOT, "experiments", cft)
     if not format_folder:
-        # c_null: no KG, no extractor/format/text levels
         parts = [base, mode_folder, exp_name]
     else:
         extractor_parts = [extractor] + ([schema_folder] if schema_folder else [])
@@ -34,8 +43,9 @@ import argparse
 import validation.Validation as va
 
 
-def load_question(name: str) -> str:
-    with open(name, "r", encoding="utf-8") as f:
+def load_question(cft_dir: str) -> str:
+    path = os.path.join(cft_dir, "file.txt")
+    with open(path, "r", encoding="utf-8") as f:
         return "".join(line + "\n" for line in f.readlines())
 
 def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, no_text, val_file, single_val_file, val):
@@ -68,51 +78,34 @@ def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents,
                 orchestrator.add_message(Message.now(str(correction).upper(), "Orchestrator", "answer", "correction"))
     proposal = orchestrator.propose(question, triplets_in_proposal, no_text)
     orchestrator.add_message(Message.now(proposal, "Orchestrator", "proposal", "default"))
-    # with open(val_file, "w") as f:
-    #     f.write("REQUIREMENTS\n")
-    #     for element in val.validate_requirements(proposal):
-    #         f.write(element + "\n")
-    #     f.write("\nCONSTRAINTS\n")
-    #     for element in val.validate_constraints(proposal):
-    #         f.write(element + "\n")
     val.validate(proposal, single_val_file)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("--cft", default="belval", help="CFT folder to use (default: belval)")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--c-null", action="store_true", help="Run without knowledge graph in prompt")
     mode.add_argument("--c-oa", action="store_true", help="Pass KG to agents in addition to orchestrator")
     mode.add_argument("--c-oap", action="store_true", help="Pass KG to agents and include extracted triplets in proposal")
     mode.add_argument("--c-op", action="store_true", help="Pass KG to orchestrator only, CFT text to agents")
-    parser.add_argument(
-        "--no-text",
-        action="store_true",
-        help="Pass only structured graph, no raw text alongside it",
-    )
+    parser.add_argument("--no-text", action="store_true")
     parser.add_argument(
         "--kg-format",
         choices=["json", "turtle-light"],
         default="turtle-light",
-        help="KG serialization format in prompts (default: turtle-light)",
     )
     parser.add_argument(
         "--extractor",
         choices=["llama", "phi4"],
         default="phi4",
-        help="Triplet extractor to use (default: phi4)",
     )
-    parser.add_argument(
-        "--no-schema",
-        action="store_true",
-        help="Remove ontology schema (entities/relations) from phi4 extractor prompts",
-    )
+    parser.add_argument("--no-schema", action="store_true")
     parser.add_argument(
         "--chunk-dimension",
         type=int,
         choices=range(0, 110, 10),
         default=0,
         metavar="N",
-        help="Chunk dimension (0-100, multiples of 10, default: 0)",
     )
     args = parser.parse_args()
 
@@ -139,19 +132,21 @@ if __name__ == "__main__":
         mode_folder, exp_prefix = "C_{O}", "C_{O}"
         graph_base, single_val_base = "Total", "single_validation_kg.txt"
 
-    exp_name  = f"{exp_prefix}_{args.chunk_dimension}"
+    exp_name      = f"{exp_prefix}_{args.chunk_dimension}"
     text_folder   = "NO_TEXT" if args.no_text else "TEXT"
     schema_folder = ("NO_SCHEMA" if args.no_schema else "SCHEMA") if args.extractor == "phi4" else ""
-    if args.c_null:
-        out_dir = _setup_output_dir(mode_folder, "", "", "", "", exp_name)
-    else:
-        out_dir = _setup_output_dir(mode_folder, fmt, text_folder, args.extractor, schema_folder, exp_name)
-    graph_name    = os.path.join(out_dir, graph_base)
-    single_val_file = os.path.join(out_dir, single_val_base)
-    val_file      = os.path.join(out_dir, single_val_base.replace("single_", ""))
 
-    val = va.Validation("llama3.3:70b", 0)
-    agent_list = create_all_agents('llama3.3:70b')
+    if args.c_null:
+        out_dir = _setup_output_dir(args.cft, mode_folder, "", "", "", "", exp_name)
+    else:
+        out_dir = _setup_output_dir(args.cft, mode_folder, fmt, text_folder, args.extractor, schema_folder, exp_name)
+
+    graph_name      = os.path.join(out_dir, graph_base)
+    single_val_file = os.path.join(out_dir, single_val_base)
+    val_file        = os.path.join(out_dir, single_val_base.replace("single_", ""))
+
+    val        = va.Validation("llama3.3:70b", 0)
+    agent_list = create_all_agents('llama3.3:70b', CFT_DIR)
     Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor, args.kg_format, args.no_schema)
-    question = load_question("file.txt")
+    question = load_question(CFT_DIR)
     _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, args.no_text, val_file, single_val_file, val)

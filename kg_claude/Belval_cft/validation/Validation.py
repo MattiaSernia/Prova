@@ -7,8 +7,9 @@ class Validation:
     def __init__(self, model, temperature):
         self.model=model
         self.temperature=temperature
-        self._requirements=self._load("validation/requirements.json", "requirements")
-        self._constraints=self._load("validation/constraints.json", "constraints")
+        _here = os.path.dirname(os.path.abspath(__file__))
+        self._requirements=self._load(os.path.join(_here, "requirements.json"), "requirements")
+        self._constraints=self._load(os.path.join(_here, "constraints.json"), "constraints")
         
     def validate_requirements(self, proposal: str) -> list[str]:
         prompt = (
