@@ -18,7 +18,7 @@ _ROOT = os.path.dirname(os.path.abspath(__file__))
 _pre = _ap.ArgumentParser(add_help=False)
 _pre.add_argument("--cft", default="belval")
 _cft_args, _ = _pre.parse_known_args()
-CFT_DIR = os.path.join(_ROOT, f"{_cft_args.cft}_cft")
+CFT_DIR = os.path.join(_ROOT, f"{_cft_args.cft.capitalize()}_cft")
 sys.path.insert(0, CFT_DIR)
 
 def _setup_output_dir(cft: str, mode_folder: str, format_folder: str, text_folder: str, extractor: str, schema_folder: str, exp_name: str) -> str:
