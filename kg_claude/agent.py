@@ -183,7 +183,7 @@ AGENT_REGISTRY = {
         "name": "ProjectCoordinator Agent",
         "role": "project coordinator and consortium lead",
         "context_file": "contexts/Coordinator_Agent.json",
-        "description":("Coordinates the consortium and consolidates all agent contributions into a coherent tender response for Nexus Engineering S.r.l. "
+        "description":("Coordinates the consortium and consolidates all agent contributions into a coherent tender response for {company} "
             "Knows the company's PM methodologies, past public sector references, consortium partners, available capacity, "
             "and governance practices as of 2024. Responsible for detecting contradictions and maintaining decision traceability.")
 
@@ -193,7 +193,7 @@ AGENT_REGISTRY = {
         "role": "technical architect",
         "context_file": "contexts/Architect_Agent.json",
         "description":(
-            "Designs and owns the technical architecture for Nexus Engineering S.r.l. tender responses. "
+            "Designs and owns the technical architecture for {company} tender responses. "
             "Knows the full technology stack (LLMs, RAG, cloud, integration, security), performance benchmarks, "
             "sovereign hosting options, and technical constraints as of 2024."
         )
@@ -203,7 +203,7 @@ AGENT_REGISTRY = {
         "role": "security and compliance officer",
         "context_file": "contexts/Compliance_Agent.json",
         "description":(
-            "Owns the security and regulatory compliance posture for Nexus Engineering S.r.l. tender responses. "
+            "Owns the security and regulatory compliance posture for {company} tender responses. "
             "Knows the company's certifications, GDPR instruments, AI security controls, audit capabilities, "
             "and experience with EU regulatory frameworks (GDPR, EU AI Act, RGS, SecNumCloud, NIS2) as of 2024."
         )
@@ -213,7 +213,7 @@ AGENT_REGISTRY = {
         "role": "legal counsel",
         "context_file": "contexts/Legal_Agent.json",
         "description":(
-            "Manages legal eligibility, contractual compliance, and regulatory risk for Nexus Engineering S.r.l. tender responses. "
+            "Manages legal eligibility, contractual compliance, and regulatory risk for {company} tender responses. "
             "Knows the company's legal standing, procurement experience across EU jurisdictions, IP model, insurance, "
             "standard contractual clauses, and AI regulatory posture (GDPR, EU AI Act) as of 2024."
         )
@@ -223,7 +223,7 @@ AGENT_REGISTRY = {
         "role": "financial manager",
         "context_file": "contexts/Budget_Agent.json",
         "description": (
-            "Manages financial eligibility, cost estimation, and margin analysis for Nexus Engineering S.r.l. tender responses. "
+            "Manages financial eligibility, cost estimation, and margin analysis for {company} tender responses. "
             "Knows the company's financials, active project budgets, daily rates, overhead, cash position, "
             "tender eligibility thresholds, and cost sensitivity parameters as of 2024."
         ),
@@ -233,7 +233,7 @@ AGENT_REGISTRY = {
         "role": "AI and innovation lead",
         "context_file": "contexts/Ai_Agent.json",
         "description":(
-            "Designs the AI components and innovation strategy for Nexus Engineering S.r.l. tender responses. "
+            "Designs the AI components and innovation strategy for {company} tender responses. "
             "Knows the company's LLM stack, RAG capabilities, fine-tuning methods, explainability tools, "
             "performance benchmarks, past AI use cases, and known trade-offs as of 2024."
         ),
@@ -243,15 +243,22 @@ AGENT_REGISTRY = {
         "role": "CSR and sustainability officer",
         "context_file": "contexts/Rse_Agent.json",
         "description":(
-            "Manages the CSR and sustainability posture for Nexus Engineering S.r.l. tender responses. "
+            "Manages the CSR and sustainability posture for {company} tender responses. "
             "Knows the company's EcoVadis rating, carbon footprint, green hosting partners, digital sobriety practices, "
             "social commitments, AI ethics principles, and known sustainability trade-offs as of 2024."
         ),
     },
 }
 
+def _get_company_name(base_dir: str) -> str:
+    coord_file = os.path.join(base_dir, "contexts", "Coordinator_Agent.json")
+    try:
+        with open(coord_file, "r", encoding="utf-8") as f:
+            return json.load(f).get("company", "the company")
+    except (FileNotFoundError, KeyError, json.JSONDecodeError):
+        return "the company"
 
-def create_agent(agent_type: str, model: str, base_dir: str = "") -> Agent:
+def create_agent(agent_type: str, model: str, base_dir: str = "", company: str = "the company") -> Agent:
     if agent_type not in AGENT_REGISTRY:
         raise ValueError(
             f"Unknown agent type: {agent_type!r}. "
@@ -263,10 +270,11 @@ def create_agent(agent_type: str, model: str, base_dir: str = "") -> Agent:
         name=cfg["name"],
         role=cfg["role"],
         context_file=context_file,
-        description=cfg["description"],
+        description=cfg["description"].format(company=company),
         model=model,
     )
 
 
 def create_all_agents(model: str, base_dir: str = "") -> list:
-    return [create_agent(key, model, base_dir) for key in AGENT_REGISTRY]
+    company = _get_company_name(base_dir) if base_dir else "the company"
+    return [create_agent(key, model, base_dir, company) for key in AGENT_REGISTRY]
