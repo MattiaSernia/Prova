@@ -36,13 +36,15 @@
   ],
   "architecture_and_integration_capabilities": {
     "api_design": "API-first (REST + webhook); documented APIs, can be embedded in existing work environments",
-    "health_interoperability": {
-      "fhir_hl7_connector": "Production for the main resources, with extended resource coverage on the roadmap",
-      "ins_support": true,
-      "framework_alignment": "Ségur / Mon espace santé–DMP",
-      "delivery_partner": "Ligeo Santé"
+    "business_tool_integration": {
+      "connectors_and_adapters": [
+        "Accounting-production and payroll software",
+        "Document-management systems (GED)",
+        "Electronic-invoicing / dematerialisation environment"
+      ],
+      "delivery_partner": "Ligeo Conseil"
     },
-    "sih_dpi_integration": "Standard connectors and, where needed, custom adapters",
+    "structured_extraction": "Figures and references extracted from documents are linked back to their source passage",
     "identity": {
       "sso": ["SAML", "OIDC"],
       "user_directories": ["LDAP", "Entra ID"]
@@ -50,22 +52,20 @@
   },
   "performance": {
     "median_latency_s": 1.3,
-    "common_queries_p95_latency_s_below": 2.0,
-    "complex_multisource_queries_p95_latency_s_below": 2.5,
-    "scope": "Measured on comparable deployments on the sovereign HDS tier; common single-document queries are below 2 seconds at p95; complex multi-source synthesis queries may reach up to 2.5 seconds at p95",
-    "throughput": "Scales horizontally with additional inference capacity"
+    "p95_latency_s_below": 2.5,
+    "scope": "Common queries on comparable deployments, depending on the model option and the hosting tier",
+    "throughput": "Scales horizontally; capacity can be sized for seasonal peak loads (closing periods, tax campaigns)"
   },
   "hosting_options": [
     {
-      "tier": "Sovereign HDS tier",
+      "tier": "Sovereign tier",
       "provider": "OuraneCloud",
       "characteristics": [
         "SecNumCloud-qualified",
-        "HDS-certified",
         "EU-only",
         "Renewable-powered"
       ],
-      "notes": "Reference tier for health data"
+      "notes": "Reference tier for confidential financial data"
     },
     {
       "tier": "High-availability premium tier",
@@ -73,18 +73,18 @@
         "Additional redundancy",
         "Dedicated inference capacity"
       ],
-      "notes": "Stricter SLA and higher throughput, at higher cost and higher energy use"
+      "notes": "Higher throughput and peak resilience, at higher cost and higher energy use"
     },
     {
       "tier": "On-premise / hybrid",
-      "notes": "Deployment within the client's own datacentre, where the client provides the infrastructure"
+      "notes": "Deployment within the firm's own infrastructure, where client data does not leave the firm's premises"
     }
   ],
   "availability_and_operations": {
     "redundancy": "Active-active across two availability zones",
-    "availability_target_pct": 99.9,
-    "operation": "24/7",
+    "availability": "High availability during business hours and resilience to peak loads",
     "condition": "On the appropriate hosting tier",
-    "built_in": ["Monitoring", "Logging", "Observability"]
+    "built_in": ["Monitoring", "Logging", "Observability"],
+    "access_control": "Can be strictly partitioned and audited per client file"
   }
 }

@@ -4,119 +4,119 @@
     "constraintType": "Regulatory",
     "subject": "holder",
     "predicate": "must guarantee strict compliance with",
-    "object": "GDPR"
+    "object": "GDPR for client and employee data"
   },
   {
     "id": "CON-02",
     "constraintType": "Regulatory",
     "subject": "holder",
-    "predicate": "must process",
-    "object": "health data as special-category data (GDPR Art. 9)"
+    "predicate": "must preserve",
+    "object": "professional secrecy (secret professionnel)"
   },
   {
     "id": "CON-03",
-    "constraintType": "Regulatory",
-    "subject": "holder",
-    "predicate": "must preserve",
-    "object": "medical confidentiality (secret médical)"
-  },
-  {
-    "id": "CON-04",
     "constraintType": "Sovereignty",
     "subject": "data",
     "predicate": "must be hosted exclusively within",
     "object": "the European Union, with no transfer outside the EU authorized"
   },
   {
+    "id": "CON-04",
+    "constraintType": "Regulatory",
+    "subject": "no decision or sign-off",
+    "predicate": "shall be automated without",
+    "object": "validation by a qualified professional"
+  },
+  {
     "id": "CON-05",
     "constraintType": "Regulatory",
-    "subject": "no clinical or medico-administrative decision",
-    "predicate": "shall be automated without",
-    "object": "explicit validation by a qualified professional"
+    "subject": "outputs",
+    "predicate": "must be",
+    "object": "explainable and auditable a posteriori (audit trail)"
   },
   {
     "id": "CON-06",
     "constraintType": "Regulatory",
-    "subject": "outputs",
-    "predicate": "must be",
-    "object": "explainable and auditable a posteriori (HAS guidance)"
+    "subject": "solution",
+    "predicate": "must respect",
+    "object": "auditor independence and separation of duties for statutory-audit (CAC) missions"
   },
   {
     "id": "CON-07",
     "constraintType": "Regulatory",
     "subject": "solution",
-    "predicate": "must be positioned as",
-    "object": "non-decisional, avoiding medical-device (CE/MDR) qualification or explicitly addressing it"
+    "predicate": "must not undermine",
+    "object": "anti-money-laundering obligations (LCB-FT)"
   },
   {
     "id": "CON-08",
     "constraintType": "Regulatory",
-    "subject": "hosting infrastructure",
-    "predicate": "must hold",
-    "object": "HDS (Hébergeur de Données de Santé) certification"
+    "subject": "holder",
+    "predicate": "must comply with",
+    "object": "legal retention and archival obligations for accounting documents"
   },
   {
     "id": "CON-09",
+    "constraintType": "Technical",
+    "subject": "client files",
+    "predicate": "must be strictly partitioned with",
+    "object": "no cross-client data leakage"
+  },
+  {
+    "id": "CON-10",
     "constraintType": "Technical",
     "subject": "sensitive data",
     "predicate": "must be protected with",
     "object": "encryption and pseudonymisation where relevant"
   },
   {
-    "id": "CON-10",
+    "id": "CON-11",
     "constraintType": "Sovereignty",
     "subject": "hosting",
     "predicate": "must be realized on",
     "object": "infrastructure of SecNumCloud type or equivalent"
   },
   {
-    "id": "CON-11",
+    "id": "CON-12",
     "constraintType": "Sovereignty",
     "subject": "solution",
     "predicate": "must minimise",
     "object": "dependency on non-European suppliers"
   },
   {
-    "id": "CON-12",
+    "id": "CON-13",
     "constraintType": "Technical",
     "subject": "response time",
     "predicate": "must be lower than",
     "object": "2 seconds for common queries"
   },
   {
-    "id": "CON-13",
-    "constraintType": "Technical",
-    "subject": "solution",
-    "predicate": "must guarantee availability of",
-    "object": "99.9%, including 24/7"
-  },
-  {
     "id": "CON-14",
     "constraintType": "Technical",
     "subject": "solution",
-    "predicate": "must integrate with",
-    "object": "the hospital information system (SIH) and the electronic patient record (DPI)"
+    "predicate": "must sustain",
+    "object": "performance during seasonal peaks and high availability during business hours"
   },
   {
     "id": "CON-15",
     "constraintType": "Technical",
     "subject": "solution",
-    "predicate": "must support",
-    "object": "HL7 / FHIR interoperability standards"
+    "predicate": "must integrate with",
+    "object": "accounting-production and payroll software"
   },
   {
     "id": "CON-16",
     "constraintType": "Technical",
     "subject": "solution",
-    "predicate": "must support",
-    "object": "the national health identifier (INS)"
+    "predicate": "must integrate with",
+    "object": "document management (GED)"
   },
   {
     "id": "CON-17",
     "constraintType": "Technical",
     "subject": "solution",
-    "predicate": "must comply with",
-    "object": "the Ségur / Mon espace santé–DMP framework"
+    "predicate": "must integrate with",
+    "object": "the e-invoicing / dematerialisation environment"
   },
   {
     "id": "CON-18",
@@ -130,14 +130,14 @@
     "constraintType": "Technical",
     "subject": "solution",
     "predicate": "must integrate with",
-    "object": "user directories"
+    "object": "the user directory (SSO)"
   },
   {
     "id": "CON-20",
     "constraintType": "Budgetary",
     "subject": "global budget",
     "predicate": "is limited to",
-    "object": "900,000 euros over 5 years"
+    "object": "220,000 euros over 3 years"
   },
   {
     "id": "CON-21",
@@ -159,5 +159,26 @@
     "subject": "solution",
     "predicate": "must rely on",
     "object": "low-carbon infrastructure as far as possible"
+  },
+  {
+    "id": "CON-24",
+    "constraintType": "Temporal",
+    "subject": "project",
+    "predicate": "must be conducted with",
+    "object": "progressive deployment (pilot then generalisation)"
+  },
+  {
+    "id": "CON-25",
+    "constraintType": "",
+    "subject": "holder",
+    "predicate": "must provide",
+    "object": "change management and training"
+  },
+  {
+    "id": "CON-26",
+    "constraintType": "Temporal",
+    "subject": "pilot",
+    "predicate": "should be operational before",
+    "object": "the next closing / tax campaign"
   }
 ]
