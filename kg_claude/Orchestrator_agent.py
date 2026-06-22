@@ -227,16 +227,23 @@ class Orchestrator_Agent:
                 together they can produce a complete bid response.
 
                 ### How to build each question:
-                1. Identify which requirements and constraints from the KG are relevant to that agent's domain.
-                2. Cross-reference with the tender text to capture any additional figures, context or nuance.
-                3. Extract and include the specific requirements, figures, constraints and deadlines
-                that this agent needs to know.
-                4. End with a precise, answerable question about our company's capabilities or risks.
+                1. List every requirement (ex:Requirement) and every constraint (ex:Constraint) in the KG.
+                2. Assign each one to the most appropriate agent based on its domain.
+                3. For each agent, write a self-contained question that quotes verbatim every requirement
+                and constraint assigned to it — copy names, standards, source types, figures and deadlines
+                exactly as they appear in the KG and the tender text, without paraphrasing them away.
+                4. End with a precise, answerable question about our company's capabilities or risks
+                relative to those specific items.
 
                 ### Rules:
                 - Respond ONLY with a valid JSON object.
                 - Keys must be agent names from the list above (use only agents relevant to this tender).
                 - Values must be specific, self-contained questions derived from both sources.
+                - COVERAGE: every requirement and every constraint from the KG must appear verbatim in
+                at least one agent's question. Do not silently drop or summarise away any KG node.
+                - When a node names a specific standard, source type, domain obligation, certification or
+                technical specification, copy it exactly into the question — do not replace it with a
+                generic description.
                 - Each question MUST quote the exact figures and constraints
                 (budget amounts, SLA targets, regulatory frameworks, technical specs, deadlines).
                 - Do not include any explanation, markdown, or extra text — raw JSON only.
@@ -257,7 +264,7 @@ class Orchestrator_Agent:
                 {{
                     "TechnicalArchitect Agent": "The client requires: response time below 2 seconds, [EXACT AVAILABILITY TARGET, including any 24/7 or off-hours constraint stated in the tender], API integration with the client's existing information systems and user directories, hosting on sovereign infrastructure certified to the level required by the tender within the EU, and no dependency on non-European suppliers. For each requirement state whether it is FULLY COVERED, PARTIALLY COVERED or NOT COVERED by our current stack, and describe the proposed architecture.",
                     "Budget Agent": "The client's global budget is [EXACT AMOUNT AND DURATION FROM TENDER]. Annual operating costs must remain controlled and compatible with the client's capacity. The tender requires [DEPLOYMENT STRUCTURE FROM TENDER]. Given our pricing model and current financial position, what is our projected margin, and what cost-optimisation strategies can we propose?",
-                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only data hosting, no transfer outside EU, encryption and pseudonymisation of sensitive data where applicable). All AI outputs must be explainable and auditable a posteriori. No decision may be automated without explicit validation by an authorised professional. [INCLUDE ANY SECTOR-SPECIFIC REGULATORY OBLIGATIONS EXTRACTED FROM THE TENDER.] What legal risks should we flag, and are we compliant?"
+                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only data hosting, no transfer outside EU, encryption and pseudonymisation of sensitive data where applicable). All AI outputs must be explainable and auditable a posteriori. No decision may be automated without explicit validation by an authorised professional. [COPY HERE EVERY SECTOR-SPECIFIC REGULATORY OBLIGATION NAMED IN THE KG OR THE TENDER, VERBATIM.] What legal risks should we flag, and are we compliant?"
                 }}"""
             if no_text:
                 user_content = f"=== CALL FOR TENDERS KNOWLEDGE GRAPH ===\n\n{kg_context}"
@@ -285,15 +292,23 @@ class Orchestrator_Agent:
                 to the relevant agents so that together they can produce a complete bid response.
 
                 ### How to build each question:
-                1. Identify which sections of the tender are relevant to that agent's domain.
-                2. Extract and paste the specific requirements, numbers, constraints and deadlines
-                that this agent needs to know.
-                3. End with a precise, answerable question about our company's capabilities or risks.
+                1. Read the entire tender and list every distinct requirement and constraint it contains.
+                2. Assign each one to the most appropriate agent based on its domain.
+                3. For each agent, write a self-contained question that quotes verbatim every requirement
+                and constraint assigned to it — copy names, standards, source types, figures and deadlines
+                exactly as they appear in the tender, without paraphrasing them away.
+                4. End with a precise, answerable question about our company's capabilities or risks
+                relative to those specific items.
 
                 ### Rules:
                 - Respond ONLY with a valid JSON object.
                 - Keys must be agent names from the list above (use only agents relevant to this tender).
                 - Values must be specific, self-contained questions derived from the Call for Tenders text.
+                - COVERAGE: every requirement and every constraint from the tender must appear verbatim in
+                at least one agent's question. Do not silently drop or summarise away any item.
+                - When an item names a specific standard, source type, domain obligation, certification or
+                technical specification, copy it exactly into the question — do not replace it with a
+                generic description.
                 - Each question MUST quote the exact figures and constraints from the tender
                 (budget amounts, SLA targets, regulatory frameworks, technical specs, deadlines).
                 - Do not include any explanation, markdown, or extra text — raw JSON only.
@@ -314,7 +329,7 @@ class Orchestrator_Agent:
                 {{
                     "TechnicalArchitect Agent": "The client requires: response time below 2 seconds, [EXACT AVAILABILITY TARGET, including any 24/7 or off-hours constraint stated in the tender], API integration with the client's existing information systems and user directories, hosting on sovereign infrastructure certified to the level required by the tender within the EU, and no dependency on non-European suppliers. For each requirement state whether it is FULLY COVERED, PARTIALLY COVERED or NOT COVERED by our current stack, and describe the proposed architecture.",
                     "Budget Agent": "The client's global budget is [EXACT AMOUNT AND DURATION FROM TENDER]. Annual operating costs must remain controlled and compatible with the client's capacity. The tender requires [DEPLOYMENT STRUCTURE FROM TENDER]. Given our pricing model and current financial position, what is our projected margin, and what cost-optimisation strategies can we propose?",
-                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only data hosting, no transfer outside EU, encryption and pseudonymisation of sensitive data where applicable). All AI outputs must be explainable and auditable a posteriori. No decision may be automated without explicit validation by an authorised professional. [INCLUDE ANY SECTOR-SPECIFIC REGULATORY OBLIGATIONS EXTRACTED FROM THE TENDER.] What legal risks should we flag, and are we compliant?"
+                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only data hosting, no transfer outside EU, encryption and pseudonymisation of sensitive data where applicable). All AI outputs must be explainable and auditable a posteriori. No decision may be automated without explicit validation by an authorised professional. [COPY HERE EVERY SECTOR-SPECIFIC REGULATORY OBLIGATION NAMED IN THE TENDER, VERBATIM.] What legal risks should we flag, and are we compliant?"
                 }}"""
             user_content = f"Call for Tenders:\n\n{task}"
 
