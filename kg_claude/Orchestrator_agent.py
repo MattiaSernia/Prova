@@ -250,14 +250,14 @@ class Orchestrator_Agent:
 
                 ### GOOD example (agent has everything it needs to answer):
                 {{
-                    "Budget Agent": "The client's global budget is 3 million EUR over 4 years. Annual operating costs must remain controlled. The tender requires a pilot phase followed by progressive rollout. Given our pricing model and current financial position, what is our projected margin on this contract, and are there cost-optimization strategies we can propose?"
+                    "Budget Agent": "The client's global budget is [EXACT AMOUNT AND DURATION FROM TENDER]. Annual operating costs must remain controlled and compatible with the client's budgetary capacity. The tender requires a pilot phase followed by progressive rollout. Given our pricing model and current financial position, what is our projected margin on this contract, and are there cost-optimisation strategies we can propose?"
                 }}
 
                 Full example format:
                 {{
-                    "Technical Architect Agent": "The client requires: response time < 2 seconds, 99.9% availability, API integration with civil-status and town-planning software, EDM and user directories. Hosting must be on SecNumCloud-certified infrastructure within the EU. No dependency on non-European suppliers. Can our current stack meet these requirements, and what architecture do you propose?",
-                    "Budget Agent": "The total contract value is 3M EUR over 4 years. Annual exploitation costs must stay within municipal budget capacity. The client expects cost optimisation without sacrificing quality. Are we financially eligible to bid, and what is the projected margin?",
-                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only hosting, no data transfer outside EU, encryption of sensitive data). All AI recommendations must be explainable post-hoc. No automated decision is allowed without explicit agent validation. What legal risks should we flag, and are we compliant?"
+                    "TechnicalArchitect Agent": "The client requires: response time below 2 seconds, [EXACT AVAILABILITY TARGET, including any 24/7 or off-hours constraint stated in the tender], API integration with the client's existing information systems and user directories, hosting on sovereign infrastructure certified to the level required by the tender within the EU, and no dependency on non-European suppliers. For each requirement state whether it is FULLY COVERED, PARTIALLY COVERED or NOT COVERED by our current stack, and describe the proposed architecture.",
+                    "Budget Agent": "The client's global budget is [EXACT AMOUNT AND DURATION FROM TENDER]. Annual operating costs must remain controlled and compatible with the client's capacity. The tender requires [DEPLOYMENT STRUCTURE FROM TENDER]. Given our pricing model and current financial position, what is our projected margin, and what cost-optimisation strategies can we propose?",
+                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only data hosting, no transfer outside EU, encryption and pseudonymisation of sensitive data where applicable). All AI outputs must be explainable and auditable a posteriori. No decision may be automated without explicit validation by an authorised professional. [INCLUDE ANY SECTOR-SPECIFIC REGULATORY OBLIGATIONS EXTRACTED FROM THE TENDER.] What legal risks should we flag, and are we compliant?"
                 }}"""
             if no_text:
                 user_content = f"=== CALL FOR TENDERS KNOWLEDGE GRAPH ===\n\n{kg_context}"
@@ -307,14 +307,14 @@ class Orchestrator_Agent:
 
                 ### GOOD example (agent has everything it needs to answer):
                 {{
-                    "Budget Agent": "The client's global budget is 3 million EUR over 4 years. Annual operating costs must remain controlled. The tender requires a pilot phase followed by progressive rollout. Given our pricing model and current financial position, what is our projected margin on this contract, and are there cost-optimization strategies we can propose?"
+                    "Budget Agent": "The client's global budget is [EXACT AMOUNT AND DURATION FROM TENDER]. Annual operating costs must remain controlled and compatible with the client's budgetary capacity. The tender requires a pilot phase followed by progressive rollout. Given our pricing model and current financial position, what is our projected margin on this contract, and are there cost-optimisation strategies we can propose?"
                 }}
 
                 Full example format:
                 {{
-                    "Technical Architect Agent": "The client requires: response time < 2 seconds, 99.9% availability, API integration with civil-status and town-planning software, EDM and user directories. Hosting must be on SecNumCloud-certified infrastructure within the EU. No dependency on non-European suppliers. Can our current stack meet these requirements, and what architecture do you propose?",
-                    "Budget Agent": "The total contract value is 3M EUR over 4 years. Annual exploitation costs must stay within municipal budget capacity. The client expects cost optimisation without sacrificing quality. Are we financially eligible to bid, and what is the projected margin?",
-                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only hosting, no data transfer outside EU, encryption of sensitive data). All AI recommendations must be explainable post-hoc. No automated decision is allowed without explicit agent validation. What legal risks should we flag, and are we compliant?"
+                    "TechnicalArchitect Agent": "The client requires: response time below 2 seconds, [EXACT AVAILABILITY TARGET, including any 24/7 or off-hours constraint stated in the tender], API integration with the client's existing information systems and user directories, hosting on sovereign infrastructure certified to the level required by the tender within the EU, and no dependency on non-European suppliers. For each requirement state whether it is FULLY COVERED, PARTIALLY COVERED or NOT COVERED by our current stack, and describe the proposed architecture.",
+                    "Budget Agent": "The client's global budget is [EXACT AMOUNT AND DURATION FROM TENDER]. Annual operating costs must remain controlled and compatible with the client's capacity. The tender requires [DEPLOYMENT STRUCTURE FROM TENDER]. Given our pricing model and current financial position, what is our projected margin, and what cost-optimisation strategies can we propose?",
+                    "Legal Agent": "The tender requires strict GDPR compliance (EU-only data hosting, no transfer outside EU, encryption and pseudonymisation of sensitive data where applicable). All AI outputs must be explainable and auditable a posteriori. No decision may be automated without explicit validation by an authorised professional. [INCLUDE ANY SECTOR-SPECIFIC REGULATORY OBLIGATIONS EXTRACTED FROM THE TENDER.] What legal risks should we flag, and are we compliant?"
                 }}"""
             user_content = f"Call for Tenders:\n\n{task}"
 
