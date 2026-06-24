@@ -38,8 +38,10 @@ def _setup_output_dir(cft: str, mode_folder: str, format_folder: str, text_folde
 from agent import create_all_agents
 from Orchestrator_agent import Orchestrator_Agent
 from mxg import Message
+from utils import token_counter
 
 import argparse
+import json
 import validation.Validation as va
 
 
@@ -91,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-text", action="store_true")
     parser.add_argument(
         "--kg-format",
-        choices=["json", "turtle-light"],
+        choices=["json", "turtle-light", "yaml-ld"],
         default="turtle-light",
     )
     parser.add_argument(
@@ -109,7 +111,12 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    fmt = "TURTLE" if args.kg_format == "turtle-light" else "JSON"
+    if args.kg_format == "turtle-light":
+        fmt = "TURTLE"
+    elif args.kg_format == "yaml-ld":
+        fmt = "YAML_LD"
+    else:
+        fmt = "JSON"
 
     if args.c_null:
         use_kg, kg_agents, cft_agents, triplets_in_proposal = False, False, False, False
@@ -145,8 +152,14 @@ if __name__ == "__main__":
     single_val_file = os.path.join(out_dir, single_val_base)
     val_file        = os.path.join(out_dir, single_val_base.replace("single_", ""))
 
+    token_counter.reset()
     val        = va.Validation("llama3.3:70b", 0)
     agent_list = create_all_agents('llama3.3:70b', CFT_DIR)
     Orchestrator = Orchestrator_Agent(agent_list, 'llama3.3:70b', graph_name, args.chunk_dimension, args.extractor, args.kg_format, args.no_schema)
     question = load_question(CFT_DIR)
     _run_pipeline(Orchestrator, agent_list, question, use_kg, kg_agents, cft_agents, triplets_in_proposal, args.no_text, val_file, single_val_file, val)
+
+    tokens_file = os.path.join(out_dir, "tokens.json")
+    with open(tokens_file, "w", encoding="utf-8") as f:
+        json.dump(token_counter.to_dict(), f, indent=2)
+    logging.info(f"Token usage saved to {tokens_file}")

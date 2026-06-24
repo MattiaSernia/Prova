@@ -1,5 +1,6 @@
 import logging
 import json
+import yaml
 from agent import Agent
 from custom_graph import Custom_Graph
 from rdflib import Namespace
@@ -172,6 +173,97 @@ class Orchestrator_Agent:
 
         return "\n".join(lines)
 
+    def _get_kg_yaml_ld(self) -> str:
+        EX   = Namespace("http://example.org/ontologia#")
+        EDGE = "http://example.org/edge/"
+        ds   = self._cgraph._ds
+
+        def local(uri):
+            s = str(uri)
+            return s.rsplit("#", 1)[-1] if "#" in s else s.rsplit("/", 1)[-1]
+
+        context = {
+            "ex":   "http://example.org/ontologia#",
+            "rdf":  "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "node": "http://example.org/node/",
+            "edge": "http://example.org/edge/",
+            "req":  "http://example.org/requirement/",
+            "con":  "http://example.org/constraint/",
+        }
+        graph = []
+
+        for subj in ds.subjects(RDF.type, EX.Requirement):
+            node = {"@id": f"req:{local(subj)}", "@type": "ex:Requirement"}
+            s_uri = next(ds.objects(subj, RDF.subject), None)
+            if s_uri:
+                node["rdf:subject"] = {"@id": f"node:{local(s_uri)}"}
+            for p, o in ds.predicate_objects(subj):
+                if str(p).startswith(EDGE):
+                    node[f"edge:{local(p)}"] = {"@id": f"node:{local(o)}"}
+            pri_uri = next(ds.objects(subj, EX.priority), None)
+            if pri_uri:
+                node["ex:priority"] = {"@id": f"ex:{local(pri_uri)}"}
+            cat_uri = next(ds.objects(subj, EX.category), None)
+            if cat_uri:
+                node["ex:category"] = {"@id": f"ex:{local(cat_uri)}"}
+            graph.append(node)
+
+        for subj in ds.subjects(RDF.type, EX.Constraint):
+            node = {"@id": f"con:{local(subj)}", "@type": "ex:Constraint"}
+            s_uri = next(ds.objects(subj, RDF.subject), None)
+            if s_uri:
+                node["rdf:subject"] = {"@id": f"node:{local(s_uri)}"}
+            for p, o in ds.predicate_objects(subj):
+                if str(p).startswith(EDGE):
+                    node[f"edge:{local(p)}"] = {"@id": f"node:{local(o)}"}
+            ct_uri = next(ds.objects(subj, EX.constraintType), None)
+            if ct_uri:
+                node["ex:constraintType"] = {"@id": f"ex:{local(ct_uri)}"}
+            graph.append(node)
+
+        doc = {"@context": context, "@graph": graph}
+        return yaml.dump(doc, allow_unicode=True, default_flow_style=False, sort_keys=True)
+
+    def _get_triplets_yaml_ld(self) -> str:
+        EX   = Namespace("http://example.org/ontologia#")
+        EDGE = "http://example.org/edge/"
+        ds   = self._cgraph._ds
+
+        def local(uri):
+            s = str(uri)
+            return s.rsplit("#", 1)[-1] if "#" in s else s.rsplit("/", 1)[-1]
+
+        context = {
+            "ex":   "http://example.org/ontologia#",
+            "rdf":  "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+            "node": "http://example.org/node/",
+            "edge": "http://example.org/edge/",
+            "tri":  "http://example.org/triplet/",
+        }
+        graph = []
+
+        for subj in ds.subjects(RDF.type, EX.Triplet):
+            node = {"@id": f"tri:{local(subj)}", "@type": "ex:Triplet"}
+            s_uri = next(ds.objects(subj, RDF.subject), None)
+            if s_uri:
+                node["rdf:subject"] = {"@id": f"node:{local(s_uri)}"}
+            for p, o in ds.predicate_objects(subj):
+                if str(p).startswith(EDGE):
+                    node[f"edge:{local(p)}"] = {"@id": f"node:{local(o)}"}
+            for _, _, _, ctx in ds.quads((subj, RDF.type, EX.Triplet, None)):
+                chunk_uri = next(ds.objects(ctx.identifier, PROV.wasDerivedFrom), None)
+                if chunk_uri:
+                    msg_uri = next(ds.objects(chunk_uri, PROV.wasDerivedFrom), None)
+                    if msg_uri:
+                        agent_uri = next(ds.objects(msg_uri, PROV.wasAttributedTo), None)
+                        if agent_uri:
+                            node["ex:extractedBy"] = {"@id": f"node:{local(agent_uri)}"}
+                break
+            graph.append(node)
+
+        doc = {"@context": context, "@graph": graph}
+        return yaml.dump(doc, allow_unicode=True, default_flow_style=False, sort_keys=True)
+
     def get_kg_context(self) -> str:
         if self._kg_format == "json":
             return (
@@ -181,6 +273,12 @@ class Orchestrator_Agent:
                 "=== CONSTRAINTS (JSON) ===\n"
                 f"{self._get_constraints_text()}\n"
                 "=== END CONSTRAINTS ==="
+            )
+        if self._kg_format == "yaml-ld":
+            return (
+                "=== KNOWLEDGE GRAPH (YAML-LD) ===\n"
+                f"{self._get_kg_yaml_ld()}\n"
+                "=== END KNOWLEDGE GRAPH ==="
             )
         return (
             "=== KNOWLEDGE GRAPH (Turtle Light) ===\n"
@@ -215,7 +313,7 @@ class Orchestrator_Agent:
                 ### Your role:
                 The user will provide you with two complementary sources:
                 1. A structured Knowledge Graph (KG) extracted from the Call for Tenders, serialized in
-                   {"Turtle Light format (simplified Turtle: no prefix declarations, subject-factorised, one line per subject)" if self._kg_format == "turtle-light" else "JSON format"}.
+                   {"Turtle Light format (simplified Turtle: no prefix declarations, subject-factorised, one line per subject)" if self._kg_format == "turtle-light" else "YAML-LD format (JSON-LD expressed in YAML syntax, using @context for namespace prefixes and @graph for nodes)" if self._kg_format == "yaml-ld" else "JSON format"}.
                    It contains two types of nodes:
                    - ex:Requirement — high-level business needs and goals the client wants to achieve.
                    - ex:Constraint  — conditions, limits and rules under which the solution must operate
@@ -399,7 +497,12 @@ Rules (no exceptions):
         triplets_section = ""
         kg_section = ""
         if use_triplets:
-            triplets_content = self._get_triplets_json() if self._kg_format == "json" else self._get_triplets_text()
+            if self._kg_format == "json":
+                triplets_content = self._get_triplets_json()
+            elif self._kg_format == "yaml-ld":
+                triplets_content = self._get_triplets_yaml_ld()
+            else:
+                triplets_content = self._get_triplets_text()
             triplets_section = f"\n\n=== TRIPLETS EXTRACTED FROM AGENT CONVERSATIONS ===\n{triplets_content}\n=== END TRIPLETS ==="
             kg_section = (
                 f"\n\n=== REQUIREMENTS AND CONSTRAINTS — address and respect each one ===\n"
