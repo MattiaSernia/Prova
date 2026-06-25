@@ -1,3 +1,6 @@
+#!/bin/bash
+export OLLAMA_MAX_LOADED_MODELS=2
+
 python3 main.py --cft belval --c-oap --extractor phi4 --kg-format json
 python3 main.py --cft belval --c-oap --extractor phi4 --kg-format json --no-text
 python3 main.py --cft belval --c-oap --extractor phi4 --kg-format turtle-light
