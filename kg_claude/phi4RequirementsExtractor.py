@@ -25,18 +25,20 @@ class Phi4RequirementsExtractor:
         ],
         "priority_values": ["MUST", "SHOULD", "MAY"],
         "category_values": [
-            "Digital Transformation", "Agent Assistance", "Information Access",
-            "Drafting", "Collaboration", "Service Management", "Compliance",
-            "Sustainability", "HR", "Finance", "Procurement"
+            "Healthcare", "Finance", "Transport", "Manufacturing",
+            "Construction", "Digital Transformation", "Service Management",
+            "Compliance", "Sustainability", "HR", "Procurement", "Security"
         ]
     })
 
     _EXAMPLE = (
-        'Text: "The hospital seeks to reduce waiting times for patients in emergency departments. '
-        'The solution should allow field inspectors to submit reports directly from mobile devices."\n'
+        'Text: "The transport authority seeks to reduce average journey times on metropolitan lines. '
+        'The organisation wants to automate invoice processing and free up staff for higher-value tasks. '
+        'The solution should allow maintenance technicians to submit intervention reports directly from mobile devices."\n'
         'Output: ['
-        '{"subject": "hospital", "predicate": "reduce", "object": "waiting times for patients in emergency departments", "priority": "MUST", "category": "Healthcare"}, '
-        '{"subject": "field inspectors", "predicate": "submit", "object": "reports directly from mobile devices", "priority": "SHOULD", "category": "Field Operations"}'
+        '{"subject": "transport authority", "predicate": "reduce", "object": "average journey times on metropolitan lines", "priority": "MUST", "category": "Transport"}, '
+        '{"subject": "organisation", "predicate": "automate", "object": "invoice processing", "priority": null, "category": "Finance"}, '
+        '{"subject": "maintenance technicians", "predicate": "submit", "object": "intervention reports directly from mobile devices", "priority": "SHOULD", "category": "Manufacturing"}'
         ']'
     )
 

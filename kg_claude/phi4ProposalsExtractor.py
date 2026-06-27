@@ -27,11 +27,13 @@ class Phi4ProposalsExtractor:
 
     _EXAMPLE = (
         'Text: "Our platform guarantees 99.95% uptime and includes automatic failover. '
-        'We will deploy a containerised architecture on ISO 27001-certified cloud infrastructure."\n'
+        'We will deploy a containerised architecture on ISO 27001-certified cloud infrastructure. '
+        'The consortium commits to completing all on-site maintenance interventions within 48 hours of notification."\n'
         'Output: ['
         '{"subject": "our platform", "predicate": "guarantees", "object": "99.95% uptime"}, '
         '{"subject": "our platform", "predicate": "includes", "object": "automatic failover"}, '
-        '{"subject": "the consortium", "predicate": "will deploy", "object": "a containerised architecture on ISO 27001-certified cloud infrastructure"}'
+        '{"subject": "the consortium", "predicate": "will deploy", "object": "a containerised architecture on ISO 27001-certified cloud infrastructure"}, '
+        '{"subject": "the consortium", "predicate": "commits to complete", "object": "all on-site maintenance interventions within 48 hours of notification"}'
         ']'
     )
 

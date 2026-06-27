@@ -27,12 +27,13 @@ class Phi4TripletExtractor:
     })
 
     _EXAMPLE = (
-        'Text: "Nexus Engineering holds ISO 27001 certification and provides '
-        'cloud hosting on SecNumCloud infrastructure."\n'
-        'Output: [{"subject": "Nexus Engineering", "predicate": "holds", '
-        '"object": "ISO 27001 certification"}, '
-        '{"subject": "Nexus Engineering", "predicate": "provides", '
-        '"object": "cloud hosting on SecNumCloud infrastructure"}]'
+        'Text: "BuildCore SA holds an ISO 14001 environmental certification and employs 320 staff across four regional offices."\n'
+        'Output: [{"subject": "BuildCore SA", "predicate": "holds", "object": "ISO 14001 environmental certification"}, '
+        '{"subject": "BuildCore SA", "predicate": "employs", "object": "320 staff across four regional offices"}]\n\n'
+        'Text: "The logistics framework contract with FastFreight Group is valued at 1.8 million euros and has a submission deadline of 30 June 2025."\n'
+        'Output: [{"subject": "logistics framework contract", "predicate": "has_value", "object": "1.8 million euros"}, '
+        '{"subject": "logistics framework contract", "predicate": "has_deadline", "object": "30 June 2025"}, '
+        '{"subject": "logistics framework contract", "predicate": "involves", "object": "FastFreight Group"}]'
     )
 
     _OUTPUT_FORMAT = '[{"subject": "...", "predicate": "...", "object": "..."}]'

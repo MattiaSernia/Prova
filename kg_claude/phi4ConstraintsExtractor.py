@@ -30,11 +30,15 @@ class Phi4ConstraintsExtractor:
     })
 
     _EXAMPLE = (
-        'Text: "The total contract value shall not exceed 2.5 million dollars over five years. '
-        'All servers hosting citizen data must be located within the national territory."\n'
+        'Text: "The total contract value shall not exceed 2.5 million euros over three years. '
+        'All data must be processed exclusively on infrastructure located within the national territory. '
+        'The platform must achieve a minimum uptime of 99.5%. '
+        'The framework agreement will run for an initial period of two years, with the possibility of two one-year extensions."\n'
         'Output: ['
-        '{"subject": "total contract value", "predicate": "shall not exceed", "object": "2.5 million dollars over five years", "constraintType": "Budgetary"}, '
-        '{"subject": "servers hosting citizen data", "predicate": "must be located", "object": "within the national territory", "constraintType": "Sovereignty"}'
+        '{"subject": "total contract value", "predicate": "shall not exceed", "object": "2.5 million euros over three years", "constraintType": "Budgetary"}, '
+        '{"subject": "data", "predicate": "must be processed on", "object": "infrastructure located within the national territory", "constraintType": "Sovereignty"}, '
+        '{"subject": "platform", "predicate": "must achieve", "object": "minimum uptime of 99.5%", "constraintType": "Technical"}, '
+        '{"subject": "framework agreement", "predicate": "will run for", "object": "initial period of two years with two possible one-year extensions", "constraintType": "Temporal"}'
         ']'
     )
 
