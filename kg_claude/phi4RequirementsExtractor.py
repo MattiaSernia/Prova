@@ -25,20 +25,19 @@ class Phi4RequirementsExtractor:
         ],
         "priority_values": ["MUST", "SHOULD", "MAY"],
         "category_values": [
-            "Healthcare", "Finance", "Transport", "Manufacturing",
-            "Construction", "Digital Transformation", "Service Management",
-            "Compliance", "Sustainability", "HR", "Procurement", "Security"
+            "Staff Assistance", "Information Access", "Drafting", "File Handling",
+            "Collaboration", "Integration", "Explainability", "Service Quality",
+            "Efficiency", "Usability", "Deployment", "Change Management"
         ]
     })
 
     _EXAMPLE = (
-        'Text: "The transport authority seeks to reduce average journey times on metropolitan lines. '
-        'The organisation wants to automate invoice processing and free up staff for higher-value tasks. '
-        'The solution should allow maintenance technicians to submit intervention reports directly from mobile devices."\n'
+        'Text: "The organisation aims to reduce document processing times and provide staff with quick access to regulatory information from their workstation. '
+        'The solution should allow teams to share file context seamlessly when handing over work between colleagues."\n'
         'Output: ['
-        '{"subject": "transport authority", "predicate": "reduce", "object": "average journey times on metropolitan lines", "priority": "MUST", "category": "Transport"}, '
-        '{"subject": "organisation", "predicate": "automate", "object": "invoice processing", "priority": null, "category": "Finance"}, '
-        '{"subject": "maintenance technicians", "predicate": "submit", "object": "intervention reports directly from mobile devices", "priority": "SHOULD", "category": "Manufacturing"}'
+        '{"subject": "organisation", "predicate": "reduce", "object": "document processing times", "priority": "MUST", "category": "Efficiency"}, '
+        '{"subject": "staff", "predicate": "access", "object": "regulatory information from their workstation", "priority": "MUST", "category": "Information Access"}, '
+        '{"subject": "teams", "predicate": "share", "object": "file context when handing over work between colleagues", "priority": "SHOULD", "category": "Collaboration"}'
         ']'
     )
 
