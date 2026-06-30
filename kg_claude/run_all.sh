@@ -58,6 +58,6 @@ python3 main.py --cft cabinet --c-oap --extractor phi4 --kg-format yaml-ld --no-
 #python3 main.py --cft cabinet --c-oap --extractor llama --kg-format yaml-ld
 #python3 main.py --cft cabinet --c-oap --extractor llama --kg-format yaml-ld --no-text
 
-python3 main.py --cft cabinet --c-null
-python3 main.py --cft chrb --c-null
-python3 main.py --cft belval --c-null
+#python3 main.py --cft cabinet --c-null
+#python3 main.py --cft chrb --c-null
+#python3 main.py --cft belval --c-null
