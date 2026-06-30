@@ -27,13 +27,14 @@ class Phi4TripletExtractor:
     })
 
     _EXAMPLE = (
-        'Text: "BuildCore SA holds an ISO 14001 environmental certification and employs 320 staff across four regional offices."\n'
-        'Output: [{"subject": "BuildCore SA", "predicate": "holds", "object": "ISO 14001 environmental certification"}, '
-        '{"subject": "BuildCore SA", "predicate": "employs", "object": "320 staff across four regional offices"}]\n\n'
-        'Text: "The logistics framework contract with FastFreight Group is valued at 1.8 million euros and has a submission deadline of 30 June 2025."\n'
-        'Output: [{"subject": "logistics framework contract", "predicate": "has_value", "object": "1.8 million euros"}, '
-        '{"subject": "logistics framework contract", "predicate": "has_deadline", "object": "30 June 2025"}, '
-        '{"subject": "logistics framework contract", "predicate": "involves", "object": "FastFreight Group"}]'
+        'Text: "Nexus Engineering holds ISO 27001 certification and has 45 certified engineers available for the project. The total proposed cost is 850,000 euros over five years."\n'
+        'Output: [{"subject": "Nexus Engineering", "predicate": "holds", "object": "ISO 27001 certification"}, '
+        '{"subject": "Nexus Engineering", "predicate": "has_available_engineers", "object": "45 certified engineers"}, '
+        '{"subject": "proposed cost", "predicate": "is_valued_at", "object": "850,000 euros over five years"}]\n\n'
+        'Text: "The solution guarantees 99.9% uptime with automatic failover. All data is hosted within the EU on certified infrastructure. The pilot phase will be completed within four months of contract signature."\n'
+        'Output: [{"subject": "the solution", "predicate": "guarantees", "object": "99.9% uptime with automatic failover"}, '
+        '{"subject": "data", "predicate": "is_hosted_within", "object": "EU on certified infrastructure"}, '
+        '{"subject": "pilot phase", "predicate": "will_be_completed_within", "object": "four months of contract signature"}]'
     )
 
     _OUTPUT_FORMAT = '[{"subject": "...", "predicate": "...", "object": "..."}]'
