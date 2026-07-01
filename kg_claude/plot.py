@@ -158,6 +158,12 @@ filtered = sorted(
 if not filtered:
     raise SystemExit("No configurations match the selected filters.")
 
+# For group-average figures: include phi4 NO_SCHEMA alongside phi4 SCHEMA and llama
+filtered_avg = sorted(
+    [c for c in ALL_CONFIGS if matches_freeze(c, freeze)],
+    key=sort_key,
+)
+
 labels = []
 for cfg in filtered:
     parts = [DIM_SHORT[d][cfg_val(cfg, d)] for d in free if cfg_val(cfg, d) is not None]
@@ -179,6 +185,22 @@ for cfg in filtered:
         per_cft_completion[cft].append(completion if completion is not None else 0)
 
 
+per_cft_req_avg  = {cft: [] for cft in active_cfts}
+per_cft_con_avg  = {cft: [] for cft in active_cfts}
+per_cft_prompt_avg     = {cft: [] for cft in active_cfts}
+per_cft_completion_avg = {cft: [] for cft in active_cfts}
+
+for cfg in filtered_avg:
+    _, _, _, _, rel_path = cfg
+    for cft in active_cfts:
+        req, con = read_scores(rel_path, cft)
+        per_cft_req_avg[cft].append(req / CFT_META[cft]["total_req"] * 100 if req is not None else 0.0)
+        per_cft_con_avg[cft].append(con / CFT_META[cft]["total_con"] * 100 if con is not None else 0.0)
+        prompt, completion = read_tokens(rel_path, cft)
+        per_cft_prompt_avg[cft].append(prompt if prompt is not None else 0)
+        per_cft_completion_avg[cft].append(completion if completion is not None else 0)
+
+
 GROUPS = {}
 for dim in free:
     opts = {}
@@ -189,7 +211,30 @@ for dim in free:
     if len(opts) >= 2:
         GROUPS[dim] = opts
 
-n_groups   = len(GROUPS)
+# GROUPS_AVG: like GROUPS but uses filtered_avg and splits phi4 by schema when extractor is free
+GROUPS_AVG = {}
+for dim in free:
+    opts = {}
+    if dim == "extractor" and extractor_free:
+        phi4_s  = [i for i, c in enumerate(filtered_avg)
+                   if cfg_val(c, "extractor") == "phi4" and cfg_val(c, "schema") == "SCHEMA"]
+        phi4_ns = [i for i, c in enumerate(filtered_avg)
+                   if cfg_val(c, "extractor") == "phi4" and cfg_val(c, "schema") == "NO_SCHEMA"]
+        llama_i = [i for i, c in enumerate(filtered_avg)
+                   if cfg_val(c, "extractor") == "llama"]
+        if phi4_s:   opts["phi4/S"]  = phi4_s
+        if phi4_ns:  opts["phi4/NS"] = phi4_ns
+        if llama_i:  opts["llama"]   = llama_i
+    else:
+        for val in DIM_VALUES[dim]:
+            idxs = [i for i, c in enumerate(filtered_avg) if cfg_val(c, dim) == val]
+            if idxs:
+                opts[val] = idxs
+    if len(opts) >= 2:
+        GROUPS_AVG[dim] = opts
+
+n_groups     = len(GROUPS)
+n_groups_avg = len(GROUPS_AVG)
 n_cfts     = len(active_cfts)
 cft_label  = args.cft.upper() if args.cft else " + ".join(c.upper() for c in active_cfts)
 freeze_str = ", ".join(f"{d}={v}" for d, v in freeze.items()) if freeze else "no freeze"
@@ -244,22 +289,22 @@ fig1.savefig(out1, dpi=150, bbox_inches="tight")
 print(f"Plot saved to: {out1}")
 
 # --- Figure 2: per-CFT group averages (2 subplots per CFT: req + con) ---
-if n_groups > 0:
-    group_colors = ["#5C6BC0", "#EF5350", "#43A047", "#FF8F00"]
-    group_dims   = list(GROUPS.keys())
-    xg = np.arange(len(group_dims))
+if n_groups_avg > 0:
+    group_colors  = ["#5C6BC0", "#EF5350", "#43A047", "#FF8F00"]
+    group_dims_avg = list(GROUPS_AVG.keys())
+    xg_avg = np.arange(len(group_dims_avg))
 
-    fig2 = plt.figure(figsize=(max(8, len(group_dims) * 2 + 4), n_cfts * 4))
+    fig2 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
     gs2  = fig2.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
 
     for ri, cft in enumerate(active_cfts):
         for ci, (per_cft_pcts, metric) in enumerate([
-            (per_cft_req, "Requirements"),
-            (per_cft_con, "Constraints"),
+            (per_cft_req_avg, "Requirements"),
+            (per_cft_con_avg, "Constraints"),
         ]):
             ax = fig2.add_subplot(gs2[ri, ci])
-            for gi, dim in enumerate(group_dims):
-                opts = GROUPS[dim]
+            for gi, dim in enumerate(group_dims_avg):
+                opts = GROUPS_AVG[dim]
                 keys = list(opts.keys())
                 n_keys = len(keys)
                 w = 0.7 / n_keys
@@ -267,9 +312,9 @@ if n_groups > 0:
                     vals = [per_cft_pcts[cft][i] for i in opts[key]]
                     mean, std = np.mean(vals), np.std(vals)
                     offset = (ki - (n_keys - 1) / 2) * w
-                    ax.bar(xg[gi] + offset, mean, w,
+                    ax.bar(xg_avg[gi] + offset, mean, w,
                            color=group_colors[ki % len(group_colors)], edgecolor="white")
-                    ax.text(xg[gi] + offset, mean + 1,
+                    ax.text(xg_avg[gi] + offset, mean + 1,
                             f"{key}\n{mean:.1f}%\n±{std:.1f}%",
                             ha="center", va="bottom", fontsize=7.5)
             nv = null_scores[cft][ci]
@@ -278,8 +323,8 @@ if n_groups > 0:
                            linestyle="--", linewidth=1.8, alpha=0.85,
                            label=f"$C_{{null}}$")
             ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
-            ax.set_xticks(xg)
-            ax.set_xticklabels(group_dims, fontsize=10)
+            ax.set_xticks(xg_avg)
+            ax.set_xticklabels(group_dims_avg, fontsize=10)
             ax.set_ylabel("% satisfied", fontsize=10)
             ax.yaxis.set_major_formatter(mtick.PercentFormatter())
             ax.set_ylim(0, 107)
@@ -335,18 +380,18 @@ fig3.savefig(out3, dpi=150, bbox_inches="tight")
 print(f"Plot saved to: {out3}")
 
 # --- Figure 4: per-CFT group averages for tokens ---
-if n_groups > 0:
-    fig4 = plt.figure(figsize=(max(8, len(group_dims) * 2 + 4), n_cfts * 4))
+if n_groups_avg > 0:
+    fig4 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
     gs4  = fig4.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
 
     for ri, cft in enumerate(active_cfts):
         for ci, (per_cft_toks, metric) in enumerate([
-            (per_cft_prompt,     "Input Tokens"),
-            (per_cft_completion, "Output Tokens"),
+            (per_cft_prompt_avg,     "Input Tokens"),
+            (per_cft_completion_avg, "Output Tokens"),
         ]):
             ax = fig4.add_subplot(gs4[ri, ci])
-            for gi, dim in enumerate(group_dims):
-                opts   = GROUPS[dim]
+            for gi, dim in enumerate(group_dims_avg):
+                opts   = GROUPS_AVG[dim]
                 keys   = list(opts.keys())
                 n_keys = len(keys)
                 w = 0.7 / n_keys
@@ -354,9 +399,9 @@ if n_groups > 0:
                     vals = [per_cft_toks[cft][i] for i in opts[key]]
                     mean, std = np.mean(vals), np.std(vals)
                     offset = (ki - (n_keys - 1) / 2) * w
-                    ax.bar(xg[gi] + offset, mean, w,
+                    ax.bar(xg_avg[gi] + offset, mean, w,
                            color=group_colors[ki % len(group_colors)], edgecolor="white")
-                    ax.text(xg[gi] + offset, mean * 1.01,
+                    ax.text(xg_avg[gi] + offset, mean * 1.01,
                             f"{key}\n{mean/1000:.0f}k\n±{std/1000:.0f}k",
                             ha="center", va="bottom", fontsize=7.5)
             nv = null_tokens[cft][ci]
@@ -365,8 +410,8 @@ if n_groups > 0:
                            linestyle="--", linewidth=1.8, alpha=0.85,
                            label=f"$C_{{null}}$")
             ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
-            ax.set_xticks(xg)
-            ax.set_xticklabels(group_dims, fontsize=10)
+            ax.set_xticks(xg_avg)
+            ax.set_xticklabels(group_dims_avg, fontsize=10)
             ax.set_ylabel("tokens", fontsize=10)
             ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
             ax.grid(axis="y", linestyle="--", alpha=0.4)
