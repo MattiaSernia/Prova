@@ -158,10 +158,10 @@ for i, key in enumerate(keys):
 
 if null_req_mean is not None:
     ax.axhline(null_req_mean, color=REQ_COLOR, linestyle="--", linewidth=1.8,
-               alpha=0.85, label=f"$C_{{null}}$ Requirements ({null_req_mean:.1f}%)")
+               alpha=0.85, label=f"$C_{{\emptyset}}$ Requirements ({null_req_mean:.1f}%)")
 if null_con_mean is not None:
     ax.axhline(null_con_mean, color=CON_COLOR, linestyle="--", linewidth=1.8,
-               alpha=0.85, label=f"$C_{{null}}$ Constraints ({null_con_mean:.1f}%)")
+               alpha=0.85, label=f"$C_{{\emptyset}}$ Constraints ({null_con_mean:.1f}%)")
 
 ax.set_xticks(x)
 ax.set_xticklabels(key_labels, fontsize=10)

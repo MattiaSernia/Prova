@@ -134,7 +134,7 @@ else:  # extractor
 
 if null_mean is not None:
     ax.axhline(null_mean, color="black", linestyle="--", linewidth=1.8,
-               alpha=0.85, label=f"$C_{{null}}$ ({null_mean/1000:.0f}k)")
+               alpha=0.85, label=f"$C_{{\emptyset}}$ ({null_mean/1000:.0f}k)")
 
 ax.set_ylabel("Input tokens", fontsize=11)
 ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))

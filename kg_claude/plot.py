@@ -63,6 +63,8 @@ parser.add_argument("--extractor", choices=DIM_VALUES["extractor"])
 parser.add_argument("--schema",    choices=DIM_VALUES["schema"])
 parser.add_argument("--format",    choices=DIM_VALUES["format"])
 parser.add_argument("--text",      choices=DIM_VALUES["text"])
+parser.add_argument("--media", action="store_true",
+                    help="Average across all CFTs instead of one bar/row per CFT")
 args = parser.parse_args()
 
 freeze = {d: getattr(args, d) for d in DIM_ORDER if getattr(args, d) is not None}
@@ -244,47 +246,87 @@ freeze_tag = "_".join(freeze.values()) if freeze else "all"
 null_scores = {cft: read_null_scores(cft) for cft in active_cfts}
 null_tokens = {cft: read_null_tokens(cft) for cft in active_cfts}
 
+
+def mean_ignore_none(values):
+    vals = [v for v in values if v is not None]
+    return float(np.mean(vals)) if vals else None
+
+
+media_tag       = "_media" if args.media else ""
+media_null_req  = mean_ignore_none([null_scores[cft][0] for cft in active_cfts])
+media_null_con  = mean_ignore_none([null_scores[cft][1] for cft in active_cfts])
+media_null_prompt     = mean_ignore_none([null_tokens[cft][0] for cft in active_cfts])
+media_null_completion = mean_ignore_none([null_tokens[cft][1] for cft in active_cfts])
+
 # --- Figure 1: per-config bar charts ---
 fig1 = plt.figure(figsize=(max(8, len(filtered) * 1.5), 9))
 gs1  = fig1.add_gridspec(2, 1, hspace=0.45)
 ax_req = fig1.add_subplot(gs1[0])
 ax_con = fig1.add_subplot(gs1[1])
 
-x         = np.arange(len(labels))
-bar_width = 0.6 / n_cfts
+x = np.arange(len(labels))
 
-for ax, data_by_cft, title, null_idx in [
-    (ax_req, per_cft_req, "Satisfied Requirements", 0),
-    (ax_con, per_cft_con, "Satisfied Constraints",  1),
-]:
-    for ci, cft in enumerate(active_cfts):
-        offset = (ci - (n_cfts - 1) / 2) * bar_width
-        xpos   = x + offset
-        bars   = ax.bar(xpos, data_by_cft[cft], width=bar_width * 0.9,
-                        color=CFT_COLORS[ci % len(CFT_COLORS)], edgecolor="white",
-                        label=cft.upper())
-        for bar, pct in zip(bars, data_by_cft[cft]):
-            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1.5,
-                    f"{pct:.0f}%", ha="center", va="bottom", fontsize=7)
-        nv = null_scores[cft][null_idx]
-        if nv is not None:
-            ax.axhline(nv, color=CFT_COLORS[ci % len(CFT_COLORS)], linestyle="--",
-                       linewidth=1.8, alpha=0.85,
-                       label=f"{cft.upper()} $C_{{null}}$")
-    ax.set_title(title, fontsize=13)
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=10)
-    ax.set_ylabel("% satisfied", fontsize=11)
-    ax.yaxis.set_major_formatter(mtick.PercentFormatter())
-    ax.set_ylim(0, 107)
-    ax.grid(axis="y", linestyle="--", alpha=0.4)
+if args.media:
+    bar_width = 0.5
+    for ax, data_by_cft, title, bar_color, null_mean in [
+        (ax_req, per_cft_req, "Satisfied Requirements", CFT_COLORS[0], media_null_req),
+        (ax_con, per_cft_con, "Satisfied Constraints",  CFT_COLORS[1], media_null_con),
+    ]:
+        means, stds = [], []
+        for i in range(len(filtered)):
+            vals = [data_by_cft[cft][i] for cft in active_cfts]
+            means.append(float(np.mean(vals)))
+            stds.append(float(np.std(vals)))
+        bars = ax.bar(x, means, width=bar_width, color=bar_color, edgecolor="white")
+        for bar, mean, std in zip(bars, means, stds):
+            ax.text(bar.get_x() + bar.get_width() / 2, mean + 1.5,
+                    f"{mean:.0f}%\n±{std:.0f}%", ha="center", va="bottom", fontsize=7)
+        if null_mean is not None:
+            ax.axhline(null_mean, color="black", linestyle="--", linewidth=1.8,
+                       alpha=0.85, label=f"$C_{{null}}$ ({null_mean:.0f}%)")
+        ax.set_title(title, fontsize=13)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=10)
+        ax.set_ylabel("% satisfied", fontsize=11)
+        ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+        ax.set_ylim(0, 107)
+        ax.grid(axis="y", linestyle="--", alpha=0.4)
+        ax.legend(fontsize=9, loc="upper right")
+else:
+    bar_width = 0.6 / n_cfts
+    for ax, data_by_cft, title, null_idx in [
+        (ax_req, per_cft_req, "Satisfied Requirements", 0),
+        (ax_con, per_cft_con, "Satisfied Constraints",  1),
+    ]:
+        for ci, cft in enumerate(active_cfts):
+            offset = (ci - (n_cfts - 1) / 2) * bar_width
+            xpos   = x + offset
+            bars   = ax.bar(xpos, data_by_cft[cft], width=bar_width * 0.9,
+                            color=CFT_COLORS[ci % len(CFT_COLORS)], edgecolor="white",
+                            label=cft.upper())
+            for bar, pct in zip(bars, data_by_cft[cft]):
+                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 1.5,
+                        f"{pct:.0f}%", ha="center", va="bottom", fontsize=7)
+            nv = null_scores[cft][null_idx]
+            if nv is not None:
+                ax.axhline(nv, color=CFT_COLORS[ci % len(CFT_COLORS)], linestyle="--",
+                           linewidth=1.8, alpha=0.85,
+                           label=f"{cft.upper()} $C_{{null}}$")
+        ax.set_title(title, fontsize=13)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=10)
+        ax.set_ylabel("% satisfied", fontsize=11)
+        ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+        ax.set_ylim(0, 107)
+        ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-handles, labels_leg = ax_req.get_legend_handles_labels()
-fig1.legend(handles, labels_leg, fontsize=9, ncol=len(handles),
-            loc="lower center", bbox_to_anchor=(0.5, -0.04))
+    handles, labels_leg = ax_req.get_legend_handles_labels()
+    fig1.legend(handles, labels_leg, fontsize=9, ncol=len(handles),
+                loc="lower center", bbox_to_anchor=(0.5, -0.04))
 
-fig1.suptitle(f"{cft_label}: $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})", fontsize=14)
-out1 = os.path.join(ROOT, f"plot_{freeze_tag}{cft_tag}.png")
+fig1.suptitle(f"{cft_label}: $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})"
+              + (" [avg over CFTs]" if args.media else ""), fontsize=14)
+out1 = os.path.join(ROOT, f"plot_{freeze_tag}{cft_tag}{media_tag}.png")
 fig1.savefig(out1, dpi=150, bbox_inches="tight")
 print(f"Plot saved to: {out1}")
 
@@ -294,22 +336,27 @@ if n_groups_avg > 0:
     group_dims_avg = list(GROUPS_AVG.keys())
     xg_avg = np.arange(len(group_dims_avg))
 
-    fig2 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
-    gs2  = fig2.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
+    if args.media:
+        per_config_req_avg = [float(np.mean([per_cft_req_avg[cft][i] for cft in active_cfts]))
+                               for i in range(len(filtered_avg))]
+        per_config_con_avg = [float(np.mean([per_cft_con_avg[cft][i] for cft in active_cfts]))
+                               for i in range(len(filtered_avg))]
 
-    for ri, cft in enumerate(active_cfts):
-        for ci, (per_cft_pcts, metric) in enumerate([
-            (per_cft_req_avg, "Requirements"),
-            (per_cft_con_avg, "Constraints"),
+        fig2 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), 4))
+        gs2  = fig2.add_gridspec(1, 2, wspace=0.35)
+
+        for ci, (per_config_pcts, metric, null_mean) in enumerate([
+            (per_config_req_avg, "Requirements", media_null_req),
+            (per_config_con_avg, "Constraints",  media_null_con),
         ]):
-            ax = fig2.add_subplot(gs2[ri, ci])
+            ax = fig2.add_subplot(gs2[0, ci])
             for gi, dim in enumerate(group_dims_avg):
                 opts = GROUPS_AVG[dim]
                 keys = list(opts.keys())
                 n_keys = len(keys)
                 w = 0.7 / n_keys
                 for ki, key in enumerate(keys):
-                    vals = [per_cft_pcts[cft][i] for i in opts[key]]
+                    vals = [per_config_pcts[i] for i in opts[key]]
                     mean, std = np.mean(vals), np.std(vals)
                     offset = (ki - (n_keys - 1) / 2) * w
                     ax.bar(xg_avg[gi] + offset, mean, w,
@@ -317,12 +364,10 @@ if n_groups_avg > 0:
                     ax.text(xg_avg[gi] + offset, mean + 1,
                             f"{key}\n{mean:.1f}%\n±{std:.1f}%",
                             ha="center", va="bottom", fontsize=7.5)
-            nv = null_scores[cft][ci]
-            if nv is not None:
-                ax.axhline(nv, color=CFT_COLORS[ri % len(CFT_COLORS)],
-                           linestyle="--", linewidth=1.8, alpha=0.85,
-                           label=f"$C_{{null}}$")
-            ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
+            if null_mean is not None:
+                ax.axhline(null_mean, color="black", linestyle="--", linewidth=1.8,
+                           alpha=0.85, label=f"$C_{{null}}$")
+            ax.set_title(f"{metric} (avg over CFTs)", fontsize=11)
             ax.set_xticks(xg_avg)
             ax.set_xticklabels(group_dims_avg, fontsize=10)
             ax.set_ylabel("% satisfied", fontsize=10)
@@ -331,9 +376,48 @@ if n_groups_avg > 0:
             ax.grid(axis="y", linestyle="--", alpha=0.4)
             ax.legend(fontsize=8, loc="upper left",
                       bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
+    else:
+        fig2 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
+        gs2  = fig2.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
 
-    fig2.suptitle(f"Group Averages $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})", fontsize=13)
-    out2 = os.path.join(ROOT, f"plot_avg_{freeze_tag}{cft_tag}.png")
+        for ri, cft in enumerate(active_cfts):
+            for ci, (per_cft_pcts, metric) in enumerate([
+                (per_cft_req_avg, "Requirements"),
+                (per_cft_con_avg, "Constraints"),
+            ]):
+                ax = fig2.add_subplot(gs2[ri, ci])
+                for gi, dim in enumerate(group_dims_avg):
+                    opts = GROUPS_AVG[dim]
+                    keys = list(opts.keys())
+                    n_keys = len(keys)
+                    w = 0.7 / n_keys
+                    for ki, key in enumerate(keys):
+                        vals = [per_cft_pcts[cft][i] for i in opts[key]]
+                        mean, std = np.mean(vals), np.std(vals)
+                        offset = (ki - (n_keys - 1) / 2) * w
+                        ax.bar(xg_avg[gi] + offset, mean, w,
+                               color=group_colors[ki % len(group_colors)], edgecolor="white")
+                        ax.text(xg_avg[gi] + offset, mean + 1,
+                                f"{key}\n{mean:.1f}%\n±{std:.1f}%",
+                                ha="center", va="bottom", fontsize=7.5)
+                nv = null_scores[cft][ci]
+                if nv is not None:
+                    ax.axhline(nv, color=CFT_COLORS[ri % len(CFT_COLORS)],
+                               linestyle="--", linewidth=1.8, alpha=0.85,
+                               label=f"$C_{{null}}$")
+                ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
+                ax.set_xticks(xg_avg)
+                ax.set_xticklabels(group_dims_avg, fontsize=10)
+                ax.set_ylabel("% satisfied", fontsize=10)
+                ax.yaxis.set_major_formatter(mtick.PercentFormatter())
+                ax.set_ylim(0, 107)
+                ax.grid(axis="y", linestyle="--", alpha=0.4)
+                ax.legend(fontsize=8, loc="upper left",
+                          bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
+
+    fig2.suptitle(f"Group Averages $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})"
+                  + (" [avg over CFTs]" if args.media else ""), fontsize=13)
+    out2 = os.path.join(ROOT, f"plot_avg_{freeze_tag}{cft_tag}{media_tag}.png")
     fig2.savefig(out2, dpi=150, bbox_inches="tight")
     print(f"Plot saved to: {out2}")
 
@@ -345,58 +429,91 @@ gs3  = fig3.add_gridspec(2, 1, hspace=0.45)
 ax_prompt = fig3.add_subplot(gs3[0])
 ax_compl  = fig3.add_subplot(gs3[1])
 
-for ax, data_by_cft, title, tok_idx in [
-    (ax_prompt, per_cft_prompt,     "Input Tokens (prompt)",     0),
-    (ax_compl,  per_cft_completion, "Output Tokens (completion)", 1),
-]:
-    for ci, cft in enumerate(active_cfts):
-        offset = (ci - (n_cfts - 1) / 2) * bar_width
-        xpos   = x + offset
-        bars   = ax.bar(xpos, data_by_cft[cft], width=bar_width * 0.9,
-                        color=CFT_COLORS[ci % len(CFT_COLORS)], edgecolor="white",
-                        label=cft.upper())
-        for bar, val in zip(bars, data_by_cft[cft]):
-            if val > 0:
-                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() * 1.01,
-                        f"{val/1000:.0f}k", ha="center", va="bottom", fontsize=7)
-        nv = null_tokens[cft][tok_idx]
-        if nv is not None:
-            ax.axhline(nv, color=CFT_COLORS[ci % len(CFT_COLORS)], linestyle="--",
-                       linewidth=1.8, alpha=0.85,
-                       label=f"{cft.upper()} $C_{{null}}$")
-    ax.set_title(title, fontsize=13)
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=10)
-    ax.set_ylabel("tokens", fontsize=11)
-    ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
-    ax.grid(axis="y", linestyle="--", alpha=0.4)
+if args.media:
+    for ax, data_by_cft, title, bar_color, null_mean in [
+        (ax_prompt, per_cft_prompt,     "Input Tokens (prompt)",      CFT_COLORS[0], media_null_prompt),
+        (ax_compl,  per_cft_completion, "Output Tokens (completion)", CFT_COLORS[1], media_null_completion),
+    ]:
+        means, stds = [], []
+        for i in range(len(filtered)):
+            vals = [data_by_cft[cft][i] for cft in active_cfts]
+            means.append(float(np.mean(vals)))
+            stds.append(float(np.std(vals)))
+        bars = ax.bar(x, means, width=bar_width, color=bar_color, edgecolor="white")
+        for bar, mean, std in zip(bars, means, stds):
+            if mean > 0:
+                ax.text(bar.get_x() + bar.get_width() / 2, mean * 1.01,
+                        f"{mean/1000:.0f}k\n±{std/1000:.0f}k", ha="center", va="bottom", fontsize=7)
+        if null_mean is not None:
+            ax.axhline(null_mean, color="black", linestyle="--", linewidth=1.8,
+                       alpha=0.85, label=f"$C_{{null}}$ ({null_mean/1000:.0f}k)")
+        ax.set_title(title, fontsize=13)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=10)
+        ax.set_ylabel("tokens", fontsize=11)
+        ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
+        ax.grid(axis="y", linestyle="--", alpha=0.4)
+        ax.legend(fontsize=9, loc="upper right")
+else:
+    for ax, data_by_cft, title, tok_idx in [
+        (ax_prompt, per_cft_prompt,     "Input Tokens (prompt)",     0),
+        (ax_compl,  per_cft_completion, "Output Tokens (completion)", 1),
+    ]:
+        for ci, cft in enumerate(active_cfts):
+            offset = (ci - (n_cfts - 1) / 2) * bar_width
+            xpos   = x + offset
+            bars   = ax.bar(xpos, data_by_cft[cft], width=bar_width * 0.9,
+                            color=CFT_COLORS[ci % len(CFT_COLORS)], edgecolor="white",
+                            label=cft.upper())
+            for bar, val in zip(bars, data_by_cft[cft]):
+                if val > 0:
+                    ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() * 1.01,
+                            f"{val/1000:.0f}k", ha="center", va="bottom", fontsize=7)
+            nv = null_tokens[cft][tok_idx]
+            if nv is not None:
+                ax.axhline(nv, color=CFT_COLORS[ci % len(CFT_COLORS)], linestyle="--",
+                           linewidth=1.8, alpha=0.85,
+                           label=f"{cft.upper()} $C_{{null}}$")
+        ax.set_title(title, fontsize=13)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, fontsize=10)
+        ax.set_ylabel("tokens", fontsize=11)
+        ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
+        ax.grid(axis="y", linestyle="--", alpha=0.4)
 
-handles3, labels3 = ax_prompt.get_legend_handles_labels()
-fig3.legend(handles3, labels3, fontsize=9, ncol=len(handles3),
-            loc="lower center", bbox_to_anchor=(0.5, -0.04))
-fig3.suptitle(f"{cft_label}: Token Usage $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})", fontsize=14)
-out3 = os.path.join(ROOT, f"plot_tokens_{freeze_tag}{cft_tag}.png")
+    handles3, labels3 = ax_prompt.get_legend_handles_labels()
+    fig3.legend(handles3, labels3, fontsize=9, ncol=len(handles3),
+                loc="lower center", bbox_to_anchor=(0.5, -0.04))
+
+fig3.suptitle(f"{cft_label}: Token Usage $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})"
+              + (" [avg over CFTs]" if args.media else ""), fontsize=14)
+out3 = os.path.join(ROOT, f"plot_tokens_{freeze_tag}{cft_tag}{media_tag}.png")
 fig3.savefig(out3, dpi=150, bbox_inches="tight")
 print(f"Plot saved to: {out3}")
 
-# --- Figure 4: per-CFT group averages for tokens ---
+# --- Figure 4: per-CFT (or averaged) group averages for tokens ---
 if n_groups_avg > 0:
-    fig4 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
-    gs4  = fig4.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
+    if args.media:
+        per_config_prompt_avg     = [float(np.mean([per_cft_prompt_avg[cft][i] for cft in active_cfts]))
+                                      for i in range(len(filtered_avg))]
+        per_config_completion_avg = [float(np.mean([per_cft_completion_avg[cft][i] for cft in active_cfts]))
+                                      for i in range(len(filtered_avg))]
 
-    for ri, cft in enumerate(active_cfts):
-        for ci, (per_cft_toks, metric) in enumerate([
-            (per_cft_prompt_avg,     "Input Tokens"),
-            (per_cft_completion_avg, "Output Tokens"),
+        fig4 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), 4))
+        gs4  = fig4.add_gridspec(1, 2, wspace=0.35)
+
+        for ci, (per_config_toks, metric, null_mean) in enumerate([
+            (per_config_prompt_avg,     "Input Tokens",  media_null_prompt),
+            (per_config_completion_avg, "Output Tokens", media_null_completion),
         ]):
-            ax = fig4.add_subplot(gs4[ri, ci])
+            ax = fig4.add_subplot(gs4[0, ci])
             for gi, dim in enumerate(group_dims_avg):
                 opts   = GROUPS_AVG[dim]
                 keys   = list(opts.keys())
                 n_keys = len(keys)
                 w = 0.7 / n_keys
                 for ki, key in enumerate(keys):
-                    vals = [per_cft_toks[cft][i] for i in opts[key]]
+                    vals = [per_config_toks[i] for i in opts[key]]
                     mean, std = np.mean(vals), np.std(vals)
                     offset = (ki - (n_keys - 1) / 2) * w
                     ax.bar(xg_avg[gi] + offset, mean, w,
@@ -404,12 +521,10 @@ if n_groups_avg > 0:
                     ax.text(xg_avg[gi] + offset, mean * 1.01,
                             f"{key}\n{mean/1000:.0f}k\n±{std/1000:.0f}k",
                             ha="center", va="bottom", fontsize=7.5)
-            nv = null_tokens[cft][ci]
-            if nv is not None:
-                ax.axhline(nv, color=CFT_COLORS[ri % len(CFT_COLORS)],
-                           linestyle="--", linewidth=1.8, alpha=0.85,
-                           label=f"$C_{{null}}$")
-            ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
+            if null_mean is not None:
+                ax.axhline(null_mean, color="black", linestyle="--", linewidth=1.8,
+                           alpha=0.85, label=f"$C_{{null}}$")
+            ax.set_title(f"{metric} (avg over CFTs)", fontsize=11)
             ax.set_xticks(xg_avg)
             ax.set_xticklabels(group_dims_avg, fontsize=10)
             ax.set_ylabel("tokens", fontsize=10)
@@ -417,8 +532,46 @@ if n_groups_avg > 0:
             ax.grid(axis="y", linestyle="--", alpha=0.4)
             ax.legend(fontsize=8, loc="upper left",
                       bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
+    else:
+        fig4 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
+        gs4  = fig4.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
 
-    fig4.suptitle(f"Group Averages Token Usage $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})", fontsize=13)
-    out4 = os.path.join(ROOT, f"plot_avg_tokens_{freeze_tag}{cft_tag}.png")
+        for ri, cft in enumerate(active_cfts):
+            for ci, (per_cft_toks, metric) in enumerate([
+                (per_cft_prompt_avg,     "Input Tokens"),
+                (per_cft_completion_avg, "Output Tokens"),
+            ]):
+                ax = fig4.add_subplot(gs4[ri, ci])
+                for gi, dim in enumerate(group_dims_avg):
+                    opts   = GROUPS_AVG[dim]
+                    keys   = list(opts.keys())
+                    n_keys = len(keys)
+                    w = 0.7 / n_keys
+                    for ki, key in enumerate(keys):
+                        vals = [per_cft_toks[cft][i] for i in opts[key]]
+                        mean, std = np.mean(vals), np.std(vals)
+                        offset = (ki - (n_keys - 1) / 2) * w
+                        ax.bar(xg_avg[gi] + offset, mean, w,
+                               color=group_colors[ki % len(group_colors)], edgecolor="white")
+                        ax.text(xg_avg[gi] + offset, mean * 1.01,
+                                f"{key}\n{mean/1000:.0f}k\n±{std/1000:.0f}k",
+                                ha="center", va="bottom", fontsize=7.5)
+                nv = null_tokens[cft][ci]
+                if nv is not None:
+                    ax.axhline(nv, color=CFT_COLORS[ri % len(CFT_COLORS)],
+                               linestyle="--", linewidth=1.8, alpha=0.85,
+                               label=f"$C_{{null}}$")
+                ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
+                ax.set_xticks(xg_avg)
+                ax.set_xticklabels(group_dims_avg, fontsize=10)
+                ax.set_ylabel("tokens", fontsize=10)
+                ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
+                ax.grid(axis="y", linestyle="--", alpha=0.4)
+                ax.legend(fontsize=8, loc="upper left",
+                          bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
+
+    fig4.suptitle(f"Group Averages Token Usage $C_{{OAP}}$, $\\gamma=0$ ({freeze_str})"
+                  + (" [avg over CFTs]" if args.media else ""), fontsize=13)
+    out4 = os.path.join(ROOT, f"plot_avg_tokens_{freeze_tag}{cft_tag}{media_tag}.png")
     fig4.savefig(out4, dpi=150, bbox_inches="tight")
     print(f"Plot saved to: {out4}")
