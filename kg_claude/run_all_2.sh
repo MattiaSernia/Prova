@@ -7,42 +7,42 @@ export OLLAMA_MAX_LOADED_MODELS=2
 # Extractors: phi4 (schema only) and llama.
 
 #python3 main.py --cft belval --c-oa --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft belval --c-oa --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft belval --c-oa --extractor phi4 --kg-format turtle-light --no-text
 #python3 main.py --cft belval --c-oa --extractor llama --kg-format turtle-light
-#python3 main.py --cft belval --c-oa --extractor llama --kg-format turtle-light --no-text
+python3 main.py --cft belval --c-oa --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft belval --c-op --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft belval --c-op --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft belval --c-op --extractor phi4 --kg-format turtle-light --no-text
 #python3 main.py --cft belval --c-op --extractor llama --kg-format turtle-light
-#python3 main.py --cft belval --c-op --extractor llama --kg-format turtle-light --no-text
+python3 main.py --cft belval --c-op --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft belval --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft belval --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft belval --extractor phi4 --kg-format turtle-light --no-text
 #python3 main.py --cft belval --extractor llama --kg-format turtle-light
-#python3 main.py --cft belval --extractor llama --kg-format turtle-light --no-text
+python3 main.py --cft belval --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft chrb --c-oa --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft chrb --c-oa --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft chrb --c-oa --extractor phi4 --kg-format turtle-light --no-text
 #python3 main.py --cft chrb --c-oa --extractor llama --kg-format turtle-light
-#python3 main.py --cft chrb --c-oa --extractor llama --kg-format turtle-light --no-text
+python3 main.py --cft chrb --c-oa --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft chrb --c-op --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft chrb --c-op --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft chrb --c-op --extractor phi4 --kg-format turtle-light --no-text
 #python3 main.py --cft chrb --c-op --extractor llama --kg-format turtle-light
-#python3 main.py --cft chrb --c-op --extractor llama --kg-format turtle-light --no-text
+python3 main.py --cft chrb --c-op --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft chrb --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft chrb --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft chrb --extractor phi4 --kg-format turtle-light --no-text
 #python3 main.py --cft chrb --extractor llama --kg-format turtle-light
-#python3 main.py --cft chrb --extractor llama --kg-format turtle-light --no-text
+python3 main.py --cft chrb --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft cabinet --c-oa --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft cabinet --c-oa --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft cabinet --c-oa --extractor phi4 --kg-format turtle-light --no-text
 #python3 main.py --cft cabinet --c-oa --extractor llama --kg-format turtle-light
-#python3 main.py --cft cabinet --c-oa --extractor llama --kg-format turtle-light --no-text
+python3 main.py --cft cabinet --c-oa --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft cabinet --c-op --extractor phi4 --kg-format turtle-light
-#python3 main.py --cft cabinet --c-op --extractor phi4 --kg-format turtle-light --no-text
+python3 main.py --cft cabinet --c-op --extractor phi4 --kg-format turtle-light --no-text
 python3 main.py --cft cabinet --c-op --extractor llama --kg-format turtle-light
 python3 main.py --cft cabinet --c-op --extractor llama --kg-format turtle-light --no-text
 

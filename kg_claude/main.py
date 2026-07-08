@@ -62,7 +62,10 @@ def _run_pipeline(orchestrator, agents, question, use_kg, kg_agents, cft_agents,
             if agent.name == key:
                 if kg_agents:
                     agent.set_kg_context(kg_context)
-                if cft_agents and not no_text:
+                if cft_agents:
+                    # cft_agents implies KG is NOT injected into the agents (kg_agents is
+                    # False in this mode), so no_text does not apply here: the CFT text is
+                    # the agent's only source and must always be provided.
                     agent.set_cft_context(question)
                 orchestrator.add_message(Message.now(plan[key], "Orchestrator", "question", "default"))
                 risposta = agent.answer(plan[key])

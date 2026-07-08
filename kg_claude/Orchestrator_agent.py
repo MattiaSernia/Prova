@@ -481,6 +481,9 @@ class Orchestrator_Agent:
         return False
 
     def propose(self, task: str, use_triplets: bool = False, no_text: bool = False) -> str:
+        # no_text only applies where the KG is actually injected into the proposal, i.e.
+        # when triplets/KG are added (use_triplets). Otherwise treat it as the text option.
+        no_text = no_text and use_triplets
         agents_context = "" if no_text else "\n\n".join(self.agent_answer)
 
         system = """You are writing a bid response on behalf of a consortium.
