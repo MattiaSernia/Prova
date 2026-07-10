@@ -235,6 +235,19 @@ for dim in free:
     if len(opts) >= 2:
         GROUPS_AVG[dim] = opts
 
+# text is no longer an aggregation group: it splits each avg figure into
+# TEXT / NO_TEXT sides, each showing all the remaining groups (extractor,
+# format, ...) as means over the other free dims.
+GROUPS_AVG.pop("text", None)
+if "text" in freeze:
+    text_sides = [freeze["text"]]
+else:
+    text_sides = [tv for tv in DIM_VALUES["text"]
+                  if any(cfg_val(c, "text") == tv for c in filtered_avg)]
+n_text = len(text_sides)
+text_idx_sets = {tv: {i for i, c in enumerate(filtered_avg) if cfg_val(c, "text") == tv}
+                 for tv in text_sides}
+
 n_groups     = len(GROUPS)
 n_groups_avg = len(GROUPS_AVG)
 n_cfts     = len(active_cfts)
@@ -332,9 +345,13 @@ print(f"Plot saved to: {out1}")
 
 # --- Figure 2: per-CFT group averages (2 subplots per CFT: req + con) ---
 if n_groups_avg > 0:
-    group_colors  = ["#5C6BC0", "#EF5350", "#43A047", "#FF8F00"]
+    series_colors = ["#5C6BC0", "#EF5350", "#43A047", "#FF8F00",
+                     "#8E24AA", "#00ACC1", "#D81B60", "#7CB342"]
     group_dims_avg = list(GROUPS_AVG.keys())
-    xg_avg = np.arange(len(group_dims_avg))
+    # x-axis = text sides (TEXT / NO_TEXT); within each side, one bar per (dim, key)
+    series_avg   = [(dim, key) for dim in group_dims_avg for key in GROUPS_AVG[dim].keys()]
+    n_series_avg = len(series_avg)
+    xt = np.arange(n_text)
 
     if args.media:
         per_config_req_avg = [float(np.mean([per_cft_req_avg[cft][i] for cft in active_cfts]))
@@ -342,7 +359,7 @@ if n_groups_avg > 0:
         per_config_con_avg = [float(np.mean([per_cft_con_avg[cft][i] for cft in active_cfts]))
                                for i in range(len(filtered_avg))]
 
-        fig2 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), 4))
+        fig2 = plt.figure(figsize=(max(8, n_series_avg * n_text * 1.1 + 4), 4))
         gs2  = fig2.add_gridspec(1, 2, wspace=0.35)
 
         for ci, (per_config_pcts, metric, null_mean) in enumerate([
@@ -350,26 +367,25 @@ if n_groups_avg > 0:
             (per_config_con_avg, "Constraints",  media_null_con),
         ]):
             ax = fig2.add_subplot(gs2[0, ci])
-            for gi, dim in enumerate(group_dims_avg):
-                opts = GROUPS_AVG[dim]
-                keys = list(opts.keys())
-                n_keys = len(keys)
-                w = 0.7 / n_keys
-                for ki, key in enumerate(keys):
-                    vals = [per_config_pcts[i] for i in opts[key]]
-                    mean, std = np.mean(vals), np.std(vals)
-                    offset = (ki - (n_keys - 1) / 2) * w
-                    ax.bar(xg_avg[gi] + offset, mean, w,
-                           color=group_colors[ki % len(group_colors)], edgecolor="white")
-                    ax.text(xg_avg[gi] + offset, mean + 1,
-                            f"{key}\n{mean:.1f}%\n±{std:.1f}%",
+            w = 0.8 / n_series_avg
+            for si, (dim, key) in enumerate(series_avg):
+                offset = (si - (n_series_avg - 1) / 2) * w
+                for ti, tv in enumerate(text_sides):
+                    vals = [per_config_pcts[i] for i in GROUPS_AVG[dim][key] if i in text_idx_sets[tv]]
+                    if not vals:
+                        continue
+                    mean = np.mean(vals)
+                    ax.bar(xt[ti] + offset, mean, w,
+                           color=series_colors[si % len(series_colors)], edgecolor="white",
+                           label=key if ti == 0 else None)
+                    ax.text(xt[ti] + offset, mean + 1, f"{key}\n{mean:.0f}%",
                             ha="center", va="bottom", fontsize=7.5)
             if null_mean is not None:
                 ax.axhline(null_mean, color="black", linestyle="--", linewidth=1.8,
                            alpha=0.85, label=f"$C_{{null}}$")
             ax.set_title(f"{metric} (avg over CFTs)", fontsize=11)
-            ax.set_xticks(xg_avg)
-            ax.set_xticklabels(group_dims_avg, fontsize=10)
+            ax.set_xticks(xt)
+            ax.set_xticklabels(text_sides, fontsize=10)
             ax.set_ylabel("% satisfied", fontsize=10)
             ax.yaxis.set_major_formatter(mtick.PercentFormatter())
             ax.set_ylim(0, 107)
@@ -377,7 +393,7 @@ if n_groups_avg > 0:
             ax.legend(fontsize=8, loc="upper left",
                       bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
     else:
-        fig2 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
+        fig2 = plt.figure(figsize=(max(8, n_series_avg * n_text * 1.1 + 4), n_cfts * 4))
         gs2  = fig2.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
 
         for ri, cft in enumerate(active_cfts):
@@ -386,19 +402,18 @@ if n_groups_avg > 0:
                 (per_cft_con_avg, "Constraints"),
             ]):
                 ax = fig2.add_subplot(gs2[ri, ci])
-                for gi, dim in enumerate(group_dims_avg):
-                    opts = GROUPS_AVG[dim]
-                    keys = list(opts.keys())
-                    n_keys = len(keys)
-                    w = 0.7 / n_keys
-                    for ki, key in enumerate(keys):
-                        vals = [per_cft_pcts[cft][i] for i in opts[key]]
-                        mean, std = np.mean(vals), np.std(vals)
-                        offset = (ki - (n_keys - 1) / 2) * w
-                        ax.bar(xg_avg[gi] + offset, mean, w,
-                               color=group_colors[ki % len(group_colors)], edgecolor="white")
-                        ax.text(xg_avg[gi] + offset, mean + 1,
-                                f"{key}\n{mean:.1f}%\n±{std:.1f}%",
+                w = 0.8 / n_series_avg
+                for si, (dim, key) in enumerate(series_avg):
+                    offset = (si - (n_series_avg - 1) / 2) * w
+                    for ti, tv in enumerate(text_sides):
+                        vals = [per_cft_pcts[cft][i] for i in GROUPS_AVG[dim][key] if i in text_idx_sets[tv]]
+                        if not vals:
+                            continue
+                        mean = np.mean(vals)
+                        ax.bar(xt[ti] + offset, mean, w,
+                               color=series_colors[si % len(series_colors)], edgecolor="white",
+                               label=key if ti == 0 else None)
+                        ax.text(xt[ti] + offset, mean + 1, f"{key}\n{mean:.0f}%",
                                 ha="center", va="bottom", fontsize=7.5)
                 nv = null_scores[cft][ci]
                 if nv is not None:
@@ -406,8 +421,8 @@ if n_groups_avg > 0:
                                linestyle="--", linewidth=1.8, alpha=0.85,
                                label=f"$C_{{null}}$")
                 ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
-                ax.set_xticks(xg_avg)
-                ax.set_xticklabels(group_dims_avg, fontsize=10)
+                ax.set_xticks(xt)
+                ax.set_xticklabels(text_sides, fontsize=10)
                 ax.set_ylabel("% satisfied", fontsize=10)
                 ax.yaxis.set_major_formatter(mtick.PercentFormatter())
                 ax.set_ylim(0, 107)
@@ -499,7 +514,7 @@ if n_groups_avg > 0:
         per_config_completion_avg = [float(np.mean([per_cft_completion_avg[cft][i] for cft in active_cfts]))
                                       for i in range(len(filtered_avg))]
 
-        fig4 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), 4))
+        fig4 = plt.figure(figsize=(max(8, n_series_avg * n_text * 1.1 + 4), 4))
         gs4  = fig4.add_gridspec(1, 2, wspace=0.35)
 
         for ci, (per_config_toks, metric, null_mean) in enumerate([
@@ -507,33 +522,32 @@ if n_groups_avg > 0:
             (per_config_completion_avg, "Output Tokens", media_null_completion),
         ]):
             ax = fig4.add_subplot(gs4[0, ci])
-            for gi, dim in enumerate(group_dims_avg):
-                opts   = GROUPS_AVG[dim]
-                keys   = list(opts.keys())
-                n_keys = len(keys)
-                w = 0.7 / n_keys
-                for ki, key in enumerate(keys):
-                    vals = [per_config_toks[i] for i in opts[key]]
-                    mean, std = np.mean(vals), np.std(vals)
-                    offset = (ki - (n_keys - 1) / 2) * w
-                    ax.bar(xg_avg[gi] + offset, mean, w,
-                           color=group_colors[ki % len(group_colors)], edgecolor="white")
-                    ax.text(xg_avg[gi] + offset, mean * 1.01,
-                            f"{key}\n{mean/1000:.0f}k\n±{std/1000:.0f}k",
+            w = 0.8 / n_series_avg
+            for si, (dim, key) in enumerate(series_avg):
+                offset = (si - (n_series_avg - 1) / 2) * w
+                for ti, tv in enumerate(text_sides):
+                    vals = [per_config_toks[i] for i in GROUPS_AVG[dim][key] if i in text_idx_sets[tv]]
+                    if not vals:
+                        continue
+                    mean = np.mean(vals)
+                    ax.bar(xt[ti] + offset, mean, w,
+                           color=series_colors[si % len(series_colors)], edgecolor="white",
+                           label=key if ti == 0 else None)
+                    ax.text(xt[ti] + offset, mean * 1.01, f"{key}\n{mean/1000:.0f}k",
                             ha="center", va="bottom", fontsize=7.5)
             if null_mean is not None:
                 ax.axhline(null_mean, color="black", linestyle="--", linewidth=1.8,
                            alpha=0.85, label=f"$C_{{null}}$")
             ax.set_title(f"{metric} (avg over CFTs)", fontsize=11)
-            ax.set_xticks(xg_avg)
-            ax.set_xticklabels(group_dims_avg, fontsize=10)
+            ax.set_xticks(xt)
+            ax.set_xticklabels(text_sides, fontsize=10)
             ax.set_ylabel("tokens", fontsize=10)
             ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
             ax.grid(axis="y", linestyle="--", alpha=0.4)
             ax.legend(fontsize=8, loc="upper left",
                       bbox_to_anchor=(1.01, 1.0), borderaxespad=0)
     else:
-        fig4 = plt.figure(figsize=(max(8, len(group_dims_avg) * 2 + 4), n_cfts * 4))
+        fig4 = plt.figure(figsize=(max(8, n_series_avg * n_text * 1.1 + 4), n_cfts * 4))
         gs4  = fig4.add_gridspec(n_cfts, 2, hspace=0.5, wspace=0.35)
 
         for ri, cft in enumerate(active_cfts):
@@ -542,19 +556,18 @@ if n_groups_avg > 0:
                 (per_cft_completion_avg, "Output Tokens"),
             ]):
                 ax = fig4.add_subplot(gs4[ri, ci])
-                for gi, dim in enumerate(group_dims_avg):
-                    opts   = GROUPS_AVG[dim]
-                    keys   = list(opts.keys())
-                    n_keys = len(keys)
-                    w = 0.7 / n_keys
-                    for ki, key in enumerate(keys):
-                        vals = [per_cft_toks[cft][i] for i in opts[key]]
-                        mean, std = np.mean(vals), np.std(vals)
-                        offset = (ki - (n_keys - 1) / 2) * w
-                        ax.bar(xg_avg[gi] + offset, mean, w,
-                               color=group_colors[ki % len(group_colors)], edgecolor="white")
-                        ax.text(xg_avg[gi] + offset, mean * 1.01,
-                                f"{key}\n{mean/1000:.0f}k\n±{std/1000:.0f}k",
+                w = 0.8 / n_series_avg
+                for si, (dim, key) in enumerate(series_avg):
+                    offset = (si - (n_series_avg - 1) / 2) * w
+                    for ti, tv in enumerate(text_sides):
+                        vals = [per_cft_toks[cft][i] for i in GROUPS_AVG[dim][key] if i in text_idx_sets[tv]]
+                        if not vals:
+                            continue
+                        mean = np.mean(vals)
+                        ax.bar(xt[ti] + offset, mean, w,
+                               color=series_colors[si % len(series_colors)], edgecolor="white",
+                               label=key if ti == 0 else None)
+                        ax.text(xt[ti] + offset, mean * 1.01, f"{key}\n{mean/1000:.0f}k",
                                 ha="center", va="bottom", fontsize=7.5)
                 nv = null_tokens[cft][ci]
                 if nv is not None:
@@ -562,8 +575,8 @@ if n_groups_avg > 0:
                                linestyle="--", linewidth=1.8, alpha=0.85,
                                label=f"$C_{{null}}$")
                 ax.set_title(f"{cft.upper()} {metric}", fontsize=11)
-                ax.set_xticks(xg_avg)
-                ax.set_xticklabels(group_dims_avg, fontsize=10)
+                ax.set_xticks(xt)
+                ax.set_xticklabels(text_sides, fontsize=10)
                 ax.set_ylabel("tokens", fontsize=10)
                 ax.yaxis.set_major_formatter(mtick.FuncFormatter(lambda v, _: f"{v/1000:.0f}k"))
                 ax.grid(axis="y", linestyle="--", alpha=0.4)

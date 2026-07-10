@@ -78,6 +78,10 @@ PALETTE = ["#1565C0", "#E65100", "#2E7D32", "#9C27B0",
            "#00695C", "#C62828", "#F9A825", "#4527A0"]
 CFT_COLORS   = ["#1565C0", "#E65100", "#2E7D32", "#9C27B0"]
 GROUP_COLORS = ["#5C6BC0", "#EF5350", "#43A047", "#FF8F00"]
+# one line per text variant
+TEXT_COLORS  = {"TEXT": "#1565C0", "NO_TEXT": "#E65100"}
+# fallback line styles when several configs share the same text colour
+LINE_STYLES  = ["-", "--", "-.", ":"]
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cft",       choices=list(CFT_META.keys()))
@@ -244,23 +248,29 @@ def fmt_val(v, is_token):
 
 
 def bar_panel(ax, mat, std, title, ylabel, null_val, is_token):
-    """mat, std: [cfg][mode] arrays.  std may be None (per-CFT, no error bars)."""
-    n_series = len(filtered)
-    bw = 0.8 / n_series
-    for ci in range(n_series):
-        offset = (ci - (n_series - 1) / 2) * bw
+    """Line chart: x = injection point, one line per config (coloured by text).
+
+    mat, std: [cfg][mode] arrays.  std may be None (per-CFT, no error bars).
+    """
+    # keep line styles distinct when several configs share the same text colour
+    style_counter = {}
+    for ci in range(len(filtered)):
         heights = np.array(mat[ci], dtype=float)
         errs = None if std is None else np.nan_to_num(np.array(std[ci], dtype=float))
-        bars = ax.bar(x + offset, np.nan_to_num(heights), width=bw * 0.9,
-                      color=PALETTE[ci % len(PALETTE)], edgecolor="white",
-                      yerr=errs, ecolor="0.4", capsize=2,
-                      label=labels[ci])
+        txt_val = cfg_val(filtered[ci], "text")
+        color = TEXT_COLORS.get(txt_val, PALETTE[ci % len(PALETTE)])
+        k = style_counter.get(txt_val, 0)
+        style_counter[txt_val] = k + 1
+        ls = LINE_STYLES[k % len(LINE_STYLES)]
+        ax.errorbar(x, heights, yerr=errs, marker="o", markersize=5,
+                    linewidth=2, linestyle=ls, color=color,
+                    ecolor="0.4", capsize=3, label=labels[ci])
         for xi, h in enumerate(heights):
             if np.isfinite(h) and h > 0:
                 txt = fmt_val(h, is_token)
                 if std is not None and np.isfinite(std[ci][xi]):
                     txt += f"\n±{fmt_val(std[ci][xi], is_token).lstrip()}"
-                ax.text(x[xi] + offset, h, txt, ha="center", va="bottom", fontsize=6)
+                ax.text(x[xi], h, txt, ha="center", va="bottom", fontsize=6)
     if null_val is not None:
         lab = f"$C_{{null}}$ ({fmt_val(null_val, is_token)})"
         ax.axhline(null_val, color="black", linestyle="--", linewidth=1.8,
@@ -268,6 +278,7 @@ def bar_panel(ax, mat, std, title, ylabel, null_val, is_token):
     ax.set_title(title, fontsize=12)
     ax.set_xticks(x)
     ax.set_xticklabels(mode_ticklabels, fontsize=11)
+    ax.set_xlim(-0.3, len(MODES) - 0.7)
     ax.set_xlabel("KG injection point", fontsize=10)
     ax.set_ylabel(ylabel, fontsize=10)
     ax.grid(axis="y", linestyle="--", alpha=0.4)
