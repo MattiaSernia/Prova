@@ -486,7 +486,20 @@ class Orchestrator_Agent:
         no_text = no_text and use_triplets
         agents_context = "" if no_text else "\n\n".join(self.agent_answer)
 
-        system = """You are writing a bid response on behalf of a consortium.
+        if no_text:
+            source = "the extracted triplets and the requirements/constraints of the knowledge graph"
+            system = f"""You are writing a bid response on behalf of a consortium.
+
+Write a single, coherent proposal text that integrates all the information from {source} into a flowing, professional response to the call for tenders.
+
+Rules (no exceptions):
+- Use ONLY information explicitly stated in {source}. Do not invent anything.
+- Copy exact figures, technologies, costs, regulations, and deadlines from {source}.
+- No filler sentences ("we are pleased to", "our team is committed to", etc.).
+- No bullet-point lists of requirements. Write flowing prose.
+- Output only the proposal text."""
+        else:
+            system = """You are writing a bid response on behalf of a consortium.
 
 Write a single, coherent proposal text that integrates all the information from the agents' answers into a flowing, professional response to the call for tenders.
 
@@ -516,12 +529,18 @@ Rules (no exceptions):
         cft_section = "" if no_text else f"=== CALL FOR TENDERS ===\n{task}\n\n"
         agents_section = "" if not agents_context else f"=== AGENTS' ANSWERS ===\n{agents_context}"
 
+        final_instruction = (
+            "Write the proposal now. Use the extracted triplets and the knowledge-graph "
+            "requirements and constraints as your only source. "
+            if no_text else
+            "Write the proposal now. Use the agents' answers as your only source. "
+        )
         user_message = (
             f"{cft_section}"
             f"{agents_section}"
             f"{triplets_section}"
             f"{kg_section}\n\n"
-            "Write the proposal now. Use the agents' answers as your only source. "
+            f"{final_instruction}"
             "Produce a coherent, flowing text that responds to the call for tenders."
         )
 
