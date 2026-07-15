@@ -8,7 +8,7 @@ export OLLAMA_MAX_LOADED_MODELS=2
 
 #python3 main.py --cft belval --c-oa --extractor phi4 --kg-format turtle-light
 python3 main.py --cft belval --c-oa --extractor phi4 --kg-format turtle-light --no-text
-python3 main.py --cft belval --c-oa --extractor llama --kg-format turtle-light
+#python3 main.py --cft belval --c-oa --extractor llama --kg-format turtle-light
 python3 main.py --cft belval --c-oa --extractor llama --kg-format turtle-light --no-text
 
 #python3 main.py --cft belval --c-op --extractor phi4 --kg-format turtle-light
@@ -43,10 +43,10 @@ python3 main.py --cft cabinet --c-oa --extractor llama --kg-format turtle-light 
 
 #python3 main.py --cft cabinet --c-op --extractor phi4 --kg-format turtle-light
 python3 main.py --cft cabinet --c-op --extractor phi4 --kg-format turtle-light --no-text
-python3 main.py --cft cabinet --c-op --extractor llama --kg-format turtle-light
+#python3 main.py --cft cabinet --c-op --extractor llama --kg-format turtle-light
 python3 main.py --cft cabinet --c-op --extractor llama --kg-format turtle-light --no-text
 
-python3 main.py --cft cabinet --extractor phi4 --kg-format turtle-light
+#python3 main.py --cft cabinet --extractor phi4 --kg-format turtle-light
 python3 main.py --cft cabinet --extractor phi4 --kg-format turtle-light --no-text
-python3 main.py --cft cabinet --extractor llama --kg-format turtle-light
+#python3 main.py --cft cabinet --extractor llama --kg-format turtle-light
 python3 main.py --cft cabinet --extractor llama --kg-format turtle-light --no-text
